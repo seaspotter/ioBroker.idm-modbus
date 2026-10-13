@@ -129,7 +129,6 @@ describe('Nav10Runner', () => {
                 return Promise.resolve();
             },
             existingIds: () => Promise.resolve([]),
-            removeObjects: () => Promise.resolve(),
             publish: (id, value) => void published.set(id, value),
             hasModbusValue: tag => modbusTags.includes(tag),
         };

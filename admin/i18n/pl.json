@@ -98,7 +98,7 @@
     "hdrExpert": "Ustawienia eksperckie",
     "hdrWebConnection": "Interfejs WWW (opcjonalnie)",
     "hideUnavailable": "Ukryj stany sprzętu, który nie zgłasza wartości",
-    "hideUnavailableHelp": "Sprzęt, którego instalacja nie ma (czujniki, pompy, solar, ...), jest zgłaszany jako \"niedostępny\" i pokazywałby tylko puste wartości. Z tą opcją takie stany nie są tworzone, a pozostałe z wcześniejszych uruchomień są usuwane około dwóch minut po starcie. Stan pojawia się sam, gdy tylko Navigator zgłosi prawdziwą wartość. Własne ustawienia usuniętego stanu (np. historia) są tracone.",
+    "hideUnavailableHelp": "Sprzęt, którego Twoja instalacja nie ma (czujniki, pompy, solar, ...), jest zgłaszany jako „niedostępny” i pokazywałby tylko puste wartości. Przy tej opcji takie stany nie są tworzone. Stan pojawia się sam, gdy tylko Navigator zgłosi rzeczywistą wartość, i wtedy pozostaje: adapter nigdy nie usuwa istniejącego stanu.",
     "host": "Host / adres IP Navigatora",
     "hostHelp": "Użyj stałego adresu IP. Modbus TCP musi być włączony w Navigatorze (Ustawienia → Zarządzanie budynkiem → Modbus TCP).",
     "intervalConfigHelp": "Jak często ponownie odczytywane są wartości nastawialne (tryby pracy, wartości zadane, krzywe grzewcze, granice). Zmieniają się rzadko i są też odczytywane przy starcie. Minimum 60 s.",

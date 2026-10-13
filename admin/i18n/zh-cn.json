@@ -98,7 +98,7 @@
     "hdrExpert": "专家设置",
     "hdrWebConnection": "网页界面（可选）",
     "hideUnavailable": "隐藏不报告数值的硬件的状态",
-    "hideUnavailableHelp": "您的设备没有的硬件（传感器、泵、太阳能等）会被报告为“不可用”，只会显示空值。启用此选项后不会创建这类状态，并在启动约两分钟后删除之前启动留下的状态。一旦 Navigator 报告真实数值，状态会自动出现。被删除状态的自定义设置（例如历史记录）会丢失。",
+    "hideUnavailableHelp": "您的设备所没有的硬件（传感器、水泵、太阳能等）会被报告为“不可用”，只会显示空值。启用此选项后，不会创建这类状态。一旦 Navigator 报告了实际值，状态会自动出现并保留：适配器绝不会删除已存在的状态。",
     "host": "Navigator 主机 / IP",
     "hostHelp": "请使用静态 IP。Navigator 上必须启用 Modbus TCP（设置 → 楼宇管理 → Modbus TCP）。",
     "intervalConfigHelp": "可调设置（运行模式、设定值、供暖曲线、限值）的重新读取频率。它们很少变化，启动时也会读取。最小 60 秒。",

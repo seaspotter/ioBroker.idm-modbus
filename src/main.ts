@@ -64,8 +64,8 @@ interface ScanSummaryNumbers {
     absent: number;
 }
 
-/** Time after the start before states without any real value are removed: the first poll of every group is done by then. */
-const PRUNE_AFTER_MS = 120000;
+/** Time after the start in which the web copy of a part waits for Modbus: the first poll of every group is done by then. */
+const MODBUS_WARMUP_MS = 120000;
 
 /**
  * Rough duration of a scan in whole minutes (measured: about 0.22 s per register at the default pause of 100 ms).
@@ -97,6 +97,8 @@ class IdmModbus extends utils.Adapter {
     private lazyStates = false;
     private readonly createdStates = new Set<string>();
     private readonly validSeen = new Set<string>();
+    private readonly validNow = new Set<string>();
+    private readonly startedAt = Date.now();
     private objectQueue: Promise<void> = Promise.resolve();
     private objectContext: {
         names: Record<string, string>;
@@ -203,10 +205,6 @@ class IdmModbus extends utils.Adapter {
         );
         if (this.config.removeInactiveStates) {
             await this.removeInactive(registers, active);
-        }
-        if (this.lazyStates) {
-            // states left over from earlier starts for hardware that never reports a value are removed after the first full poll
-            this.setTimeout(() => void this.pruneUnavailable(active), PRUNE_AFTER_MS);
         }
 
         const port = this.config.port || DEFAULT_PORT;
@@ -452,15 +450,13 @@ class IdmModbus extends utils.Adapter {
                 const list = await this.getObjectListAsync({ startkey: start, endkey: `${start}\u9999` });
                 return list.rows.map(row => row.id.slice(this.namespace.length + 1));
             },
-            removeObjects: async (ids: string[]) => {
-                for (const id of ids) {
-                    await this.delObjectAsync(id).catch(() => undefined);
-                    await this.delStateAsync(id).catch(() => undefined);
-                }
-            },
             hasModbusValue: (tag: string) => {
                 const registerId = tagRegisters.get(tag);
-                return registerId !== undefined && this.validSeen.has(registerId);
+                // "now", not "ever": a register that reports invalid again (M73 = -1 while the pump stands) needs the web copy
+                return (
+                    registerId !== undefined &&
+                    (this.validNow.has(registerId) || Date.now() - this.startedAt < MODBUS_WARMUP_MS)
+                );
             },
             publish: (id: string, value: string | number | boolean | null) => this.put(id, { val: value, ack: true }),
         };
@@ -837,35 +833,6 @@ class IdmModbus extends utils.Adapter {
     }
 
     /**
-     * Remove the states of enabled registers that did not report one real value since the start (hardware the plant does not
-     * have: they would only show empty values). They come back by themselves when a value appears later.
-     *
-     * @param active the enabled registers
-     */
-    private async pruneUnavailable(active: readonly RegisterEntry[]): Promise<void> {
-        if (this.unloading) {
-            return;
-        }
-        const seen = active.filter(reg => this.validSeen.has(reg.id));
-        let removed = 0;
-        for (const id of planCleanup(active, seen)) {
-            try {
-                if ((await this.getObjectAsync(id)) && !this.createdStates.has(id)) {
-                    await this.delObjectAsync(id);
-                    removed++;
-                }
-            } catch (error) {
-                this.log.debug(`Could not remove ${id}: ${(error as Error).message}`);
-            }
-        }
-        if (removed) {
-            this.log.info(
-                `Removed ${removed} states of hardware that reports no value ("not available"); they return when a value appears`,
-            );
-        }
-    }
-
-    /**
      * Delete states (and channels) of registers the configuration no longer enables.
      *
      * @param all every register of the family
@@ -918,6 +885,9 @@ class IdmModbus extends utils.Adapter {
                 };
                 if (valid) {
                     this.validSeen.add(reg.id);
+                    this.validNow.add(reg.id);
+                } else {
+                    this.validNow.delete(reg.id);
                 }
                 if (this.lazyStates && !this.createdStates.has(stateIdFor(reg))) {
                     if (!valid) {

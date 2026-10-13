@@ -6,13 +6,11 @@ export interface ObjectHost {
     createObjects(objects: PlannedObject[]): Promise<void>;
     /** ids (relative to the instance) of the existing objects below `prefix` */
     existingIds(prefix: string): Promise<string[]>;
-    /** delete objects and their states */
-    removeObjects(ids: string[]): Promise<void>;
 }
 
 /**
- * The objects below one prefix, kept equal to a plan: new ones are created, and ones that are no longer planned (a state that
- * Modbus delivers now, a part the plant lost, leftovers of an earlier version) are removed. The first call also takes in what an
+ * The objects below one prefix: planned ones that do not exist yet are created. Nothing is ever deleted here (a state that was
+ * there stays, whatever the plan says now; only a scan or the user removes states). The first call also takes in what an
  * earlier start left in the object tree.
  */
 export class ManagedObjects {
@@ -38,16 +36,10 @@ export class ManagedObjects {
             this.loaded = true;
             (await this.host.existingIds(this.prefix)).forEach(id => this.known.add(id));
         }
-        const wanted = new Set(planned.map(object => object.id));
         const fresh = planned.filter(object => !this.known.has(object.id));
         if (fresh.length) {
             await this.host.createObjects(fresh);
             fresh.forEach(object => this.known.add(object.id));
-        }
-        const stale = [...this.known].filter(id => !wanted.has(id));
-        if (stale.length) {
-            await this.host.removeObjects(stale);
-            stale.forEach(id => this.known.delete(id));
         }
     }
 }

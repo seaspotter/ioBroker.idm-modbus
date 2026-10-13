@@ -38,7 +38,7 @@ Alles Weitere ist optional und bleibt aus, bis Sie es einschalten.
 
 Heizkreise A–G (mit optionalem Namen), Anzahl der Zonenmodule und Räume je Modul, optionale Registerblöcke (Solar, ISC, Kaskade, Bivalenz, PV- und Leistungswerte, Booster-Wärmepumpen beim Navigator 10), der Gerätescan mit „Vorschlag übernehmen“ und zwei Optionen dazu, welche Datenpunkte es gibt:
 
-- **Datenpunkte von Hardware ausblenden, die keinen Wert meldet** (Standard: ein): Datenpunkte von Fühlern, Pumpen usw., die Ihre Anlage nicht hat, werden nicht angelegt; Reste aus früheren Starts werden etwa zwei Minuten nach dem Start entfernt. Ein Datenpunkt erscheint von selbst, sobald ein echter Wert kommt. Eigene Einstellungen (zum Beispiel Verlauf) eines entfernten Datenpunkts gehen verloren.
+- **Datenpunkte von Hardware ausblenden, die keinen Wert meldet** (Standard: ein): Datenpunkte von Fühlern, Pumpen usw., die Ihre Anlage nicht hat, werden nicht angelegt. Ein Datenpunkt erscheint von selbst, sobald ein echter Wert kommt, und bleibt dann: Der Adapter löscht nie einen vorhandenen Datenpunkt (nur das Abschalten eines Registers in den Einstellungen tut das).
 - **Datenpunkte von hier abgeschalteten Kreisen, Zonen und Blöcken löschen**: räumt auf, was Sie abgeschaltet haben.
 
 ### Statistik
@@ -109,7 +109,7 @@ Mit der PIN des Displays liest der Adapter die lokalen Webseiten des Navigators 
 
 Die Ein- und Ausgänge aus dem Informationsmenü des Navigators (Fühler, Digitaleingänge, Analog- und Digitalausgänge) liegen unter `web.io`; die Namen bekannter Teile sind in allen Sprachen vorhanden, unbekannte stehen so, wie der Navigator sie zeigt. Navigator 10: dieselben Tabellen werden über den WebSocket des Navigator 10 gelesen (Port 61220, die Display-PIN als Anmeldung); Räume, Heizkreisnamen und Statistik werden dort noch nicht gelesen. Das ist nur gegen einen simulierten Navigator 10 getestet, nach dem Protokoll, das Xerolux dokumentiert; bitte berichten Sie, wie es an einem echten Gerät läuft. Navigator 1.0/1.7: es gibt keine Weboberfläche zum Lesen, die Option ist ausgeblendet.
 
-Modbus hat Vorrang: Was Modbus liefert (der Adapter erkennt das an der IDM-Bezeichnung in den Registernamen, z. B. B33, M64), wird aus diesen Tabellen nicht noch einmal angelegt, und für einen Raum, den Modbus liest, gibt es unter `web.rooms` keinen Eintrag (sein Name ist der Zustand `zones.<Zone>.rooms.<Raum>.name` und der Name des Kanals, seine Werte sind die Zonen-Zustände). Die Web-Variante erscheint nur, solange Modbus keinen Wert hat, zum Beispiel bei der Ladepumpe M73 im Stillstand. Reste früherer Versionen werden beim Start entfernt.
+Modbus hat Vorrang: Was Modbus liefert (der Adapter erkennt das an der IDM-Bezeichnung in den Registernamen, z. B. B33, M64), wird aus diesen Tabellen nicht noch einmal angelegt, und für einen Raum, den Modbus liest, gibt es unter `web.rooms` keinen Eintrag (sein Name ist der Zustand `zones.<Zone>.rooms.<Raum>.name` und der Name des Kanals, seine Werte sind die Zonen-Zustände). Die Web-Variante erscheint nur, solange Modbus keinen Wert hat, zum Beispiel bei der Ladepumpe M73 im Stillstand. Eine vorhandene Web-Variante bleibt bestehen (es wird nichts gelöscht), neu angelegt wird sie aber nur für einen Teil, für den Modbus gerade keinen Wert meldet.
 
 ## 8a. Wärmepumpen-Diagramm
 

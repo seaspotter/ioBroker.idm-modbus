@@ -98,7 +98,7 @@
     "hdrExpert": "Expertinstellingen",
     "hdrWebConnection": "Webinterface (optioneel)",
     "hideUnavailable": "States van hardware die geen waarde meldt verbergen",
-    "hideUnavailableHelp": "Hardware dat uw installatie niet heeft (voelers, pompen, zonne-energie, ...) wordt als \"niet beschikbaar\" gemeld en zou alleen lege waarden tonen. Met deze optie worden zulke states niet aangemaakt en worden resten van eerdere starts ongeveer twee minuten na de start verwijderd. Een state verschijnt vanzelf zodra de Navigator een echte waarde meldt. Eigen instellingen van een verwijderde state (bijvoorbeeld historie) gaan verloren.",
+    "hideUnavailableHelp": "Hardware die uw installatie niet heeft (sensoren, pompen, zonne-energie, ...) wordt gemeld als \"niet beschikbaar\" en zou alleen lege waarden tonen. Met deze optie worden dergelijke states niet aangemaakt. Een state verschijnt vanzelf zodra de Navigator een echte waarde meldt en blijft dan bestaan: de adapter verwijdert nooit een bestaande state.",
     "host": "Navigator-host / IP",
     "hostHelp": "Gebruik een vast IP-adres. Modbus TCP moet op de Navigator zijn ingeschakeld (Instellingen → Gebouwbeheer → Modbus TCP).",
     "intervalConfigHelp": "Hoe vaak instelbare waarden (bedrijfsmodi, streefwaarden, stookcurves, grenzen) opnieuw worden uitgelezen. Ze veranderen zelden en worden ook bij het starten gelezen. Minimaal 60 s.",

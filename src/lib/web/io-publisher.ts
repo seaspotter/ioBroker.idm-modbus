@@ -11,7 +11,7 @@ export interface IoHost extends ObjectHost {
 
 /**
  * Turns the input/output tables of the Navigator (read through the PHP pages or the Navigator 10 WebSocket) into states below
- * `web.io`: Modbus wins over the web copy, only changed values are written, and what is no longer planned is removed.
+ * `web.io`: Modbus wins over the web copy, only changed values are written, and objects that exist stay.
  */
 export class IoPublisher {
     private readonly objects: ManagedObjects;

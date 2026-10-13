@@ -98,7 +98,7 @@
     "hdrExpert": "Experteneinstellungen",
     "hdrWebConnection": "Weboberfläche (optional)",
     "hideUnavailable": "Datenpunkte von Hardware ausblenden, die keinen Wert meldet",
-    "hideUnavailableHelp": "Hardware, die Ihre Anlage nicht hat (Fühler, Pumpen, Solar, ...), wird als „nicht verfügbar“ gemeldet und würde nur leere Werte zeigen. Mit dieser Option werden solche Datenpunkte nicht angelegt, und übrig gebliebene aus früheren Starts etwa zwei Minuten nach dem Start entfernt. Ein Datenpunkt erscheint von selbst, sobald der Navigator einen echten Wert meldet. Eigene Einstellungen eines entfernten Datenpunkts (zum Beispiel Verlauf) gehen verloren.",
+    "hideUnavailableHelp": "Hardware, die Ihre Anlage nicht hat (Fühler, Pumpen, Solar, ...), wird als „nicht verfügbar“ gemeldet und würde nur leere Werte zeigen. Mit dieser Option werden solche Datenpunkte nicht angelegt. Ein Datenpunkt erscheint von selbst, sobald der Navigator einen echten Wert meldet, und bleibt dann: Der Adapter löscht nie einen vorhandenen Datenpunkt.",
     "host": "Navigator Host / IP",
     "hostHelp": "Feste IP-Adresse verwenden. Modbus TCP muss am Navigator eingeschaltet sein (Einstellungen → Gebäudeleittechnik → Modbus TCP = Ein).",
     "intervalConfigHelp": "Wie oft einstellbare Werte (Betriebsarten, Sollwerte, Heizkurven, Grenzen) erneut gelesen werden. Sie ändern sich selten und werden auch beim Start gelesen. Mindestens 60 s.",

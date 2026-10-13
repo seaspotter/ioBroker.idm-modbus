@@ -168,7 +168,7 @@
     "boostTargetC": "Boost target temperature (°C, 40-65)",
     "boostMaxMinutes": "Boost time limit (minutes, 5-240)",
     "hideUnavailable": "Hide states of hardware that reports no value",
-    "hideUnavailableHelp": "Hardware your plant does not have (sensors, pumps, solar, ...) is reported as \"not available\" and would only show empty values. With this option such states are not created, and those left over from earlier starts are removed about two minutes after the start. A state appears by itself as soon as the Navigator reports a real value. Custom settings of a removed state (for example history) are lost.",
+    "hideUnavailableHelp": "Hardware your plant does not have (sensors, pumps, solar, ...) is reported as \"not available\" and would only show empty values. With this option such states are not created. A state appears by itself as soon as the Navigator reports a real value and then stays: the adapter never deletes a state that exists.",
     "scanProgressLabel": "Scan progress (%)",
     "scanResultButton": "Show last scan result",
     "scanResult": "Scan of %s: %s registers answered, %s answered \"not available\", %s do not exist. Suggested installation: heating circuits %s, zone modules %s (rooms per module %s), blocks %s.",

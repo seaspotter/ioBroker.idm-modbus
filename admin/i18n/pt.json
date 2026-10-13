@@ -98,7 +98,7 @@
     "hdrExpert": "Definições de especialista",
     "hdrWebConnection": "Interface web (opcional)",
     "hideUnavailable": "Ocultar estados de hardware que não indica valores",
-    "hideUnavailableHelp": "O hardware que a sua instalação não tem (sensores, bombas, solar, ...) é indicado como \"não disponível\" e mostraria apenas valores vazios. Com esta opção esses estados não são criados e os que sobraram de arranques anteriores são removidos cerca de dois minutos após o arranque. Um estado aparece sozinho assim que o Navigator indica um valor real. As definições próprias de um estado removido (por exemplo histórico) perdem-se.",
+    "hideUnavailableHelp": "O hardware que a sua instalação não tem (sensores, bombas, solar, ...) é indicado como «não disponível» e só mostraria valores vazios. Com esta opção, esses estados não são criados. Um estado aparece por si assim que o Navigator indica um valor real e depois permanece: o adaptador nunca elimina um estado existente.",
     "host": "Anfitrião / IP do Navigator",
     "hostHelp": "Utilize um IP fixo. O Modbus TCP tem de estar ativado no Navigator (Definições → Gestão técnica do edifício → Modbus TCP = Ligado).",
     "intervalConfigHelp": "Com que frequência os valores ajustáveis (modos de operação, valores desejados, curvas de aquecimento, limites) são lidos de novo. Mudam raramente e também são lidos no arranque. Mínimo 60 s.",

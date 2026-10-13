@@ -126,7 +126,6 @@ describe('WebRunner', () => {
         created: string[];
         roomNames: string[];
         circuitNames: string[];
-        removed: string[];
     }
     /** What Modbus delivers (tags and zone rooms as `zone.room`) and what an earlier start left in the object tree. */
     interface Modbus {
@@ -144,7 +143,6 @@ describe('WebRunner', () => {
         const created: string[] = [];
         const roomNames: string[] = [];
         const circuitNames: string[] = [];
-        const removed: string[] = [];
         const host: WebHost = {
             now: () => 0,
             log: {
@@ -168,10 +166,6 @@ describe('WebRunner', () => {
             setRoomName: (zone, room, name) => void roomNames.push(`${zone}.${room}=${name}`),
             setCircuitName: (letter, name) => void circuitNames.push(`${letter}=${name}`),
             existingIds: prefix => Promise.resolve((modbus.existing ?? []).filter(id => id.startsWith(`${prefix}.`))),
-            removeObjects: ids => {
-                removed.push(...ids);
-                return Promise.resolve();
-            },
             hasModbusValue: tag => (modbus.tags ?? []).includes(tag),
             hasModbusRoom: (zone, room) => (modbus.rooms ?? []).includes(`${zone}.${room}`),
         };
@@ -182,7 +176,6 @@ describe('WebRunner', () => {
             created,
             roomNames,
             circuitNames,
-            removed,
         };
     };
 
@@ -225,7 +218,7 @@ describe('WebRunner', () => {
         expect(t.created.filter(id => id === 'web.io.sensors.b2')).to.have.length(1);
     });
 
-    it('creates nothing for a room that Modbus delivers, and removes what an earlier start left', async () => {
+    it('creates nothing for a room that Modbus delivers, and keeps what an earlier start left', async () => {
         const t = make(
             () => Promise.resolve(ok(rooms)),
             {},
@@ -240,7 +233,6 @@ describe('WebRunner', () => {
         expect(t.created).to.include('web.rooms.109.humidity'); // not read by Modbus: all values from the web
         expect(t.published.has('web.rooms.101.name')).to.equal(false);
         expect(t.roomNames).to.include('1.1=Room One'); // the name goes to the channel of the zone room
-        expect(t.removed).to.have.members(['web.rooms.101.temperature', 'web.io.sensors.b51']);
     });
 
     it('gives a room that Modbus reads a name state, once, and the channel its name', async () => {

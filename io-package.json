@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "idm-modbus",
-        "version": "0.1.7",
+        "version": "0.1.8",
         "news": {
+            "0.1.8": {
+                "en": "states are never deleted any more (only switching a register off removes them); the web copy of a part appears whenever Modbus reports no value for it (for example the charging pump M73 while it stands)",
+                "de": "Datenpunkte werden nie mehr gelöscht (nur das Abschalten eines Registers entfernt sie); die Web-Variante eines Teils erscheint, sobald Modbus keinen Wert dafür meldet (zum Beispiel die Ladepumpe M73 im Stillstand)",
+                "ru": "состояния больше никогда не удаляются (их убирает только отключение регистра); веб-копия компонента появляется, когда Modbus не сообщает для него значение (например, зарядный насос M73 в простое)",
+                "pt": "os estados deixam de ser eliminados (só desligar um registo os remove); a cópia web de um componente aparece sempre que o Modbus não indica valor para ele (por exemplo, a bomba de carga M73 parada)",
+                "nl": "states worden nooit meer verwijderd (alleen het uitschakelen van een register verwijdert ze); de webkopie van een onderdeel verschijnt zodra Modbus er geen waarde voor meldt (bijvoorbeeld de laadpomp M73 in stilstand)",
+                "fr": "les états ne sont plus jamais supprimés (seule la désactivation d'un registre les retire) ; la copie web d'un élément apparaît dès que Modbus n'indique aucune valeur pour lui (par exemple la pompe de charge M73 à l'arrêt)",
+                "it": "gli stati non vengono più eliminati (solo la disattivazione di un registro li rimuove); la copia web di un componente compare quando Modbus non indica alcun valore per esso (ad esempio la pompa di carica M73 ferma)",
+                "es": "los estados ya no se eliminan nunca (solo desactivar un registro los quita); la copia web de un componente aparece cuando Modbus no notifica valor para él (por ejemplo, la bomba de carga M73 parada)",
+                "pl": "stany nigdy nie są już usuwane (usuwa je tylko wyłączenie rejestru); kopia webowa elementu pojawia się, gdy Modbus nie zgłasza dla niego wartości (na przykład pompa ładowania M73 w postoju)",
+                "uk": "стани більше ніколи не видаляються (їх прибирає лише вимкнення регістра); веб-копія компонента з'являється, коли Modbus не повідомляє для нього значення (наприклад, зарядний насос M73 у простої)",
+                "zh-cn": "状态不再被删除（只有关闭寄存器才会移除）；当 Modbus 对某部件不报告数值时，会出现其网页副本（例如停机时的充水泵 M73）"
+            },
             "0.1.7": {
                 "en": "diagram: new setting for the source of power and COP (Navigator or external meters, with fallback), thermal power shown, fan label under the icon; external power as states; translations reviewed",
                 "de": "Diagramm: neue Einstellung für die Quelle von Leistung und COP (Navigator oder externe Zähler, mit Rückfall), thermische Leistung angezeigt, Lüfter-Beschriftung unter dem Symbol; externe Leistung als Datenpunkte; Übersetzungen überarbeitet",
@@ -54,19 +67,6 @@
                 "pl": "schemat: pasują długie etykiety, szersze ramki, kreski rur obwodu przebiegają przez skrzyżowanie, COP pojawia się bez przeładowywania, wybierz pokazany COP (Nawigator, liczniki zewnętrzne, oba)",
                 "uk": "схема: довгі написи підходять, ширші коробки, штрихи контурних труб проходять через з’єднання, COP з’являється без перезавантаження, виберіть показаний COP (Навігатор, зовнішні лічильники, обидва)",
                 "zh-cn": "图表：长标签适合，更宽的盒子，电路管道的虚线穿过连接处，COP出现而无需重新加载，选择所示的COP（导航器，外部仪表，两者）"
-            },
-            "0.1.3": {
-                "en": "diagram: the return pipe flows from the storage to the heat pump, water pipes follow the charging pump and flow sensor, heat pump power with one decimal, fresh water station moved",
-                "de": "Diagramm: Rücklaufleitung fließt vom Speicher zur Wärmepumpe, Wasserleitungen folgen der Ladepumpe und dem Vorlaufsensor, Wärmepumpenleistung mit einer Nachkommastelle, Frischwasserstation verschoben",
-                "ru": "Схема: обратная труба идет от накопителя к тепловому насосу, водопроводные трубы следуют к подпиточному насосу и датчику расхода, мощность теплового насоса с точностью до одной десятичной точки, станция пресной воды перемещена",
-                "pt": "diagrama: o tubo de retorno flui do armazenamento para a bomba de calor, os tubos de água seguem a bomba de carga e o sensor de fluxo, potência da bomba de calor com uma casa decimal, estação de água doce movida",
-                "nl": "schema: de retourleiding stroomt van de opslag naar de warmtepomp, waterleidingen volgen de laadpomp en aanvoersensor, vermogen warmtepomp met één decimaal, verswaterstation verplaatst",
-                "fr": "schéma : le tuyau de retour circule du ballon vers la pompe à chaleur, les conduites d'eau suivent la pompe de charge et le capteur de débit, puissance de la pompe à chaleur avec une décimale, station d'eau douce déplacée",
-                "it": "diagramma: il tubo di ritorno va dall'accumulo alla pompa di calore, i tubi dell'acqua seguono la pompa di carico e il sensore di flusso, potenza della pompa di calore con un decimale, stazione acqua dolce spostata",
-                "es": "diagrama: la tubería de retorno fluye desde el almacenamiento a la bomba de calor, las tuberías de agua siguen a la bomba de carga y al sensor de flujo, la potencia de la bomba de calor con un decimal, la estación de agua dulce se mueve",
-                "pl": "schemat: rura powrotna płynie z zasobnika do pompy ciepła, rury wodne podążają za pompą ładującą i czujnikiem przepływu, moc pompy ciepła z dokładnością do jednego miejsca po przecinku, stacja świeżej wody przesunięta",
-                "uk": "діаграма: зворотна труба тече від накопичувача до теплового насосу, водопровідні труби слідують за зарядним насосом і датчиком витрати, потужність теплового насоса з одним десятковим, станція прісної води переміщена",
-                "zh-cn": "示意图：回水管从蓄水池流向热泵，水管走补水泵和流量传感器，热泵功率保留一位小数，淡水站搬迁"
             }
         },
         "titleLang": {

@@ -38,7 +38,7 @@ Everything else is optional and off until you switch it on.
 
 Heating circuits A–G (with optional names), number of zone modules and rooms per module, optional register blocks (solar, ISC, cascade, bivalence, PV and power values, booster pumps of the Navigator 10), the device scan with _Apply suggestion_, and two options for which states exist:
 
-- **Hide states of hardware that reports no value** (default on): states of sensors, pumps and the like that your plant does not have are not created, leftovers are removed two minutes after the start. A state appears by itself when a real value arrives. Custom settings (for example history) of a removed state are lost.
+- **Hide states of hardware that reports no value** (default on): states of sensors, pumps and the like that your plant does not have are not created. A state appears by itself when a real value arrives and then stays: the adapter never deletes a state that exists (only switching a register off in the settings does).
 - **Delete states of circuits, zones and blocks switched off here**: cleans up what you disabled.
 
 ### Statistics
@@ -111,7 +111,7 @@ The inputs and outputs of the Navigator's information menu become states under `
 
 Navigator 10: the same input/output tables are read through the Navigator 10's WebSocket (port 61220, the display PIN as login). Rooms, circuit names and statistics are not read there yet. This has been tested against a simulated Navigator 10 only, following the protocol that Xerolux documents; please report how it behaves on a real device. Navigator 1.0/1.7: there is no web interface to read, the option is hidden.
 
-Modbus wins: a part that Modbus delivers (the adapter matches the IDM tag in the register names, e.g. B33, M64) is not created from these tables, and a room that Modbus reads has no entry under `web.rooms` at all (its name is the state `zones.<zone>.rooms.<room>.name` and the name of the channel, its values are the zone states). The web copy appears only while Modbus has no value, for example the charging pump M73 while it stands (-1 % = not driven cannot be told from "not available" by Modbus). Leftovers of earlier versions are removed at the start.
+Modbus wins: a part that Modbus delivers (the adapter matches the IDM tag in the register names, e.g. B33, M64) is not created from these tables, and a room that Modbus reads has no entry under `web.rooms` at all (its name is the state `zones.<zone>.rooms.<room>.name` and the name of the channel, its values are the zone states). The web copy appears only while Modbus has no value, for example the charging pump M73 while it stands (-1 % = not driven cannot be told from "not available" by Modbus). A web copy that exists stays (nothing is deleted), but only a part that Modbus currently reports no value for gets a new one.
 
 ## 8a. Heat pump diagram
 
