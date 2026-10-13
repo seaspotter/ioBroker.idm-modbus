@@ -341,6 +341,22 @@ describe('StatsEngine', () => {
         expect(out['calc.cop_external']).to.equal(5);
     });
 
+    it('publishes the momentary power of the external meters, only for meters that deliver power', () => {
+        const engine = new StatsEngine(baseConfig({ externalElectricalPower: true, externalHeatPower: true }));
+        expect(Object.keys(engine.outputs(T0))).to.include.members([
+            'calc.power_electrical_external',
+            'calc.power_thermal_external',
+        ]);
+        engine.onExternalElectricalPower(T0, 2.5);
+        engine.onExternalHeatPower(T0, 9);
+        const out = engine.outputs(T0 + SECOND);
+        expect(out['calc.power_electrical_external']).to.equal(2.5);
+        expect(out['calc.power_thermal_external']).to.equal(9);
+        expect(engine.outputs(T0 + 3 * MINUTE)['calc.power_electrical_external']).to.equal(null); // stale
+        const internalOnly = new StatsEngine(baseConfig()).outputs(T0);
+        expect(internalOnly).to.not.have.any.keys('calc.power_electrical_external', 'calc.power_thermal_external');
+    });
+
     it('ignores stale external power for the momentary COP', () => {
         const engine = new StatsEngine(baseConfig({ externalElectricalPower: true }));
         engine.tick(tick(T0));

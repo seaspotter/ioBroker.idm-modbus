@@ -31,6 +31,8 @@ const STATE_NAMES: Record<string, string> = {
     flow_deviation: 'Flow temperature minus setpoint',
     cop_internal: 'COP now (internal)',
     cop_external: 'COP now (external)',
+    power_electrical_external: 'Electrical power (external meter)',
+    power_thermal_external: 'Thermal power (external meter)',
     hours_day: 'Operating hours today',
     hours_total: 'Operating hours since start',
     starts_day: 'Starts today',
@@ -100,6 +102,9 @@ function describe(id: string, currency: string): { role: string; unit?: string }
     }
     if (/\.hours_(day|total)$/.test(id)) {
         return { role: 'value', unit: 'h' };
+    }
+    if (/\.power_(electrical|thermal)_external$/.test(id)) {
+        return { role: 'value.power', unit: 'kW' };
     }
     if (/delta_t$|deviation$/.test(id)) {
         return { role: 'value', unit: 'K' };

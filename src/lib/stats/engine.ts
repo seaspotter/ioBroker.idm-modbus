@@ -297,6 +297,13 @@ export class StatsEngine {
             const circuit = t?.circuits[letter];
             out[`calc.hc.${letter}.flow_deviation`] = flowDeviation(circuit?.flow ?? null, circuit?.setpoint ?? null);
         }
+        // the external meters' momentary power, for the diagram (kW; null while the meter is silent or stale)
+        if (this.config.externalElectricalPower) {
+            out['calc.power_electrical_external'] = this.fresh(this.externalElectricalPower, now);
+        }
+        if (this.config.externalHeatPower) {
+            out['calc.power_thermal_external'] = this.fresh(this.externalHeatPower, now);
+        }
         const navigatorThermalKw = this.latest?.thermalKw ?? null;
         out['calc.cop_internal'] = instantCop(navigatorThermalKw, this.latest?.electricalKw ?? null);
         if (this.hasExternalElectrical) {
