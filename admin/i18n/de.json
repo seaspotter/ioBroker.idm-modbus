@@ -40,11 +40,11 @@
     "counterUnit": "Einheit des Zählerstands",
     "currency": "Währung",
     "dailyWriteWarn": "Warnen ab dieser Zahl von Schreibvorgängen je Einstellung und Tag",
-    "diagramCop": "COP in der Wärmepumpen-Box",
+    "diagramCop": "COP-Zeilen",
     "diagramCopBoth": "Beide",
-    "diagramCopExternal": "Von den externen Zählern",
-    "diagramCopHelp": "Angezeigt wird der aktuelle COP: Wärmeleistung geteilt durch elektrische Leistung. Die Werte des Navigators gibt es immer; der externe braucht einen externen Stromzähler (Reiter Statistik).",
-    "diagramCopInternal": "Vom Navigator",
+    "diagramSourceExternal": "Von den externen Zählern",
+    "diagramCopHelp": "Ein COP folgt der Quelle oben; „Beide“ zeigt den COP des Navigators und den externen COP.",
+    "diagramSourceInternal": "Vom Navigator",
     "diagramCopNone": "Nicht anzeigen",
     "diagramHeader": "Wärmepumpen-Diagramm",
     "diagramHeatSource": "Wärmequelle",
@@ -218,5 +218,8 @@
     "writeZonesHelp": "Nur Raumsolltemperatur (in 0,5-°C-Schritten) und Betriebsart je Raum; Temperatur und Feuchte bleiben nur lesbar. Ein Sollwert von hier wirkt nur, solange der Raum auf der Betriebsart Normal steht. Nicht dauerhaft schreiben: Das Zonenmodul startet sonst neu.",
     "zoneHeader": "Zonenmodule (Einzelraumregelung)",
     "zoneModules": "Anzahl Zonenmodule",
-    "zoneModulesHelp": "0 = keine, maximal 10"
+    "zoneModulesHelp": "0 = keine, maximal 10",
+    "diagramSource": "Quelle für Leistung und COP",
+    "diagramSourceHelp": "Elektrische Leistung, thermische Leistung und COP stammen vom Navigator oder von Ihren externen Zählern (Reiter Statistik). Fehlt ein externer Wert, wird der Wert des Navigators angezeigt.",
+    "diagramCopSource": "Ein COP (aus der Quelle oben)"
 }

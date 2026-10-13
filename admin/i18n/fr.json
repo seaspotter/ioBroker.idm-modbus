@@ -40,11 +40,11 @@
     "counterUnit": "Unité du compteur",
     "currency": "Devise",
     "dailyWriteWarn": "Avertir au-dessus de ce nombre d'écritures par réglage et par jour",
-    "diagramCop": "COP dans le bloc de la pompe à chaleur",
+    "diagramCop": "Lignes de COP",
     "diagramCopBoth": "Les deux",
-    "diagramCopExternal": "Depuis les compteurs externes",
-    "diagramCopHelp": "Le COP indiqué est celui actuel : puissance calorifique divisée par la puissance électrique. Les valeurs du Navigator sont toujours disponibles ; l'externe nécessite un compteur électrique externe (onglet Statistiques).",
-    "diagramCopInternal": "Du Navigator",
+    "diagramSourceExternal": "Depuis les compteurs externes",
+    "diagramCopHelp": "Un seul COP suit la source ci-dessus ; « Les deux » affiche le COP du Navigator et le COP externe.",
+    "diagramSourceInternal": "Du Navigator",
     "diagramCopNone": "Ne pas afficher",
     "diagramHeader": "Schéma de la pompe à chaleur",
     "diagramHeatSource": "Source de chaleur",
@@ -218,5 +218,8 @@
     "writeZonesHelp": "Uniquement la consigne (par pas de 0,5 °C) et le mode de fonctionnement de chaque pièce ; température et humidité restent en lecture seule. Une consigne envoyée d'ici n'agit que si la pièce est en mode Normal. N'écrivez pas en continu : le module de zone redémarre.",
     "zoneHeader": "Modules de zone (régulation pièce par pièce)",
     "zoneModules": "Nombre de modules de zone",
-    "zoneModulesHelp": "0 = aucun, maximum 10"
+    "zoneModulesHelp": "0 = aucun, maximum 10",
+    "diagramSource": "Source de la puissance et du COP",
+    "diagramSourceHelp": "La puissance électrique, la puissance thermique et le COP proviennent du Navigator ou de vos compteurs externes (onglet Statistiques). Si une valeur externe manque, celle du Navigator est affichée.",
+    "diagramCopSource": "Un COP (de la source ci-dessus)"
 }

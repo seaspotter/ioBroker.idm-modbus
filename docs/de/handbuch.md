@@ -122,7 +122,8 @@ Das Diagramm ist ein Livebild Ihrer Anlage auf einer Webseite. Es wird aus den W
 | Einstellung                   | Bedeutung                                                                                                                                                                       |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Wärmequelle                   | Automatisch, Luft oder Erdreich oder Grundwasser. „Automatisch“ entscheidet anhand der Fühler, die der Navigator meldet; von Hand wählen, wenn es falsch rät.                   |
-| COP in der Wärmepumpen-Box    | Zeigt den aktuellen COP (Wärmeleistung geteilt durch elektrische Leistung) aus den Navigator-Werten (Standard), aus den externen Zählern (Reiter Statistik), beide oder keinen. |
+| Quelle für Leistung und COP   | Elektrische Leistung, thermische Leistung und COP kommen vom Navigator (Standard) oder von den externen Zählern (Reiter Statistik). Ohne externen Zähler gilt der Navigator-Wert. |
+| COP-Zeilen                    | Zeigt den COP der gewählten Quelle (Standard), beide COPs (Navigator und extern) oder keinen.                                                                                    |
 | Teile, die weggelassen werden | Pufferspeicher, Trinkwassererwärmer, Frischwasserstation, Photovoltaik, Solar, Bivalenz. Teile, die die Anlage nicht hat, werden ohnehin nicht gezeichnet.                      |
 | Räume neben Heizkreisen       | Standardmäßig stehen die Räume von Zonenmodul 1 neben Heizkreis A, die von Modul 2 neben Heizkreis B usw. Mit einer Zeile ordnen Sie ein Zonenmodul einem anderen Heizkreis zu. |
 

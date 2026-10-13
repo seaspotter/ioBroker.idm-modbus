@@ -40,11 +40,11 @@
     "counterUnit": "Unità del contatore",
     "currency": "Valuta",
     "dailyWriteWarn": "Avvisa oltre questo numero di scritture per impostazione e giorno",
-    "diagramCop": "COP nel blocco della pompa di calore",
+    "diagramCop": "Righe COP",
     "diagramCopBoth": "Entrambi",
-    "diagramCopExternal": "Dai contatori esterni",
-    "diagramCopHelp": "Il COP indicato è quello attuale: potenza termica divisa per potenza elettrica. I valori del Navigator sono sempre disponibili; quello esterno necessita di un contatore elettrico esterno (scheda Statistiche).",
-    "diagramCopInternal": "Dal Navigator",
+    "diagramSourceExternal": "Dai contatori esterni",
+    "diagramCopHelp": "Un solo COP segue la fonte indicata sopra; «Entrambi» mostra il COP del Navigator e quello esterno.",
+    "diagramSourceInternal": "Dal Navigator",
     "diagramCopNone": "Non visualizzare",
     "diagramHeader": "Schema della pompa di calore",
     "diagramHeatSource": "Fonte di calore",
@@ -218,5 +218,8 @@
     "writeZonesHelp": "Solo il setpoint (a passi di 0,5 °C) e la modalità di funzionamento di ogni ambiente; temperatura e umidità restano di sola lettura. Un setpoint da qui ha effetto solo se l'ambiente è in modalità Normale. Non scrivere in continuo: il modulo di zona si riavvia.",
     "zoneHeader": "Moduli di zona (regolazione ambiente singolo)",
     "zoneModules": "Numero di moduli di zona",
-    "zoneModulesHelp": "0 = nessuno, massimo 10"
+    "zoneModulesHelp": "0 = nessuno, massimo 10",
+    "diagramSource": "Fonte di potenza e COP",
+    "diagramSourceHelp": "Potenza elettrica, potenza termica e COP provengono dal Navigator o dai contatori esterni (scheda Statistiche). Se manca un valore esterno, viene mostrato quello del Navigator.",
+    "diagramCopSource": "Un COP (dalla fonte sopra)"
 }

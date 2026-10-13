@@ -110,5 +110,5 @@ export const DEFAULT_BOOST_MAX_MINUTES = 60;
 export const DIAGRAM_PARTS = ['buffer', 'dhw', 'freshwater', 'pv', 'solar', 'bivalence'] as const;
 /** Zone modules the diagram can place next to a heating circuit (the Navigator has up to ten). */
 export const MAX_DIAGRAM_ZONE = 10;
-/** Where the diagram takes its COP from: the Navigator, the external meters, both rows, or no COP row. */
-export const DIAGRAM_COP_SOURCES = ['internal', 'external', 'both', 'none'] as const;
+/** The COP rows of the diagram: one that follows the source setting, both (Navigator and external), or none. */
+export const DIAGRAM_COP_ROWS = ['source', 'both', 'none'] as const;

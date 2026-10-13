@@ -25,6 +25,9 @@
         hpMode: ['hp.hp_operating_mode'],
         compressor: ['hp.compressor_status_1'],
         power: ['energy.power_consumption_hp'],
+        // the external meters' power (the adapter publishes it when a meter delivers power)
+        powerExternal: ['calc.power_electrical_external'],
+        thermalPowerExternal: ['calc.power_thermal_external'],
         // the heat output (Navigator 1.7 has the instantaneous total instead of the flow sensor value)
         thermalPower: ['energy.thermal_power_flow_sensor', 'energy.thermal_power_total'],
         copInternal: ['calc.cop_internal'],
@@ -167,10 +170,19 @@
             ids[name] = pick(STATE_IDS[name]);
         });
 
-        // the COP row: from the Navigator, from the external meters, both, or none (settings.cop)
-        var copSetting = settings.cop || 'internal';
-        ids.cop = copSetting === 'external' ? ids.copExternal : copSetting === 'none' ? null : ids.copInternal;
-        ids.cop2 = copSetting === 'both' ? ids.copExternal : null;
+        // power and COP come from the Navigator or from the external meters; where an external value is missing, the Navigator's
+        // is shown
+        var external = settings.source === 'external';
+        if (external) {
+            ids.power = ids.powerExternal || ids.power;
+            ids.thermalPower = ids.thermalPowerExternal || ids.thermalPower;
+        }
+        var copRows = settings.cop || 'source';
+        ids.cop = copRows === 'none' ? null : external ? ids.copExternal || ids.copInternal : ids.copInternal;
+        ids.cop2 = copRows === 'both' ? ids.copExternal : null;
+        if (copRows === 'both') {
+            ids.cop = ids.copInternal;
+        }
 
         var circuits = [];
         for (var i = 0; i < CIRCUIT_LETTERS.length; i++) {

@@ -40,11 +40,11 @@
     "counterUnit": "Eenheid van de teller",
     "currency": "Valuta",
     "dailyWriteWarn": "Waarschuwen boven dit aantal schrijfacties per instelling en dag",
-    "diagramCop": "COP in het warmtepompblok",
+    "diagramCop": "COP-regels",
     "diagramCopBoth": "Beide",
-    "diagramCopExternal": "Van de externe meters",
-    "diagramCopHelp": "De getoonde COP is de actuele: thermisch vermogen gedeeld door elektrisch vermogen. De Navigator-waarden zijn altijd beschikbaar; voor de externe COP is een externe elektriciteitsmeter nodig (tabblad Statistiek).",
-    "diagramCopInternal": "Van de Navigator",
+    "diagramSourceExternal": "Van de externe meters",
+    "diagramCopHelp": "Eén COP volgt de bron hierboven; \"Beide\" toont de COP van de Navigator en de externe COP.",
+    "diagramSourceInternal": "Van de Navigator",
     "diagramCopNone": "Niet tonen",
     "diagramHeader": "Warmtepompdiagram",
     "diagramHeatSource": "Warmtebron",
@@ -218,5 +218,8 @@
     "writeZonesHelp": "Alleen de streefwaarde (in stappen van 0,5 °C) en de bedrijfsmodus per ruimte; temperatuur en vochtigheid blijven alleen-lezen. Een streefwaarde van hier werkt alleen zolang de ruimte in bedrijfsmodus Normaal staat. Schrijf niet continu: de zonemodule start anders opnieuw op.",
     "zoneHeader": "Zonemodules (regeling per ruimte)",
     "zoneModules": "Aantal zonemodules",
-    "zoneModulesHelp": "0 = geen, maximaal 10"
+    "zoneModulesHelp": "0 = geen, maximaal 10",
+    "diagramSource": "Bron voor vermogen en COP",
+    "diagramSourceHelp": "Elektrisch vermogen, thermisch vermogen en COP komen van de Navigator of van uw externe meters (tabblad Statistiek). Ontbreekt een externe waarde, dan wordt de waarde van de Navigator getoond.",
+    "diagramCopSource": "Eén COP (uit de bron hierboven)"
 }

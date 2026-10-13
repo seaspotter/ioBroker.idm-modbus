@@ -1,6 +1,6 @@
 import {
     DEFAULT_CO2_G_PER_KWH,
-    DIAGRAM_COP_SOURCES,
+    DIAGRAM_COP_ROWS,
     DIAGRAM_PARTS,
     MAX_DIAGRAM_ZONE,
     DEFAULT_DAILY_WRITE_WARN,
@@ -765,8 +765,13 @@ export function readBoostSettings(config: Partial<ioBroker.AdapterConfig>): Boos
 export interface DiagramSettings {
     /** 'air' or 'ground'; left out for automatic detection */
     heatSource?: 'air' | 'ground';
-    /** the COP shown in the heat pump box; left out for the default (the Navigator's) */
-    cop?: 'external' | 'both' | 'none';
+    /**
+     * Where power and COP come from: left out for the Navigator, `external` for the external meters (Navigator values where
+     * there is no external one).
+     */
+    source?: 'external';
+    /** the COP rows: left out for one COP that follows the source */
+    cop?: 'both' | 'none';
     /** parts the user does not want to see */
     hidden: string[];
     /** which heating circuit the rooms of a zone module stand next to (a zone without an entry follows its number) */
@@ -808,13 +813,16 @@ export function readDiagramSettings(config: Partial<ioBroker.AdapterConfig>): {
         }
     }
     const source = config.diagramHeatSource;
-    const cop = (DIAGRAM_COP_SOURCES as readonly string[]).includes(String(config.diagramCop))
-        ? (config.diagramCop as (typeof DIAGRAM_COP_SOURCES)[number])
-        : 'internal';
+    // before the source setting existed, the COP row had its own choice: "external" meant the external meters
+    const external = config.diagramSource === 'external' || config.diagramCop === 'external';
+    const rows = (DIAGRAM_COP_ROWS as readonly string[]).includes(String(config.diagramCop))
+        ? (config.diagramCop as (typeof DIAGRAM_COP_ROWS)[number])
+        : 'source';
     return {
         settings: {
             ...(source === 'air' || source === 'ground' ? { heatSource: source } : {}),
-            ...(cop !== 'internal' ? { cop } : {}),
+            ...(external ? { source: 'external' as const } : {}),
+            ...(rows !== 'source' ? { cop: rows } : {}),
             hidden,
             zoneCircuit,
         },

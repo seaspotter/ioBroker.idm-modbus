@@ -40,11 +40,11 @@
     "counterUnit": "Unidade do contador",
     "currency": "Moeda",
     "dailyWriteWarn": "Avisar acima deste número de escritas por definição e dia",
-    "diagramCop": "COP no bloco da bomba de calor",
+    "diagramCop": "Linhas de COP",
     "diagramCopBoth": "Ambos",
-    "diagramCopExternal": "Dos contadores externos",
-    "diagramCopHelp": "O COP mostrado é o atual: potência térmica dividida pela potência elétrica. Os valores do Navigator estão sempre disponíveis; o COP externo precisa de um contador de eletricidade externo (separador Estatística).",
-    "diagramCopInternal": "Do Navigator",
+    "diagramSourceExternal": "Dos contadores externos",
+    "diagramCopHelp": "Um COP segue a origem acima; \"Ambos\" mostra o COP do Navigator e o COP externo.",
+    "diagramSourceInternal": "Do Navigator",
     "diagramCopNone": "Não mostrar",
     "diagramHeader": "Diagrama da bomba de calor",
     "diagramHeatSource": "Fonte de calor",
@@ -218,5 +218,8 @@
     "writeZonesHelp": "Apenas o valor desejado (em passos de 0,5 °C) e o modo de operação de cada divisão; temperatura e humidade continuam só de leitura. Um valor desejado daqui só tem efeito enquanto a divisão estiver no modo Normal. Não escreva continuamente: o módulo de zona reinicia.",
     "zoneHeader": "Módulos de zona (controlo individual de divisões)",
     "zoneModules": "Número de módulos de zona",
-    "zoneModulesHelp": "0 = nenhum, máximo 10"
+    "zoneModulesHelp": "0 = nenhum, máximo 10",
+    "diagramSource": "Origem da potência e do COP",
+    "diagramSourceHelp": "A potência elétrica, a potência térmica e o COP vêm do Navigator ou dos seus contadores externos (separador Estatística). Se faltar um valor externo, é mostrado o valor do Navigator.",
+    "diagramCopSource": "Um COP (da origem acima)"
 }

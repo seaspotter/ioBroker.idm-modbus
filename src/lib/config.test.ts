@@ -259,12 +259,21 @@ describe('readDiagramSettings', () => {
         });
         expect(warnings).to.have.length(4);
     });
-    it('reads the COP source and leaves the default out', () => {
-        expect(readDiagramSettings({ diagramCop: 'internal' }).settings.cop).to.equal(undefined);
+    it('reads the source of power and COP and the COP rows, and leaves the defaults out', () => {
+        expect(readDiagramSettings({ diagramSource: 'internal' }).settings.source).to.equal(undefined);
+        expect(readDiagramSettings({ diagramSource: 'external' }).settings.source).to.equal('external');
+        expect(readDiagramSettings({ diagramCop: 'source' }).settings.cop).to.equal(undefined);
         expect(readDiagramSettings({ diagramCop: 'both' }).settings.cop).to.equal('both');
-        expect(readDiagramSettings({ diagramCop: 'external' }).settings.cop).to.equal('external');
         expect(readDiagramSettings({ diagramCop: 'none' }).settings.cop).to.equal('none');
-        expect(readDiagramSettings({ diagramCop: 'average' }).settings.cop).to.equal(undefined);
+        expect(readDiagramSettings({ diagramCop: 'average' }).settings).to.deep.equal({ hidden: [], zoneCircuit: [] });
+    });
+    it('still understands the COP choice of versions before the source setting', () => {
+        expect(readDiagramSettings({ diagramCop: 'internal' }).settings).to.deep.equal({ hidden: [], zoneCircuit: [] });
+        expect(readDiagramSettings({ diagramCop: 'external' }).settings).to.deep.equal({
+            source: 'external',
+            hidden: [],
+            zoneCircuit: [],
+        });
     });
     it('survives values of the wrong type', () => {
         const wrong = { diagramHidden: '', diagramZoneCircuit: 'x' } as unknown as Partial<ioBroker.AdapterConfig>;

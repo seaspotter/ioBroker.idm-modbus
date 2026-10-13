@@ -213,10 +213,13 @@
     "co2UnitHelp": "How the fixed CO₂ factor and the CO₂ state are given.",
     "co2UnitG": "g per kWh",
     "co2UnitKg": "kg per kWh",
-    "diagramCop": "COP in the heat pump box",
-    "diagramCopHelp": "The COP shown is the current one: heat output divided by electrical power. The Navigator values are always available; the external one needs an external electricity meter (Statistics tab).",
-    "diagramCopInternal": "From the Navigator",
-    "diagramCopExternal": "From the external meters",
+    "diagramCop": "COP rows",
+    "diagramCopHelp": "One COP follows the source above; \"Both\" shows the Navigator COP and the external COP.",
+    "diagramSourceInternal": "From the Navigator",
+    "diagramSourceExternal": "From the external meters",
     "diagramCopBoth": "Both",
-    "diagramCopNone": "Do not show"
+    "diagramCopNone": "Do not show",
+    "diagramSource": "Source of power and COP",
+    "diagramSourceHelp": "Electrical power, thermal power and COP come from the Navigator or from your external meters (Statistics tab). Where an external value is missing, the Navigator value is shown.",
+    "diagramCopSource": "One COP (from the source above)"
 }

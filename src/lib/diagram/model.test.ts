@@ -22,6 +22,7 @@ interface Model {
     labels: Record<string, string>;
 }
 interface Settings {
+    source?: string;
     cop?: string;
     heatSource?: string;
     hidden?: string[];
@@ -265,19 +266,38 @@ describe('diagram labels', () => {
         expect(diagram.PARTS).to.deep.equal([...DIAGRAM_PARTS]);
     });
 
-    it('takes the COP from the Navigator, the external meters, both or none', () => {
+    it('takes the COP from the Navigator or the external meters, shows both or none', () => {
         const states = { 'calc.cop_internal': 6.2, 'calc.cop_external': 4.8 };
         expect(build(states).ids).to.deep.include({ cop: 'calc.cop_internal', cop2: null });
-        expect(build(states, { settings: { cop: 'external' } }).ids).to.deep.include({
+        expect(build(states, { settings: { source: 'external' } }).ids).to.deep.include({
             cop: 'calc.cop_external',
             cop2: null,
         });
+        // without an external value the Navigator's is shown
+        expect(build({ 'calc.cop_internal': 6.2 }, { settings: { source: 'external' } }).ids.cop).to.equal(
+            'calc.cop_internal',
+        );
         expect(build(states, { settings: { cop: 'both' } }).ids).to.deep.include({
             cop: 'calc.cop_internal',
             cop2: 'calc.cop_external',
         });
         expect(build(states, { settings: { cop: 'none' } }).ids.cop).to.equal(null);
-        // no value, no row
         expect(build({ 'calc.cop_internal': 6.2 }, { settings: { cop: 'both' } }).ids.cop2).to.equal(null);
+    });
+
+    it('takes electrical and thermal power from the Navigator or the external meters, with a fallback', () => {
+        const states = {
+            'energy.power_consumption_hp': 1.2,
+            'energy.thermal_power_flow_sensor': 6,
+            'calc.power_electrical_external': 1.1,
+        };
+        expect(build(states).ids).to.deep.include({
+            power: 'energy.power_consumption_hp',
+            thermalPower: 'energy.thermal_power_flow_sensor',
+        });
+        expect(build(states, { settings: { source: 'external' } }).ids).to.deep.include({
+            power: 'calc.power_electrical_external',
+            thermalPower: 'energy.thermal_power_flow_sensor', // no external heat meter: the Navigator's value
+        });
     });
 });

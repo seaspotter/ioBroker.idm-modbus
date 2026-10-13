@@ -1716,18 +1716,34 @@
                     "lg": 4,
                     "xl": 4
                 },
+                "diagramSource": {
+                    "type": "select",
+                    "label": "diagramSource",
+                    "help": "diagramSourceHelp",
+                    "options": [
+                        {
+                            "label": "diagramSourceInternal",
+                            "value": "internal"
+                        },
+                        {
+                            "label": "diagramSourceExternal",
+                            "value": "external"
+                        }
+                    ],
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
                 "diagramCop": {
                     "type": "select",
                     "label": "diagramCop",
                     "help": "diagramCopHelp",
                     "options": [
                         {
-                            "label": "diagramCopInternal",
-                            "value": "internal"
-                        },
-                        {
-                            "label": "diagramCopExternal",
-                            "value": "external"
+                            "label": "diagramCopSource",
+                            "value": "source"
                         },
                         {
                             "label": "diagramCopBoth",

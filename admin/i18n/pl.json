@@ -40,11 +40,11 @@
     "counterUnit": "Jednostka licznika",
     "currency": "Waluta",
     "dailyWriteWarn": "Ostrzegaj powyżej tej liczby zapisów na ustawienie i dzień",
-    "diagramCop": "COP w bloku pompy ciepła",
+    "diagramCop": "Wiersze COP",
     "diagramCopBoth": "Obydwa",
-    "diagramCopExternal": "Z liczników zewnętrznych",
-    "diagramCopHelp": "Wyświetlany jest bieżący COP: moc cieplna podzielona przez moc elektryczną. Wartości Navigatora są zawsze dostępne; zewnętrzny COP wymaga zewnętrznego licznika energii elektrycznej (karta Statystyka).",
-    "diagramCopInternal": "Z Navigatora",
+    "diagramSourceExternal": "Z liczników zewnętrznych",
+    "diagramCopHelp": "Jeden COP odpowiada źródłu powyżej; „Obydwa” pokazuje COP z Navigatora i zewnętrzny.",
+    "diagramSourceInternal": "Z Navigatora",
     "diagramCopNone": "Nie wyświetlaj",
     "diagramHeader": "Schemat pompy ciepła",
     "diagramHeatSource": "Źródło ciepła",
@@ -218,5 +218,8 @@
     "writeZonesHelp": "Tylko wartość zadana (w krokach co 0,5 °C) i tryb pracy każdego pomieszczenia; temperatura i wilgotność pozostają tylko do odczytu. Wartość zadana stąd działa tylko, gdy pomieszczenie jest w trybie Normalny. Nie zapisuj w sposób ciągły: moduł strefowy się zrestartuje.",
     "zoneHeader": "Moduły strefowe (regulacja pojedynczych pomieszczeń)",
     "zoneModules": "Liczba modułów strefowych",
-    "zoneModulesHelp": "0 = brak, maksymalnie 10"
+    "zoneModulesHelp": "0 = brak, maksymalnie 10",
+    "diagramSource": "Źródło mocy i COP",
+    "diagramSourceHelp": "Moc elektryczna, moc cieplna i COP pochodzą z Navigatora lub z zewnętrznych liczników (karta Statystyka). Gdy brakuje wartości zewnętrznej, pokazywana jest wartość z Navigatora.",
+    "diagramCopSource": "Jeden COP (ze źródła powyżej)"
 }
