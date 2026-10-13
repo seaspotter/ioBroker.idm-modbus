@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "idm-modbus",
-        "version": "0.1.6",
+        "version": "0.1.7",
         "news": {
+            "0.1.7": {
+                "en": "diagram: new setting for the source of power and COP (Navigator or external meters, with fallback), thermal power shown, fan label under the icon; external power as states; translations reviewed",
+                "de": "Diagramm: neue Einstellung für die Quelle von Leistung und COP (Navigator oder externe Zähler, mit Rückfall), thermische Leistung angezeigt, Lüfter-Beschriftung unter dem Symbol; externe Leistung als Datenpunkte; Übersetzungen überarbeitet",
+                "ru": "диаграмма: новая настройка источника мощности и COP (Navigator или внешние счётчики, с резервным вариантом), отображается тепловая мощность, подпись вентилятора под значком; внешняя мощность в виде состояний; переводы пересмотрены",
+                "pt": "diagrama: nova definição para a origem da potência e do COP (Navigator ou contadores externos, com alternativa), potência térmica apresentada, legenda do ventilador sob o ícone; potência externa como estados; traduções revistas",
+                "nl": "diagram: nieuwe instelling voor de bron van vermogen en COP (Navigator of externe meters, met terugval), thermisch vermogen getoond, ventilatorlabel onder het pictogram; extern vermogen als states; vertalingen herzien",
+                "fr": "schéma : nouveau réglage de la source de la puissance et du COP (Navigator ou compteurs externes, avec repli), puissance thermique affichée, libellé du ventilateur sous l'icône ; puissance externe en états ; traductions révisées",
+                "it": "diagramma: nuova impostazione per la fonte di potenza e COP (Navigator o contatori esterni, con ripiego), potenza termica mostrata, etichetta del ventilatore sotto l'icona; potenza esterna come stati; traduzioni riviste",
+                "es": "esquema: nuevo ajuste para el origen de la potencia y el COP (Navigator o contadores externos, con alternativa), potencia térmica mostrada, etiqueta del ventilador bajo el icono; potencia externa como estados; traducciones revisadas",
+                "pl": "schemat: nowe ustawienie źródła mocy i COP (Navigator lub liczniki zewnętrzne, z rozwiązaniem zastępczym), wyświetlana moc cieplna, etykieta wentylatora pod ikoną; moc zewnętrzna jako stany; poprawione tłumaczenia",
+                "uk": "схема: нове налаштування джерела потужності та COP (Navigator або зовнішні лічильники, із запасним варіантом), відображається теплова потужність, підпис вентилятора під значком; зовнішня потужність як стани; переглянуто переклади",
+                "zh-cn": "示意图：新增功率和 COP 来源设置（Navigator 或外部电表，带回退）、显示热功率、风扇标签位于图标下方；外部功率作为状态提供；翻译已审校"
+            },
             "0.1.6": {
                 "en": "diagram: the pump circle turns green while it runs, M71 and the fan M13 in the heat pump box as percent, the hot gas line moves only while M71 is open and the water moves, larger display",
                 "de": "Diagramm: Der Pumpenkreis wird grün während er läuft, M71 und der Ventilator M13 im Wärmepumpenkasten in Prozent, die Heißgasleitung bewegt sich nur solange M71 geöffnet ist und das Wasser bewegt, größere Anzeige",
@@ -54,19 +67,6 @@
                 "pl": "schemat: rura powrotna płynie z zasobnika do pompy ciepła, rury wodne podążają za pompą ładującą i czujnikiem przepływu, moc pompy ciepła z dokładnością do jednego miejsca po przecinku, stacja świeżej wody przesunięta",
                 "uk": "діаграма: зворотна труба тече від накопичувача до теплового насосу, водопровідні труби слідують за зарядним насосом і датчиком витрати, потужність теплового насоса з одним десятковим, станція прісної води переміщена",
                 "zh-cn": "示意图：回水管从蓄水池流向热泵，水管走补水泵和流量传感器，热泵功率保留一位小数，淡水站搬迁"
-            },
-            "0.1.2": {
-                "en": "plain-text states follow the system language (scan status, fault texts, operating modes), choose the unit of the price (currency or cent per kWh) and of the CO2 factor (g or kg per kWh), scan status next to the progress",
-                "de": "Klartextzustände folgen der Systemsprache (Scanstatus, Fehlertexte, Betriebsmodi), wählen Sie die Einheit des Preises (Währung oder Cent pro kWh) und des CO2-Faktors (g oder kg pro kWh), Scanstatus neben dem Fortschritt",
-                "ru": "текстовые состояния соответствуют языку системы (состояние сканирования, тексты неисправностей, режимы работы), выберите единицу измерения цены (валюта или цент за кВтч) и коэффициента CO2 (г или кг на кВтч), статус сканирования рядом с ходом выполнения",
-                "pt": "estados de texto simples seguem a linguagem do sistema (status de varredura, textos de falhas, modos de operação), escolhem a unidade do preço (moeda ou centavos por kWh) e do fator CO2 (g ou kg por kWh), status de varredura próximo ao progresso",
-                "nl": "statussen in platte tekst volgen de systeemtaal (scanstatus, storingsteksten, bedrijfsmodi), kies de eenheid van de prijs (valuta of cent per kWh) en van de CO2-factor (g of kg per kWh), scanstatus naast de voortgang",
-                "fr": "les états en texte clair suivent la langue du système (état du scan, textes d'erreur, modes de fonctionnement), choisissez l'unité du prix (devise ou centime par kWh) et du facteur CO2 (g ou kg par kWh), l'état du scan à côté de la progression",
-                "it": "gli stati del testo in chiaro seguono la lingua del sistema (stato di scansione, testi di errore, modalità operative), scelgono l'unità del prezzo (valuta o centesimi per kWh) e del fattore CO2 (g o kg per kWh), lo stato della scansione accanto all'avanzamento",
-                "es": "Los estados de texto plano siguen el idioma del sistema (estado de escaneo, textos de falla, modos de funcionamiento), eligen la unidad del precio (moneda o centavo por kWh) y del factor de CO2 (g o kg por kWh), el estado de escaneo junto al progreso",
-                "pl": "Stany w postaci zwykłego tekstu są zgodne z językiem systemu (status skanowania, teksty usterek, tryby pracy), wybierz jednostkę ceny (waluta lub cent za kWh) i współczynnika CO2 (g lub kg na kWh), status skanowania obok postępu",
-                "uk": "текстові стани слідують за системною мовою (статус сканування, тексти помилок, режими роботи), виберіть одиницю ціни (валюта або цент за кВт-год) і коефіцієнт CO2 (г або кг за кВт-год), статус сканування поруч із прогресом",
-                "zh-cn": "纯文本状态遵循系统语言（扫描状态、故障文本、操作模式），选择价格单位（货币或美分每千瓦时）和二氧化碳系数（克或千克每千瓦时），扫描进度旁边的状态"
             }
         },
         "titleLang": {

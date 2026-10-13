@@ -61,6 +61,10 @@ This is an independent community project. IDM and Navigator are trademarks of th
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.7 (2026-10-13)
+
+- (SeaSpotter) diagram: new setting for the source of power and COP (Navigator or external meters, falling back to the Navigator where no external value exists), COP rows setting, thermal power shown, fan label under the icon; external electrical and thermal power as states; translations reviewed in all languages
+
 ### 0.1.6 (2026-10-13)
 
 - (SeaSpotter) diagram: the circle of a pump symbol turns green while the pump runs, the hot gas mixer M71 and the fan M13 show as 0-100 % in the heat pump box, the hot gas line moves only while M71 is open and the water moves, the drawing is shown larger
