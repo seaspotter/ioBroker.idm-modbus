@@ -2185,14 +2185,14 @@
     },
     "Photovoltaics": {
         "de": "Photovoltaik",
-        "ru": "Фотоэлектрика",
+        "ru": "Фотовольтаика",
         "pt": "Fotovoltaico",
-        "nl": "Fotovoltaïsch",
+        "nl": "Fotovoltaïek",
         "fr": "Photovoltaïque",
         "it": "Fotovoltaico",
         "es": "Fotovoltaica",
         "pl": "Fotowoltaika",
-        "uk": "Фотоелектрика",
+        "uk": "Фотовольтаїка",
         "zh-cn": "光伏"
     },
     "Register family": {
@@ -2204,7 +2204,7 @@
         "it": "Famiglia di registri",
         "es": "Familia de registros",
         "pl": "Rodzina rejestrów",
-        "uk": "Родина регістрів",
+        "uk": "Сімейство регістрів",
         "zh-cn": "寄存器系列"
     },
     "Request errors since start": {
@@ -2888,7 +2888,7 @@
         "it": "Conflitto di scrittura della temperatura ambiente",
         "es": "Conflicto de escritura de la temperatura ambiente",
         "pl": "Konflikt zapisu temperatury pomieszczenia",
-        "uk": "Конфлікт запису кімнатної температури",
+        "uk": "Конфлікт запису температури приміщення",
         "zh-cn": "室温写入冲突"
     },
     "Last room temperature write": {
@@ -2900,7 +2900,7 @@
         "it": "Ultima scrittura della temperatura ambiente",
         "es": "Última escritura de la temperatura ambiente",
         "pl": "Ostatni zapis temperatury pomieszczenia",
-        "uk": "Останній запис кімнатної температури",
+        "uk": "Останній запис температури приміщення",
         "zh-cn": "最近一次室温写入"
     },
     "GLT writer conflict": {
@@ -3567,13 +3567,13 @@
         "de": "Frischwasserzapftemperatur",
         "ru": "Температура водоразбора свежей воды",
         "pt": "Temperatura de tiragem de água fresca",
-        "nl": "Tapwatertemperatuur friswater",
+        "nl": "Tapwatertemperatuur",
         "fr": "Température de puisage d'eau fraîche",
         "it": "Temperatura di prelievo acqua fresca",
         "es": "Temperatura de toma de agua fresca",
-        "pl": "Temperatura poboru świeżej wody",
+        "pl": "Temperatura poboru c.w.u.",
         "uk": "Температура водорозбору свіжої води",
-        "zh-cn": "新鲜水出水温度"
+        "zh-cn": "即热热水出水温度"
     },
     "Heating circuit {i} room device temperature": {
         "de": "Heizkreis {i} Raumgerät",
@@ -3713,7 +3713,7 @@
         "pt": "Sensor de arrefecimento de retorno ISC",
         "nl": "ISC-terugkoelvoeler",
         "fr": "Sonde de refroidissement de retour ISC",
-        "it": "Sensore di ricooling ISC",
+        "it": "Sensore di ri-raffreddamento ISC",
         "es": "Sensor de reenfriamiento ISC",
         "pl": "Czujnik chłodzenia zwrotnego ISC",
         "uk": "Датчик зворотного охолодження ISC",
@@ -3929,7 +3929,7 @@
         "pt": "Estado da bomba de arrefecimento de retorno ISC",
         "nl": "Status ISC-terugkoelpomp",
         "fr": "État de la pompe de refroidissement de retour ISC",
-        "it": "Stato della pompa di ricooling ISC",
+        "it": "Stato della pompa di ri-raffreddamento ISC",
         "es": "Estado de la bomba de reenfriamiento ISC",
         "pl": "Status pompy chłodzenia zwrotnego ISC",
         "uk": "Статус насоса зворотного охолодження ISC",
@@ -4191,13 +4191,13 @@
         "de": "Frischwasser-Solltemperatur",
         "ru": "Заданная температура свежей воды",
         "pt": "Valor desejado de água fresca",
-        "nl": "Streeftemperatuur friswater",
+        "nl": "Streeftemperatuur tapwater",
         "fr": "Consigne d'eau fraîche",
         "it": "Setpoint acqua fresca",
         "es": "Consigna de agua fresca",
-        "pl": "Temperatura zadana świeżej wody",
+        "pl": "Temperatura zadana c.w.u. (stacja)",
         "uk": "Задана температура свіжої води",
-        "zh-cn": "新鲜水设定温度"
+        "zh-cn": "即热热水设定温度"
     },
     "Web interface": {
         "de": "Weboberfläche",
@@ -4442,14 +4442,14 @@
     "Fresh water station sensor (B42)": {
         "de": "Fühler Frischwasserstation (B42)",
         "ru": "Датчик станции свежей воды (B42)",
-        "pt": "Sensor da estação de água fresca (B42)",
-        "nl": "Voeler frisswaterstation (B42)",
-        "fr": "Sonde de la station d'eau fraîche (B42)",
-        "it": "Sensore della stazione acqua fresca (B42)",
-        "es": "Sensor de la estación de agua fresca (B42)",
-        "pl": "Czujnik stacji świeżej wody (B42)",
+        "pt": "Sensor da estação de AQS instantânea (B42)",
+        "nl": "Voeler tapwaterstation (B42)",
+        "fr": "Sonde de la station d'ECS instantanée (B42)",
+        "it": "Sensore della stazione acqua calda istantanea (B42)",
+        "es": "Sensor de la estación de ACS instantánea (B42)",
+        "pl": "Czujnik stacji c.w.u. przepływowej (B42)",
         "uk": "Датчик станції свіжої води (B42)",
-        "zh-cn": "新鲜水站传感器 (B42)"
+        "zh-cn": "即热热水站传感器 (B42)"
     },
     "Flow sensor heating circuit A (B51)": {
         "de": "Vorlauffühler HK A (B51)",
@@ -6361,7 +6361,7 @@
     },
     "Outdoor": {
         "de": "Außen",
-        "ru": "Улица",
+        "ru": "Снаружи",
         "pt": "Exterior",
         "nl": "Buiten",
         "fr": "Extérieur",
@@ -6397,27 +6397,27 @@
     },
     "Buffer": {
         "de": "Pufferspeicher",
-        "ru": "Буфер",
-        "pt": "Acumulador",
-        "nl": "Buffer",
+        "ru": "Буферная ёмкость",
+        "pt": "Acumulador tampão",
+        "nl": "Buffervat",
         "fr": "Ballon tampon",
-        "it": "Accumulo",
-        "es": "Acumulador",
-        "pl": "Bufor",
-        "uk": "Буфер",
+        "it": "Accumulo inerziale",
+        "es": "Acumulador de inercia",
+        "pl": "Zasobnik buforowy",
+        "uk": "Буферна ємність",
         "zh-cn": "缓冲罐"
     },
     "Setpoint": {
         "de": "Soll",
-        "ru": "Заданное",
-        "pt": "Desejado",
-        "nl": "Streef",
+        "ru": "Уставка",
+        "pt": "Valor nominal",
+        "nl": "Instelwaarde",
         "fr": "Consigne",
         "it": "Setpoint",
         "es": "Consigna",
-        "pl": "Zadana",
-        "uk": "Задане",
-        "zh-cn": "设定"
+        "pl": "Wartość zadana",
+        "uk": "Уставка",
+        "zh-cn": "设定值"
     },
     "House": {
         "de": "Haus",
@@ -6457,15 +6457,15 @@
     },
     "Solar thermal": {
         "de": "Solarthermie",
-        "ru": "Солнечный коллектор",
+        "ru": "Гелиосистема",
         "pt": "Solar térmico",
-        "nl": "Zonneboiler",
+        "nl": "Zonnewarmte",
         "fr": "Solaire thermique",
         "it": "Solare termico",
         "es": "Solar térmico",
         "pl": "Solar termiczny",
-        "uk": "Сонячний колектор",
-        "zh-cn": "太阳能热水"
+        "uk": "Геліосистема",
+        "zh-cn": "太阳能光热"
     },
     "Collector": {
         "de": "Kollektor",
@@ -6529,14 +6529,14 @@
     },
     "Storage": {
         "de": "Speicher",
-        "ru": "Накопитель",
-        "pt": "Reservatório",
+        "ru": "Бак-накопитель",
+        "pt": "Depósito",
         "nl": "Buffervat",
         "fr": "Ballon",
         "it": "Accumulo",
         "es": "Acumulador",
         "pl": "Zasobnik",
-        "uk": "Накопичувач",
+        "uk": "Бак-накопичувач",
         "zh-cn": "储热罐"
     },
     "Sensors": {
@@ -6554,14 +6554,14 @@
     "Fresh water station": {
         "de": "Frischwasserstation",
         "ru": "Станция свежей воды",
-        "pt": "Estação de água fresca",
-        "nl": "Verswaterstation",
-        "fr": "Station d'eau fraîche",
-        "it": "Stazione acqua fresca",
-        "es": "Estación de agua fresca",
-        "pl": "Stacja świeżej wody",
+        "pt": "Estação de AQS instantânea",
+        "nl": "Tapwaterstation",
+        "fr": "Station d'ECS instantanée",
+        "it": "Stazione acqua calda istantanea",
+        "es": "Estación de ACS instantánea",
+        "pl": "Stacja c.w.u. przepływowa",
         "uk": "Станція свіжої води",
-        "zh-cn": "鲜水站"
+        "zh-cn": "即热热水站"
     },
     "Cold water": {
         "de": "Kaltwasser",
@@ -6637,15 +6637,15 @@
     },
     "Heating flow sensor": {
         "de": "Durchflußsensor Heizung",
-        "ru": "Датчик потока отопления",
-        "pt": "Sensor de fluxo de aquecimento",
-        "nl": "Verwarmingsaanvoersensor",
+        "ru": "Датчик расхода отопления",
+        "pt": "Sensor de caudal de aquecimento",
+        "nl": "Debietsensor verwarming",
         "fr": "Sonde de départ chauffage",
-        "it": "Sensore di flusso del riscaldamento",
-        "es": "Sensor de flujo de calefacción",
+        "it": "Sensore di portata riscaldamento",
+        "es": "Sensor de caudal de calefacción",
         "pl": "Czujnik przepływu ogrzewania",
-        "uk": "Датчик потоку опалення",
-        "zh-cn": "加热流量传感器"
+        "uk": "Датчик витрати опалення",
+        "zh-cn": "供暖流量传感器"
     },
     "Evaporation pressure 1": {
         "de": "Verdampfungsdruck 1",
@@ -6657,7 +6657,7 @@
         "es": "Presión de evaporación 1",
         "pl": "Ciśnienie parowania 1",
         "uk": "Тиск випаровування 1",
-        "zh-cn": "蒸发压力1"
+        "zh-cn": "蒸发压力 1"
     },
     "Evaporation temperature 1": {
         "de": "Verdampfungstemp. 1",
@@ -6669,7 +6669,7 @@
         "es": "Temperatura de evaporación 1",
         "pl": "Temperatura parowania 1",
         "uk": "Температура випаровування 1",
-        "zh-cn": "蒸发温度1"
+        "zh-cn": "蒸发温度 1"
     },
     "Condensation pressure 1": {
         "de": "Kondensationsdruck 1",
@@ -6681,7 +6681,7 @@
         "es": "Presión de condensación 1",
         "pl": "Ciśnienie kondensacji 1",
         "uk": "Тиск конденсації 1",
-        "zh-cn": "冷凝压力1"
+        "zh-cn": "冷凝压力 1"
     },
     "Condensation temperature 1": {
         "de": "Kondensationstemp. 1",
@@ -6693,7 +6693,7 @@
         "es": "Temperatura de condensación 1",
         "pl": "Temperatura kondensacji 1",
         "uk": "Температура конденсації 1",
-        "zh-cn": "冷凝温度1"
+        "zh-cn": "冷凝温度 1"
     },
     "Evaporator outlet 1": {
         "de": "Verdampferaustritt 1",
@@ -6705,7 +6705,7 @@
         "es": "Salida del evaporador 1",
         "pl": "Wylot parownika 1",
         "uk": "Вихід випарника 1",
-        "zh-cn": "蒸发器出口1"
+        "zh-cn": "蒸发器出口 1"
     },
     "Hot gas temperature 1": {
         "de": "Heißgastemperatur 1",
@@ -6717,7 +6717,7 @@
         "es": "Temperatura del gas caliente 1",
         "pl": "Temperatura gorącego gazu 1",
         "uk": "Температура гарячого газу 1",
-        "zh-cn": "热气温度1"
+        "zh-cn": "热气温度 1"
     },
     "Liquid line temperature": {
         "de": "Flüssigkeitsleit. Temp.",
@@ -6738,18 +6738,18 @@
         "nl": "Bordtemperatuur",
         "fr": "Température de la carte",
         "it": "Temperatura della scheda",
-        "es": "Temperatura del tablero",
+        "es": "Temperatura de la placa",
         "pl": "Temperatura płyty",
         "uk": "Температура плати",
-        "zh-cn": "板温"
+        "zh-cn": "电路板温度"
     },
     "Control unit battery voltage": {
         "de": "Batteriespannung Zentraleinheit",
         "ru": "Напряжение аккумуляторной батареи блока управления",
-        "pt": "Tensão da bateria da unidade de controle",
+        "pt": "Tensão da bateria da unidade de controlo",
         "nl": "Accuspanning van de besturingseenheid",
         "fr": "Tension de la batterie de la centrale",
-        "it": "Voltaggio batteria centralina",
+        "it": "Tensione batteria unità di controllo",
         "es": "Tensión de la batería de la unidad de control",
         "pl": "Napięcie akumulatora jednostki sterującej",
         "uk": "Напруга акумулятора блоку управління",
@@ -6757,111 +6757,111 @@
     },
     "Hot water flow": {
         "de": "Durchfluss Warmwasser",
-        "ru": "Поток горячей воды",
-        "pt": "Fluxo de água quente",
-        "nl": "Warmwaterstroom",
+        "ru": "Расход горячей воды",
+        "pt": "Caudal de água quente",
+        "nl": "Warmwaterdebiet",
         "fr": "Débit d'eau chaude",
-        "it": "Flusso di acqua calda",
-        "es": "Flujo de agua caliente",
+        "it": "Portata acqua calda",
+        "es": "Caudal de agua caliente",
         "pl": "Przepływ gorącej wody",
-        "uk": "Потік гарячої води",
+        "uk": "Витрата гарячої води",
         "zh-cn": "热水流量"
     },
     "External demand": {
         "de": "Externe Anforderung",
-        "ru": "Внешний спрос",
-        "pt": "Demanda externa",
+        "ru": "Внешний запрос",
+        "pt": "Pedido externo",
         "nl": "Externe vraag",
         "fr": "Demande extérieure",
-        "it": "Domanda esterna",
+        "it": "Richiesta esterna",
         "es": "Demanda externa",
-        "pl": "Popyt zewnętrzny",
-        "uk": "Зовнішній попит",
+        "pl": "Żądanie zewnętrzne",
+        "uk": "Зовнішній запит",
         "zh-cn": "外部需求"
     },
     "External heating/cooling changeover": {
         "de": "Ext. Umschaltung H/K",
         "ru": "Внешнее переключение отопления/охлаждения",
-        "pt": "Comutação externa de aquecimento/resfriamento",
+        "pt": "Comutação externa de aquecimento/arrefecimento",
         "nl": "Externe omschakeling verwarming/koeling",
         "fr": "Commutation chauffage/refroidissement externe",
-        "it": "Commutazione riscaldamento/raffreddamento esterno",
-        "es": "Cambio de calefacción/refrigeración externa",
+        "it": "Commutazione esterna riscaldamento/raffrescamento",
+        "es": "Conmutación externa calefacción/refrigeración",
         "pl": "Zewnętrzne przełączanie ogrzewania/chłodzenia",
-        "uk": "Перемикання зовнішнього опалення/охолодження",
-        "zh-cn": "外部加热/冷却转换"
+        "uk": "Зовнішнє перемикання опалення/охолодження",
+        "zh-cn": "外部供暖/制冷切换"
     },
     "Electric heating rod fault": {
         "de": "Störung E-Heizstab",
-        "ru": "Неисправность электрического нагревательного стержня",
-        "pt": "Falha na haste de aquecimento elétrico",
-        "nl": "Storing elektrische verwarmingsstaaf",
+        "ru": "Неисправность электронагревателя (ТЭН)",
+        "pt": "Avaria da resistência elétrica",
+        "nl": "Storing elektrisch verwarmingselement",
         "fr": "Défaut thermoplongeur électrique",
         "it": "Guasto alla resistenza elettrica",
-        "es": "Fallo en la varilla calefactora eléctrica",
-        "pl": "Usterka elektrycznego pręta grzejnego",
-        "uk": "Несправність електронагрівача",
+        "es": "Avería de la resistencia eléctrica",
+        "pl": "Awaria grzałki elektrycznej",
+        "uk": "Несправність електронагрівача (ТЕН)",
         "zh-cn": "电热棒故障"
     },
     "Dew point monitor heating circuit A": {
         "de": "Taupunktwächter Heizkreis A",
-        "ru": "Датчик точки росы отопительного контура А",
-        "pt": "Circuito de aquecimento do monitor de ponto de orvalho A",
+        "ru": "Датчик точки росы отопительного контура A",
+        "pt": "Monitor de ponto de orvalho do circuito de aquecimento A",
         "nl": "Dauwpuntbewaking verwarmingscircuit A",
         "fr": "Surveillance du point de rosée circuit de chauffage A",
-        "it": "Circuito di riscaldamento A per il monitoraggio del punto di rugiada",
-        "es": "Vigilancia del punto de rocío del circuito de calefacción A",
-        "pl": "Monitor punktu rosy obieg grzewczy A",
-        "uk": "Монітор точки роси контур опалення A",
-        "zh-cn": "露点监测器加热电路 A"
+        "it": "Monitor punto di rugiada circuito di riscaldamento A",
+        "es": "Monitor de punto de rocío del circuito de calefacción A",
+        "pl": "Czujnik punktu rosy obiegu grzewczego A",
+        "uk": "Датчик точки роси контуру опалення A",
+        "zh-cn": "供暖回路 A 露点监控器"
     },
     "External priority charging": {
         "de": "ext. Vorrangladung",
         "ru": "Внешняя приоритетная зарядка",
-        "pt": "Cobrança prioritária externa",
-        "nl": "Opladen met externe prioriteit",
+        "pt": "Carga prioritária externa",
+        "nl": "Externe voorrangslading",
         "fr": "Chargement prioritaire externe",
         "it": "Carica prioritaria esterna",
         "es": "Carga prioritaria externa",
         "pl": "Zewnętrzne ładowanie priorytetowe",
         "uk": "Зовнішня пріоритетна зарядка",
-        "zh-cn": "外部优先充电"
+        "zh-cn": "外部优先充热"
     },
     "High pressure fault 1": {
         "de": "Störung Hochdruck 1",
         "ru": "Ошибка высокого давления 1",
-        "pt": "Falha de alta pressão 1",
+        "pt": "Avaria de alta pressão 1",
         "nl": "Hogedrukstoring 1",
         "fr": "Défaut haute pression 1",
         "it": "Guasto alta pressione 1",
-        "es": "Fallo de alta presión 1",
-        "pl": "Błąd wysokiego ciśnienia 1",
+        "es": "Avería de alta presión 1",
+        "pl": "Awaria wysokiego ciśnienia 1",
         "uk": "Помилка високого тиску 1",
-        "zh-cn": "高压故障1"
+        "zh-cn": "高压故障 1"
     },
     "Charging pump": {
         "de": "Ladepumpe",
         "ru": "Зарядный насос",
-        "pt": "Bomba de carregamento",
-        "nl": "Oplaadpomp",
+        "pt": "Bomba de carga",
+        "nl": "Laadpomp",
         "fr": "Pompe de charge",
         "it": "Pompa di carica",
         "es": "Bomba de carga",
         "pl": "Pompa ładująca",
         "uk": "Зарядний насос",
-        "zh-cn": "增压泵"
+        "zh-cn": "充热泵"
     },
     "Hot gas line mixer": {
         "de": "HGL Mischer",
         "ru": "Смеситель линии горячего газа",
-        "pt": "Misturador de linha de gás quente",
-        "nl": "Menger voor heetgasleiding",
+        "pt": "Misturador da linha de gás quente",
+        "nl": "Mengklep voor heetgasleiding",
         "fr": "Mélangeur de conduite de gaz chaud",
         "it": "Miscelatore linea gas caldo",
         "es": "Mezclador de línea de gas caliente",
-        "pl": "Mieszalnik przewodu gorącego gazu",
+        "pl": "Mieszacz przewodu gorącego gazu",
         "uk": "Змішувач гарячого газу",
-        "zh-cn": "热气管线混合器"
+        "zh-cn": "热气管路混合阀"
     },
     "Fan speed 1": {
         "de": "Ventilatordrehzahl 1",
@@ -6869,47 +6869,47 @@
         "pt": "Velocidade do ventilador 1",
         "nl": "Ventilatorsnelheid 1",
         "fr": "Vitesse du ventilateur 1",
-        "it": "Velocità della ventola 1",
+        "it": "Velocità del ventilatore 1",
         "es": "Velocidad del ventilador 1",
         "pl": "Prędkość wentylatora 1",
         "uk": "Швидкість вентилятора 1",
-        "zh-cn": "风扇速度1"
+        "zh-cn": "风机转速 1"
     },
     "4-way valve circuit 1": {
         "de": "4-Wegeventil Kreis 1",
         "ru": "4-ходовой клапан контура 1",
-        "pt": "Circuito de válvula de 4 vias 1",
-        "nl": "4-wegklepcircuit 1",
+        "pt": "Válvula de 4 vias do circuito 1",
+        "nl": "4-wegklep circuit 1",
         "fr": "Vanne 4 voies circuit 1",
-        "it": "Circuito valvola a 4 vie 1",
-        "es": "Circuito de válvula de 4 vías 1",
-        "pl": "Obwód zaworu 4-drogowego 1",
+        "it": "Valvola a 4 vie circuito 1",
+        "es": "Válvula de 4 vías del circuito 1",
+        "pl": "Zawór 4-drogowy obiegu 1",
         "uk": "4-ходовий клапан контуру 1",
-        "zh-cn": "四通阀回路1"
+        "zh-cn": "四通阀，回路 1"
     },
     "Pump heating circuit A": {
         "de": "Pumpe Heizkreis A",
-        "ru": "Насос отопительного контура А",
-        "pt": "Circuito de aquecimento da bomba A",
+        "ru": "Насос отопительного контура A",
+        "pt": "Bomba do circuito de aquecimento A",
         "nl": "Pomp verwarmingscircuit A",
         "fr": "Pompe circuit de chauffage A",
         "it": "Pompa circuito riscaldamento A",
-        "es": "Circuito de calefacción de la bomba A",
+        "es": "Bomba del circuito de calefacción A",
         "pl": "Pompa obiegu grzewczego A",
-        "uk": "Насос контуру опалення А",
-        "zh-cn": "泵加热回路A"
+        "uk": "Насос контуру опалення A",
+        "zh-cn": "供暖回路 A 泵"
     },
     "Mixer heating circuit A": {
         "de": "Mischer Heizkreis A",
-        "ru": "Смеситель отопительного контура А",
-        "pt": "Circuito de aquecimento do misturador A",
-        "nl": "Menger verwarmingscircuit A",
+        "ru": "Смеситель отопительного контура A",
+        "pt": "Misturador do circuito de aquecimento A",
+        "nl": "Mengklep verwarmingscircuit A",
         "fr": "Mélangeur circuit de chauffage A",
-        "it": "Circuito di riscaldamento miscelato A",
-        "es": "Circuito de calefacción del mezclador A",
+        "it": "Miscelatore circuito di riscaldamento A",
+        "es": "Mezclador del circuito de calefacción A",
         "pl": "Mieszacz obiegu grzewczego A",
-        "uk": "Змішувач опалювального контуру А",
-        "zh-cn": "混合器加热电路A"
+        "uk": "Змішувач контуру опалення A",
+        "zh-cn": "供暖回路 A 混合阀"
     },
     "Circulation pump": {
         "de": "Zirkulationspumpe",
@@ -6918,7 +6918,7 @@
         "nl": "Circulatiepomp",
         "fr": "Pompe de circulation",
         "it": "Pompa di circolazione",
-        "es": "bomba de circulación",
+        "es": "Bomba de circulación",
         "pl": "Pompa obiegowa",
         "uk": "Циркуляційний насос",
         "zh-cn": "循环泵"
@@ -6933,7 +6933,7 @@
         "es": "Calentamiento por sifón 1",
         "pl": "Ogrzewanie syfonowe 1",
         "uk": "Сифонний підігрів 1",
-        "zh-cn": "虹吸加热1"
+        "zh-cn": "虹吸管加热 1"
     },
     "Electric heating element 1 kW": {
         "de": "Elektroheizeinsatz 1kW",
@@ -6942,10 +6942,10 @@
         "nl": "Elektrisch verwarmingselement 1 kW",
         "fr": "Élément chauffant électrique 1 kW",
         "it": "Resistenza elettrica 1 kW",
-        "es": "Elemento calefactor eléctrico 1 kW.",
+        "es": "Elemento calefactor eléctrico 1 kW",
         "pl": "Elektryczny element grzejny 1 kW",
-        "uk": "Електричний нагрівальний елемент 1 кВт",
-        "zh-cn": "电热元件1千瓦"
+        "uk": "Електричний ТЕН 1 кВт",
+        "zh-cn": "电热元件 1 kW"
     },
     "Electric heating element 2 kW": {
         "de": "Elektroheizeinsatz 2kW",
@@ -6954,10 +6954,10 @@
         "nl": "Elektrisch verwarmingselement 2 kW",
         "fr": "Élément chauffant électrique 2 kW",
         "it": "Resistenza elettrica 2 kW",
-        "es": "Elemento calefactor eléctrico 2 kW.",
+        "es": "Elemento calefactor eléctrico 2 kW",
         "pl": "Elektryczny element grzejny 2 kW",
         "uk": "Електричний ТЕН 2 кВт",
-        "zh-cn": "电热元件2千瓦"
+        "zh-cn": "电热元件 2 kW"
     },
     "Electric heating element 3 kW": {
         "de": "Elektroheizeinsatz 3kW",
@@ -6966,28 +6966,28 @@
         "nl": "Elektrisch verwarmingselement 3 kW",
         "fr": "Élément chauffant électrique 3 kW",
         "it": "Resistenza elettrica 3 kW",
-        "es": "Elemento calefactor eléctrico 3 kW.",
+        "es": "Elemento calefactor eléctrico 3 kW",
         "pl": "Elektryczny element grzejny 3 kW",
         "uk": "Електричний ТЕН 3 кВт",
-        "zh-cn": "电热元件3千瓦"
+        "zh-cn": "电热元件 3 kW"
     },
     "Heating/cooling valve": {
         "de": "Ventil Heizen/Kühlen",
         "ru": "Клапан отопления/охлаждения",
-        "pt": "Válvula de aquecimento/resfriamento",
-        "nl": "Verwarmings-/koelingsklep",
+        "pt": "Válvula de aquecimento/arrefecimento",
+        "nl": "Klep verwarmen/koelen",
         "fr": "Vanne de chauffage/refroidissement",
-        "it": "Valvola di riscaldamento/raffreddamento",
+        "it": "Valvola riscaldamento/raffrescamento",
         "es": "Válvula de calefacción/refrigeración",
         "pl": "Zawór ogrzewania/chłodzenia",
         "uk": "Клапан опалення/охолодження",
-        "zh-cn": "加热/冷却阀"
+        "zh-cn": "供暖/制冷阀"
     },
     "Heat/cold valve": {
         "de": "Ventil Wärme/Kälte",
         "ru": "Клапан тепла/холода",
         "pt": "Válvula de calor/frio",
-        "nl": "Warmte/koude klep",
+        "nl": "Klep warmte/koude",
         "fr": "Vanne chaud/froid",
         "it": "Valvola caldo/freddo",
         "es": "Válvula de calor/frío",
@@ -6999,13 +6999,13 @@
         "de": "Ventil Heizen/Vorrang",
         "ru": "Клапан отопления/приоритета",
         "pt": "Válvula de aquecimento/prioridade",
-        "nl": "Verwarming/voorrangsklep",
+        "nl": "Klep verwarmen/voorrang",
         "fr": "Vanne chauffage/priorité",
-        "it": "Riscaldamento/valvola prioritaria",
+        "it": "Valvola riscaldamento/priorità",
         "es": "Válvula de calefacción/prioridad",
-        "pl": "Zawór grzewczy/priorytetowy",
+        "pl": "Zawór ogrzewanie/priorytet",
         "uk": "Клапан опалення/пріоритет",
-        "zh-cn": "加热/优先阀"
+        "zh-cn": "供暖/优先阀"
     },
     "Support files": {
         "de": "Support-Dateien",
@@ -7034,14 +7034,14 @@
     "COP (external meter)": {
         "de": "COP (externer Zähler)",
         "ru": "COP (внешний счётчик)",
-        "pt": "COP (medidor externo)",
+        "pt": "COP (contador externo)",
         "nl": "COP (externe meter)",
         "fr": "COP (compteur externe)",
         "it": "COP (contatore esterno)",
-        "es": "COP (medidor externo)",
+        "es": "COP (contador externo)",
         "pl": "COP (licznik zewnętrzny)",
         "uk": "COP (зовнішній лічильник)",
-        "zh-cn": "COP（外部仪表）"
+        "zh-cn": "COP（外部电表）"
     },
     "Electrical power": {
         "de": "Elektrische Leistung",
@@ -7066,5 +7066,29 @@
         "pl": "Moc cieplna",
         "uk": "Теплова потужність",
         "zh-cn": "热功率"
+    },
+    "Electrical power (external meter)": {
+        "de": "Elektrische Leistung (externer Zähler)",
+        "ru": "Электрическая мощность (внешний счётчик)",
+        "pt": "Potência elétrica (contador externo)",
+        "nl": "Elektrisch vermogen (externe meter)",
+        "fr": "Puissance électrique (compteur externe)",
+        "it": "Potenza elettrica (contatore esterno)",
+        "es": "Potencia eléctrica (contador externo)",
+        "pl": "Moc elektryczna (licznik zewnętrzny)",
+        "uk": "Електрична потужність (зовнішній лічильник)",
+        "zh-cn": "电功率（外部电表）"
+    },
+    "Thermal power (external meter)": {
+        "de": "Thermische Leistung (externer Zähler)",
+        "ru": "Тепловая мощность (внешний счётчик)",
+        "pt": "Potência térmica (contador externo)",
+        "nl": "Thermisch vermogen (externe meter)",
+        "fr": "Puissance thermique (compteur externe)",
+        "it": "Potenza termica (contatore esterno)",
+        "es": "Potencia térmica (contador externo)",
+        "pl": "Moc cieplna (licznik zewnętrzny)",
+        "uk": "Теплова потужність (зовнішній лічильник)",
+        "zh-cn": "热功率（外部热量表）"
     }
 }

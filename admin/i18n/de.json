@@ -56,7 +56,7 @@
     "diagramHiddenHelp": "Wählen Sie Teile, die nicht gezeichnet werden sollen. Teile, die die Heizungsanlage nicht hat, werden ohnehin nicht gezeichnet.",
     "diagramIntro": "Das Diagramm ist eine schreibgeschützte Webseite, die Ihre Anlage mit Live-Werten zeichnet. Sie öffnen sie über den Link neben der Instanz in der Instanzenliste; dafür wird eine Instanz des Web-Adapters gebraucht. Das Bild baut sich aus den Werten auf, die der Adapter hat. Mit diesen Einstellungen korrigieren Sie es, wenn es falsch rät oder Sie ein einfacheres Bild wünschen; sie gelten sofort.",
     "diagramPartBivalence": "Bivalenz",
-    "diagramPartBuffer": "Puffer",
+    "diagramPartBuffer": "Pufferspeicher",
     "diagramPartDhw": "Trinkwassererwärmer (Speicher)",
     "diagramPartFreshwater": "Frischwasserstation",
     "diagramPartPv": "Photovoltaik",

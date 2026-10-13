@@ -145,6 +145,8 @@
         "Heating/priority valve": "Ventil Heizen/Vorrang",
         "Heat pump diagram": "Wärmepumpen-Diagramm",
         "Diagram settings": "Diagramm-Einstellungen",
-        "Support files": "Support-Dateien"
+        "Support files": "Support-Dateien",
+        "Electrical power (external meter)": "Elektrische Leistung (externer Zähler)",
+        "Thermal power (external meter)": "Thermische Leistung (externer Zähler)"
     }
 }

@@ -15,7 +15,7 @@
     "outdoor": {
         "en": "Outdoor",
         "de": "Außen",
-        "ru": "Улица",
+        "ru": "Снаружи",
         "pt": "Exterior",
         "nl": "Buiten",
         "fr": "Extérieur",
@@ -94,14 +94,14 @@
         "en": "COP (external meter)",
         "de": "COP (externer Zähler)",
         "ru": "COP (внешний счётчик)",
-        "pt": "COP (medidor externo)",
+        "pt": "COP (contador externo)",
         "nl": "COP (externe meter)",
         "fr": "COP (compteur externe)",
         "it": "COP (contatore esterno)",
-        "es": "COP (medidor externo)",
+        "es": "COP (contador externo)",
         "pl": "COP (licznik zewnętrzny)",
         "uk": "COP (зовнішній лічильник)",
-        "zh-cn": "COP（外部仪表）"
+        "zh-cn": "COP（外部电表）"
     },
     "heatPump": {
         "en": "Heat pump",
@@ -119,14 +119,14 @@
     "buffer": {
         "en": "Buffer",
         "de": "Pufferspeicher",
-        "ru": "Буфер",
-        "pt": "Acumulador",
-        "nl": "Buffer",
+        "ru": "Буферная ёмкость",
+        "pt": "Acumulador tampão",
+        "nl": "Buffervat",
         "fr": "Ballon tampon",
-        "it": "Accumulo",
-        "es": "Acumulador",
-        "pl": "Bufor",
-        "uk": "Буфер",
+        "it": "Accumulo inerziale",
+        "es": "Acumulador de inercia",
+        "pl": "Zasobnik buforowy",
+        "uk": "Буферна ємність",
         "zh-cn": "缓冲罐"
     },
     "dhw": {
@@ -145,27 +145,27 @@
     "setpoint": {
         "en": "Setpoint",
         "de": "Soll",
-        "ru": "Заданное",
-        "pt": "Desejado",
-        "nl": "Streef",
+        "ru": "Уставка",
+        "pt": "Valor nominal",
+        "nl": "Instelwaarde",
         "fr": "Consigne",
         "it": "Setpoint",
         "es": "Consigna",
-        "pl": "Zadana",
-        "uk": "Задане",
-        "zh-cn": "设定"
+        "pl": "Wartość zadana",
+        "uk": "Уставка",
+        "zh-cn": "设定值"
     },
     "pv": {
         "en": "Photovoltaics",
         "de": "Photovoltaik",
-        "ru": "Фотоэлектрика",
+        "ru": "Фотовольтаика",
         "pt": "Fotovoltaico",
-        "nl": "Fotovoltaïsch",
+        "nl": "Fotovoltaïek",
         "fr": "Photovoltaïque",
         "it": "Fotovoltaico",
         "es": "Fotovoltaica",
         "pl": "Fotowoltaika",
-        "uk": "Фотоелектрика",
+        "uk": "Фотовольтаїка",
         "zh-cn": "光伏"
     },
     "house": {
@@ -210,15 +210,15 @@
     "solar": {
         "en": "Solar thermal",
         "de": "Solarthermie",
-        "ru": "Солнечный коллектор",
+        "ru": "Гелиосистема",
         "pt": "Solar térmico",
-        "nl": "Zonneboiler",
+        "nl": "Zonnewarmte",
         "fr": "Solaire thermique",
         "it": "Solare termico",
         "es": "Solar térmico",
         "pl": "Solar termiczny",
-        "uk": "Сонячний колектор",
-        "zh-cn": "太阳能热水"
+        "uk": "Геліосистема",
+        "zh-cn": "太阳能光热"
     },
     "collector": {
         "en": "Collector",
@@ -275,14 +275,14 @@
     "storage": {
         "en": "Storage",
         "de": "Speicher",
-        "ru": "Накопитель",
-        "pt": "Reservatório",
+        "ru": "Бак-накопитель",
+        "pt": "Depósito",
         "nl": "Buffervat",
         "fr": "Ballon",
         "it": "Accumulo",
         "es": "Acumulador",
         "pl": "Zasobnik",
-        "uk": "Накопичувач",
+        "uk": "Бак-накопичувач",
         "zh-cn": "储热罐"
     },
     "isc": {
@@ -341,14 +341,14 @@
         "en": "Fresh water station",
         "de": "Frischwasserstation",
         "ru": "Станция свежей воды",
-        "pt": "Estação de água fresca",
-        "nl": "Verswaterstation",
-        "fr": "Station d'eau fraîche",
-        "it": "Stazione acqua fresca",
-        "es": "Estación de agua fresca",
-        "pl": "Stacja świeżej wody",
+        "pt": "Estação de AQS instantânea",
+        "nl": "Tapwaterstation",
+        "fr": "Station d'ECS instantanée",
+        "it": "Stazione acqua calda istantanea",
+        "es": "Estación de ACS instantánea",
+        "pl": "Stacja c.w.u. przepływowa",
         "uk": "Станція свіжої води",
-        "zh-cn": "鲜水站"
+        "zh-cn": "即热热水站"
     },
     "coldWater": {
         "en": "Cold water",

@@ -200,7 +200,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -244,7 +246,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -288,7 +292,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -332,7 +338,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -376,7 +384,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -420,7 +430,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -464,7 +476,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -508,7 +522,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -522,13 +538,13 @@
                 "de": "Frischwasserzapftemperatur",
                 "ru": "Температура водоразбора свежей воды",
                 "pt": "Temperatura de tiragem de água fresca",
-                "nl": "Tapwatertemperatuur friswater",
+                "nl": "Tapwatertemperatuur",
                 "fr": "Température de puisage d'eau fraîche",
                 "it": "Temperatura di prelievo acqua fresca",
                 "es": "Temperatura de toma de agua fresca",
-                "pl": "Temperatura poboru świeżej wody",
+                "pl": "Temperatura poboru c.w.u.",
                 "uk": "Температура водорозбору свіжої води",
-                "zh-cn": "新鲜水出水温度"
+                "zh-cn": "即热热水出水温度"
             }
         },
         {
@@ -552,9 +568,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -596,9 +616,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -640,9 +664,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -684,9 +712,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -728,9 +760,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -772,9 +808,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -816,9 +856,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -860,9 +904,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -904,9 +952,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -948,9 +1000,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -992,9 +1048,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1036,9 +1096,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1080,9 +1144,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1124,9 +1192,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1168,7 +1240,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1212,7 +1286,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1256,7 +1332,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1300,7 +1378,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1344,9 +1424,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["block:solar"],
+            "requires": [
+                "block:solar"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1388,9 +1472,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["block:solar"],
+            "requires": [
+                "block:solar"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1432,9 +1520,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["block:solar"],
+            "requires": [
+                "block:solar"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1476,9 +1568,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["block:solar"],
+            "requires": [
+                "block:solar"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1520,7 +1616,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1564,7 +1662,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1608,9 +1708,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["block:isc"],
+            "requires": [
+                "block:isc"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1652,9 +1756,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["block:isc"],
+            "requires": [
+                "block:isc"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1668,7 +1776,7 @@
                 "pt": "Sensor de arrefecimento de retorno ISC",
                 "nl": "ISC-terugkoelvoeler",
                 "fr": "Sonde de refroidissement de retour ISC",
-                "it": "Sensore di ricooling ISC",
+                "it": "Sensore di ri-raffreddamento ISC",
                 "es": "Sensor de reenfriamiento ISC",
                 "pl": "Czujnik chłodzenia zwrotnego ISC",
                 "uk": "Датчик зворотного охолодження ISC",
@@ -1696,7 +1804,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1740,7 +1850,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1784,7 +1896,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1828,9 +1942,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["block:solar"],
+            "requires": [
+                "block:solar"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -1872,7 +1990,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1916,7 +2036,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1960,7 +2082,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -2004,7 +2128,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -2048,9 +2174,13 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
-            "requires": ["block:solar"],
+            "requires": [
+                "block:solar"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -2092,7 +2222,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -2136,7 +2268,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -2339,7 +2473,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -2384,7 +2520,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -2429,7 +2567,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -2474,7 +2614,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -2519,7 +2661,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -2564,7 +2708,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -2609,7 +2755,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -3237,7 +3385,9 @@
                     "zh-cn": "故障"
                 }
             },
-            "requires": ["block:isc"],
+            "requires": [
+                "block:isc"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -3322,7 +3472,9 @@
                     "zh-cn": "故障"
                 }
             },
-            "requires": ["block:isc"],
+            "requires": [
+                "block:isc"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -3336,7 +3488,7 @@
                 "pt": "Estado da bomba de arrefecimento de retorno ISC",
                 "nl": "Status ISC-terugkoelpomp",
                 "fr": "État de la pompe de refroidissement de retour ISC",
-                "it": "Stato della pompa di ricooling ISC",
+                "it": "Stato della pompa di ri-raffreddamento ISC",
                 "es": "Estado de la bomba de reenfriamiento ISC",
                 "pl": "Status pompy chłodzenia zwrotnego ISC",
                 "uk": "Статус насоса зворотного охолодження ISC",
@@ -3502,7 +3654,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["block:cascade"],
+            "requires": [
+                "block:cascade"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -3547,7 +3701,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["block:solar"],
+            "requires": [
+                "block:solar"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -3637,7 +3793,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["block:isc"],
+            "requires": [
+                "block:isc"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -3844,7 +4002,9 @@
                     "zh-cn": "手动供暖"
                 }
             },
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -3954,7 +4114,9 @@
                     "zh-cn": "手动供暖"
                 }
             },
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4064,7 +4226,9 @@
                     "zh-cn": "手动供暖"
                 }
             },
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4174,7 +4338,9 @@
                     "zh-cn": "手动供暖"
                 }
             },
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4284,7 +4450,9 @@
                     "zh-cn": "手动供暖"
                 }
             },
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4394,7 +4562,9 @@
                     "zh-cn": "手动供暖"
                 }
             },
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4504,7 +4674,9 @@
                     "zh-cn": "手动供暖"
                 }
             },
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4548,7 +4720,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4592,7 +4766,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4636,7 +4812,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4680,7 +4858,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4724,7 +4904,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4768,7 +4950,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4812,7 +4996,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4856,7 +5042,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4900,7 +5088,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4944,7 +5134,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -4988,7 +5180,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5032,7 +5226,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5076,7 +5272,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5120,7 +5318,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5164,7 +5364,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5208,7 +5410,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5252,7 +5456,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5296,7 +5502,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5340,7 +5548,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5384,7 +5594,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5428,7 +5640,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5472,7 +5686,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5516,7 +5732,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5560,7 +5778,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5604,7 +5824,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5648,7 +5870,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5692,7 +5916,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5736,7 +5962,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5780,7 +6008,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5824,7 +6054,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5868,7 +6100,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5912,7 +6146,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -5956,7 +6192,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6000,7 +6238,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6044,7 +6284,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6088,7 +6330,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6132,7 +6376,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6176,7 +6422,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6220,7 +6468,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6264,7 +6514,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6308,7 +6560,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6352,7 +6606,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6396,7 +6652,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6440,7 +6698,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6484,7 +6744,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6528,7 +6790,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6572,7 +6836,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6616,7 +6882,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6660,7 +6928,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6704,7 +6974,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6748,7 +7020,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6792,7 +7066,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6836,7 +7112,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6880,7 +7158,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6924,7 +7204,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -6968,7 +7250,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -7012,7 +7296,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:A"],
+            "requires": [
+                "hc:A"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -7056,7 +7342,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:B"],
+            "requires": [
+                "hc:B"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -7100,7 +7388,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:C"],
+            "requires": [
+                "hc:C"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -7144,7 +7434,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:D"],
+            "requires": [
+                "hc:D"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -7188,7 +7480,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:E"],
+            "requires": [
+                "hc:E"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -7232,7 +7526,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:F"],
+            "requires": [
+                "hc:F"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -7276,7 +7572,9 @@
             "cyclicSec": null,
             "sentinel": [],
             "enum": null,
-            "requires": ["hc:G"],
+            "requires": [
+                "hc:G"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -7562,7 +7860,9 @@
                     "zh-cn": "热源 / 泳池"
                 }
             },
-            "requires": ["block:solar"],
+            "requires": [
+                "block:solar"
+            ],
             "overlaps": [],
             "verified": "doc",
             "deviceStatus": null,
@@ -7618,13 +7918,13 @@
                 "de": "Frischwasser-Solltemperatur",
                 "ru": "Заданная температура свежей воды",
                 "pt": "Valor desejado de água fresca",
-                "nl": "Streeftemperatuur friswater",
+                "nl": "Streeftemperatuur tapwater",
                 "fr": "Consigne d'eau fraîche",
                 "it": "Setpoint acqua fresca",
                 "es": "Consigna de agua fresca",
-                "pl": "Temperatura zadana świeżej wody",
+                "pl": "Temperatura zadana c.w.u. (stacja)",
                 "uk": "Задана температура свіжої води",
-                "zh-cn": "新鲜水设定温度"
+                "zh-cn": "即热热水设定温度"
             }
         },
         {
@@ -7648,7 +7948,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [-1],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
