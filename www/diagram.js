@@ -41,7 +41,7 @@
         pipeGap: 100, // between hot gas line, flow and return pipe
         circuit: { x: 980, w: 216, h: 170, gap: 28, pipeDy: 40, manifold: 60 },
         room: { w: 114, h: 52, gap: 8 },
-        station: { y: 128, w: 124, h: 134, hxW: 70, hxH: 70, gap: 48 }, // gap: from the storage to the station card
+        station: { y: 128, w: 124, h: 134, hxW: 70, hxH: 70, gap: 48, circulationExtra: 40, circulationGap: 74 }, // gap: from the storage to the station card
         solar: { sensorGap: 40, reserve: 110 }, // reserve: room at the bottom of the tank for the solar coil
         cards: { wrap: 1000, w: 310, gap: 330, rowH: 44 },
         tile: { w: 176, h: 62, gap: 12 },
@@ -236,7 +236,7 @@
     }
     /* a pump from the web interface or Modbus: a small pump symbol (green = running, grey = off) with the IDM tag; analog pumps
        show their speed */
-    function badge(parent, x, y, tag, id, showPercent) {
+    function badge(parent, x, y, tag, id, showPercent, name) {
         var r = 7;
         var cy = y - 4;
         var body = el('circle', { cx: x + r, cy: cy, r: r, class: 'pumpbody smallpump' }, parent);
@@ -250,6 +250,12 @@
             parent,
         );
         var label = text(parent, x + 2 * r + 6, y, `${tag} ${view.m.labels.off}`, 'small');
+        if (name) {
+            // the tooltip names the part (hover)
+            [body, label].forEach(function (node) {
+                el('title', {}, node).textContent = name;
+            });
+        }
         bind(id, function (v) {
             var on = isRunning(v);
             arrow.style.fill = on ? 'var(--good)' : 'var(--muted)';
@@ -881,14 +887,19 @@
         var tankInside = L.tank.x + L.tank.w - 60; // the storage pipes start where the tank wall is straight
         /* the station runs while the hot water flow switch B1 or the station pump M22 says so (else with the compressor) */
         var active = ids.dhwFlow || ids.pumpM22 ? [ids.dhwFlow, ids.pumpM22] : [ids.compressor];
-        var coldEnd = x + s.w + 54;
-        var tapX = x + s.w + 90;
+        // the card is wider by the circulation pump badge beside the station pump
+        var w = s.w + (ids.circulation ? s.circulationExtra : 0);
+        var coldEnd = x + w + 54;
+        var tapX = x + w + 90;
         var tapY = inY - 20;
 
-        card(view.mid, x, y, s.w, s.h, null);
-        text(view.mid, x + s.w / 2, y + 108, m.labels.freshwater, 'small', 'middle');
+        card(view.mid, x, y, w, s.h, null);
+        text(view.mid, x + w / 2, y + 108, m.labels.freshwater, 'small', 'middle');
         if (ids.pumpM22) {
             badge(view.mid, x + 14, y + 126, 'M22', ids.pumpM22, true);
+        }
+        if (ids.circulation) {
+            circulationBadge(view.mid, x + 14 + (ids.pumpM22 ? s.circulationGap : 0), y + 126);
         }
         hline(view.mid, tankInside, hxX, inY, ids.dhwTop, active);
         hline(view.mid, hxX, tankInside, outY, ids.dhwBottom || ids.buffer, active);
@@ -903,6 +914,41 @@
         if (ids.dhwSetpoint) {
             labeled(view.parts, tapX + 56, tapY + 54, m.labels.setpoint, ids.dhwSetpoint, 0, '°C');
         }
+    }
+
+    /* the stages of the electric heating rod: a pill per stage, green while its output is on */
+    function drawRod(g) {
+        var m = view.m;
+        var parts = view.parts;
+        var count = m.rods.length;
+        var pillW = 46;
+        var gap = 8;
+        var total = count * pillW + (count - 1) * gap;
+        var cx = L.tank.x + L.tank.w / 2;
+        var y = g.tankBottom + 22;
+        text(parts, cx, y, m.labels.rod, 'small', 'middle');
+        m.rods.forEach(function (stage, i) {
+            var x = cx - total / 2 + i * (pillW + gap);
+            var pill = el('rect', { x: x, y: y + 8, width: pillW, height: 22, rx: 11, class: 'level' }, parts);
+            var label = text(parts, x + pillW / 2, y + 24, stage.label, 'leveltext', 'middle');
+            bind(stage.id, function (v) {
+                var on = isRunning(v);
+                pill.style.fill = on ? 'var(--good)' : '';
+                label.style.fill = on ? '#fff' : '';
+            });
+        });
+    }
+    /* the hot water circulation pump M64: a pump badge whose tooltip names it */
+    function circulationBadge(parent, x, y) {
+        badge(parent, x, y, 'M64', view.m.ids.circulation, false, view.m.labels.circulation);
+    }
+    /* without a fresh water station (an AQA tank) the circulation pump stands beside the hot water part on its own */
+    function drawCirculation(g) {
+        var m = view.m;
+        var x = L.tank.x + L.tank.w + L.station.gap;
+        var y = (m.storage === 'separate' ? g.dhwTop + 20 : L.station.y) + 40;
+        text(view.parts, x + 14, y - 22, m.labels.circulation, 'small');
+        circulationBadge(view.parts, x + 14, y);
     }
 
     /* solar thermal below the heat pump, connected to the lower part of the storage by a flow and a return pipe with a coil
@@ -1053,6 +1099,12 @@
         );
         if (m.parts.freshwater && hasTank) {
             drawStation(g);
+        }
+        if (m.rods.length && hasTank) {
+            drawRod(g);
+        }
+        if (m.ids.circulation && hasTank && !m.parts.freshwater) {
+            drawCirculation(g);
         }
         if (m.parts.solar && hasTank) {
             bottom = Math.max(bottom, drawSolar(g, hp));

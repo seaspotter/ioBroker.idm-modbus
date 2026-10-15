@@ -14,6 +14,7 @@ interface Model {
     language: string;
     heatSource: 'air' | 'ground';
     storage: 'combined' | 'separate';
+    rods: { id: string; label: string }[];
     parts: Record<string, boolean>;
     ids: Record<string, string | null>;
     circuits: {
@@ -247,6 +248,20 @@ describe('diagram model', () => {
             'web.io.analog_out.m71',
         );
         expect(build({ 'hp.hgl_flow_temp': 48 }).ids.hglMixer).to.equal(null);
+    });
+
+    it('lists the heating rod stages that report and finds the circulation pump', () => {
+        const model = build({
+            'web.io.digital_out.elektroheizeinsatz_1kw': 0,
+            'web.io.digital_out.elektroheizeinsatz_3kw': 1,
+            'dhw.circulation_pump': false,
+        });
+        expect(model.rods.map(stage => stage.label)).to.deep.equal(['1 kW', '3 kW']);
+        expect(model.ids.circulation).to.equal('dhw.circulation_pump');
+        expect(build({ 'web.io.digital_out.m64': 0 }).ids.circulation).to.equal('web.io.digital_out.m64');
+        const none = build({});
+        expect(none.rods).to.have.length(0);
+        expect(none.ids.circulation).to.equal(null);
     });
 
     it('draws two vessels only when asked and when both hot water and a heating buffer report', () => {

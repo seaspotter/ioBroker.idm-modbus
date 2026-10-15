@@ -53,7 +53,16 @@
         // the mixer of heating circuit A; the Navigator reports a text for it
         mixerM41: ['web.io.digital_out.m41'],
         fanM13: ['web.io.analog_out.m13'],
+        // the hot water circulation pump
+        circulation: ['dhw.circulation_pump', 'web.io.digital_out.m64'],
     };
+
+    /* the stages of the electric heating rod (web outputs), each with the kW it stands for */
+    var ROD_STAGES = [
+        { id: 'web.io.digital_out.elektroheizeinsatz_1kw', label: '1 kW' },
+        { id: 'web.io.digital_out.elektroheizeinsatz_2kw', label: '2 kW' },
+        { id: 'web.io.digital_out.elektroheizeinsatz_3kw', label: '3 kW' },
+    ];
 
     /* an air intake sensor means an air heat pump, source sensors and pumps a ground or groundwater one */
     var AIR_INTAKE_ID = 'hp.air_intake_temp';
@@ -291,6 +300,9 @@
             },
             ids: ids,
             circuits: circuits,
+            rods: ROD_STAGES.filter(function (stage) {
+                return hasValue(states, stage.id);
+            }),
             rooms: rooms,
             sensors: sensors,
             hpModes: modes,

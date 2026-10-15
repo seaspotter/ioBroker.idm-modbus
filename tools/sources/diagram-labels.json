@@ -132,6 +132,14 @@
         "directCircuit": {
             "en": "Direct circuit",
             "de": "Direktheizkreis"
+        },
+        "circulation": {
+            "en": "Circulation",
+            "de": "Zirkulation"
+        },
+        "rod": {
+            "en": "Heating rod",
+            "de": "Heizstab"
         }
     }
 }

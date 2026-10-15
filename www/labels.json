@@ -427,5 +427,31 @@
         "pl": "Obieg grzewczy bezpośredni",
         "uk": "Прямий контур опалення",
         "zh-cn": "直接供暖回路"
+    },
+    "circulation": {
+        "en": "Circulation",
+        "de": "Zirkulation",
+        "ru": "Циркуляция",
+        "pt": "Circulação",
+        "nl": "Circulatie",
+        "fr": "Circulation",
+        "it": "Ricircolo",
+        "es": "Recirculación",
+        "pl": "Cyrkulacja",
+        "uk": "Циркуляція",
+        "zh-cn": "循环"
+    },
+    "rod": {
+        "en": "Heating rod",
+        "de": "Heizstab",
+        "ru": "Электронагреватель",
+        "pt": "Resistência elétrica",
+        "nl": "Verwarmingselement",
+        "fr": "Résistance électrique",
+        "it": "Resistenza elettrica",
+        "es": "Resistencia eléctrica",
+        "pl": "Grzałka elektryczna",
+        "uk": "Електронагрівач",
+        "zh-cn": "电加热棒"
     }
 }
