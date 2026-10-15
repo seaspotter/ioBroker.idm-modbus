@@ -221,5 +221,9 @@
     "zoneModulesHelp": "0 = nessuno, massimo 10",
     "diagramSource": "Fonte di potenza e COP",
     "diagramSourceHelp": "Potenza elettrica, potenza termica e COP provengono dal Navigator o dai contatori esterni (scheda Statistiche). Se manca un valore esterno, viene mostrato quello del Navigator.",
-    "diagramCopSource": "Un COP (dalla fonte sopra)"
+    "diagramCopSource": "Un COP (dalla fonte sopra)",
+    "diagramStorage": "Accumulo nello schema",
+    "diagramStorageHelp": "In un Hygienik con piastra di stratificazione l'accumulo inerziale e l'acqua calda condividono un unico serbatoio; con un accumulo inerziale separato (TERMO) accanto a un Hygienik o AQA i serbatoi sono due. I punti di misura non permettono di distinguere i due casi.",
+    "diagramStorageCombined": "Un serbatoio (Hygienik con piastra di stratificazione)",
+    "diagramStorageSeparate": "Due serbatoi (accumulo inerziale separato)"
 }

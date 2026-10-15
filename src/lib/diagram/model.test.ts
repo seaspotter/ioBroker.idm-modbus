@@ -13,6 +13,7 @@ type Value = string | number | boolean | null;
 interface Model {
     language: string;
     heatSource: 'air' | 'ground';
+    storage: 'combined' | 'separate';
     parts: Record<string, boolean>;
     ids: Record<string, string | null>;
     circuits: {
@@ -35,6 +36,7 @@ interface Settings {
     source?: string;
     cop?: string;
     heatSource?: string;
+    storage?: string;
     hidden?: string[];
     zoneCircuit?: { zone: number; circuit: string }[];
 }
@@ -245,6 +247,15 @@ describe('diagram model', () => {
             'web.io.analog_out.m71',
         );
         expect(build({ 'hp.hgl_flow_temp': 48 }).ids.hglMixer).to.equal(null);
+    });
+
+    it('draws two vessels only when asked and when both hot water and a heating buffer report', () => {
+        const states = { 'dhw.dhw_temp_top': 45, 'dhw.storage_temp': 30 };
+        expect(build(states).storage).to.equal('combined');
+        expect(build(states, { settings: { storage: 'separate' } }).storage).to.equal('separate');
+        // without a heating buffer or without hot water there is nothing to separate
+        expect(build({ 'dhw.dhw_temp_top': 45 }, { settings: { storage: 'separate' } }).storage).to.equal('combined');
+        expect(build({ 'dhw.storage_temp': 30 }, { settings: { storage: 'separate' } }).storage).to.equal('combined');
     });
 
     it('gives every circuit its own pump and mixer, and lists a direct circuit that has a pump but no flow sensor', () => {

@@ -221,5 +221,9 @@
     "zoneModulesHelp": "0 = brak, maksymalnie 10",
     "diagramSource": "Źródło mocy i COP",
     "diagramSourceHelp": "Moc elektryczna, moc cieplna i COP pochodzą z Navigatora lub z zewnętrznych liczników (karta Statystyka). Gdy brakuje wartości zewnętrznej, pokazywana jest wartość z Navigatora.",
-    "diagramCopSource": "Jeden COP (ze źródła powyżej)"
+    "diagramCopSource": "Jeden COP (ze źródła powyżej)",
+    "diagramStorage": "Zasobnik na schemacie",
+    "diagramStorageHelp": "W Hygieniku z płytą rozwarstwiającą zasobnik buforowy i ciepła woda użytkowa dzielą jeden zbiornik; przy osobnym zasobniku buforowym (TERMO) obok Hygieniku lub AQA są to dwa zbiorniki. Punkty pomiarowe nie pozwalają ich odróżnić.",
+    "diagramStorageCombined": "Jeden zbiornik (Hygienik z płytą rozwarstwiającą)",
+    "diagramStorageSeparate": "Dwa zbiorniki (osobny zasobnik buforowy)"
 }

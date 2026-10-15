@@ -772,6 +772,8 @@ export interface DiagramSettings {
     source?: 'external';
     /** the COP rows: left out for one COP that follows the source */
     cop?: 'both' | 'none';
+    /** `separate`: the heating buffer is a vessel of its own next to the hot water vessel; left out for one combined vessel */
+    storage?: 'separate';
     /** parts the user does not want to see */
     hidden: string[];
     /** which heating circuit the rooms of a zone module stand next to (a zone without an entry follows its number) */
@@ -823,6 +825,7 @@ export function readDiagramSettings(config: Partial<ioBroker.AdapterConfig>): {
             ...(source === 'air' || source === 'ground' ? { heatSource: source } : {}),
             ...(external ? { source: 'external' as const } : {}),
             ...(rows !== 'source' ? { cop: rows } : {}),
+            ...(config.diagramStorage === 'separate' ? { storage: 'separate' as const } : {}),
             hidden,
             zoneCircuit,
         },

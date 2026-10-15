@@ -221,5 +221,9 @@
     "zoneModulesHelp": "0 = keine, maximal 10",
     "diagramSource": "Quelle für Leistung und COP",
     "diagramSourceHelp": "Elektrische Leistung, thermische Leistung und COP stammen vom Navigator oder von Ihren externen Zählern (Reiter Statistik). Fehlt ein externer Wert, wird der Wert des Navigators angezeigt.",
-    "diagramCopSource": "Ein COP (aus der Quelle oben)"
+    "diagramCopSource": "Ein COP (aus der Quelle oben)",
+    "diagramStorage": "Speicher im Schema",
+    "diagramStorageHelp": "Bei einem Hygienik mit Schichttrennplatte teilen sich Heizungspuffer und Warmwasser einen Behälter; mit einem eigenen Heizungspuffer (TERMO) neben einem Hygienik oder AQA sind es zwei Behälter. Aus den Messstellen lässt sich das nicht unterscheiden.",
+    "diagramStorageCombined": "Ein Behälter (Hygienik mit Schichttrennplatte)",
+    "diagramStorageSeparate": "Zwei Behälter (eigener Heizungspuffer)"
 }

@@ -237,6 +237,7 @@
         "diagramHeatSource": "auto",
         "diagramSource": "internal",
         "diagramCop": "source",
+        "diagramStorage": "combined",
         "diagramHidden": [],
         "diagramZoneCircuit": [],
         "webEnabled": false,

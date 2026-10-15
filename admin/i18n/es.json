@@ -221,5 +221,9 @@
     "zoneModulesHelp": "0 = ninguno, máximo 10",
     "diagramSource": "Origen de la potencia y del COP",
     "diagramSourceHelp": "La potencia eléctrica, la potencia térmica y el COP proceden del Navigator o de sus contadores externos (pestaña Estadísticas). Si falta un valor externo, se muestra el del Navigator.",
-    "diagramCopSource": "Un COP (del origen indicado arriba)"
+    "diagramCopSource": "Un COP (del origen indicado arriba)",
+    "diagramStorage": "Acumulador en el esquema",
+    "diagramStorageHelp": "En un Hygienik con placa de estratificación, el acumulador de inercia y el agua caliente comparten un depósito; con un acumulador de inercia separado (TERMO) junto a un Hygienik o AQA son dos depósitos. Los puntos de medida no permiten distinguirlos.",
+    "diagramStorageCombined": "Un depósito (Hygienik con placa de estratificación)",
+    "diagramStorageSeparate": "Dos depósitos (acumulador de inercia separado)"
 }

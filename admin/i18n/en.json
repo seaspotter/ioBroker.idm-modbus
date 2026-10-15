@@ -221,5 +221,9 @@
     "diagramCopNone": "Do not show",
     "diagramSource": "Source of power and COP",
     "diagramSourceHelp": "Electrical power, thermal power and COP come from the Navigator or from your external meters (Statistics tab). Where an external value is missing, the Navigator value is shown.",
-    "diagramCopSource": "One COP (from the source above)"
+    "diagramCopSource": "One COP (from the source above)",
+    "diagramStorage": "Storage in the diagram",
+    "diagramStorageHelp": "In a Hygienik with stratification plate the heating buffer and the hot water share one vessel; with a separate heating buffer (TERMO) next to a Hygienik or AQA they are two vessels. The tags cannot tell the two apart.",
+    "diagramStorageCombined": "One vessel (Hygienik with stratification plate)",
+    "diagramStorageSeparate": "Two vessels (separate heating buffer)"
 }

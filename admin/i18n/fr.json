@@ -221,5 +221,9 @@
     "zoneModulesHelp": "0 = aucun, maximum 10",
     "diagramSource": "Source de la puissance et du COP",
     "diagramSourceHelp": "La puissance électrique, la puissance thermique et le COP proviennent du Navigator ou de vos compteurs externes (onglet Statistiques). Si une valeur externe manque, celle du Navigator est affichée.",
-    "diagramCopSource": "Un COP (de la source ci-dessus)"
+    "diagramCopSource": "Un COP (de la source ci-dessus)",
+    "diagramStorage": "Ballon dans le schéma",
+    "diagramStorageHelp": "Dans un Hygienik avec plaque de stratification, le ballon tampon et l'eau chaude partagent une même cuve ; avec un ballon tampon séparé (TERMO) à côté d'un Hygienik ou d'un AQA, ce sont deux cuves. Les points de mesure ne permettent pas de les distinguer.",
+    "diagramStorageCombined": "Une cuve (Hygienik avec plaque de stratification)",
+    "diagramStorageSeparate": "Deux cuves (ballon tampon séparé)"
 }

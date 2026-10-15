@@ -36,6 +36,8 @@
         outdoorX: -150,
         hp: { x: -20, w: 330, minH: 270, rowGap: 50, iconSize: 96 },
         tank: { x: 520, w: 150, top: 80, h: 460, hSolar: 540, radius: 58, levelInset: 56, levelH: 30, pipeInset: 12 },
+        // two vessels: the hot water vessel above takes this share of the height, a gap separates it from the heating buffer
+        split: { dhwShare: 0.34, gap: 50, branchFeedY: 216, branchReturnY: 230, feedX: 36, returnX: 22, reach: 40 },
         pipeGap: 100, // between hot gas line, flow and return pipe
         circuit: { x: 980, w: 216, h: 170, gap: 28, pipeDy: 40, manifold: 60 },
         room: { w: 114, h: 52, gap: 8 },
@@ -57,6 +59,7 @@
     var modelJson = '';
     var state = {}; // latest value per state id
     var bindings = {}; // state id -> functions that show the value
+    var tankCount = 0; // one gradient per vessel
     var view = null; // what the current render draws into: model, layers, colours of the flow and return sensors
 
     /* ---------- values and bindings ---------- */
@@ -418,7 +421,7 @@
     }
     /* the storage: a vertical gradient from hot to cold with a chip per sensor level */
     function tank(parent, x, y, w, h, levels, title, reserveBottom) {
-        var gradientId = 'tank-gradient';
+        var gradientId = `tank-gradient-${tankCount++}`;
         var grad = el('linearGradient', { id: gradientId, x1: 0, y1: 0, x2: 0, y2: 1 }, el('defs', {}, parent));
         [
             ['0%', '#f28a3a'],
@@ -511,12 +514,16 @@
     function gridOf(m) {
         var tankH = m.parts.solar ? L.tank.hSolar : L.tank.h;
         var yFlow = L.tank.top + tankH / 2;
+        var dhwH = Math.round(tankH * L.split.dhwShare);
         return {
             tankH: tankH,
             tankBottom: L.tank.top + tankH,
             yHgl: yFlow - L.pipeGap,
             yFlow: yFlow,
             yRet: yFlow + L.pipeGap,
+            // the two vessels of a separate heating buffer: hot water above, the heating buffer below
+            dhwH: dhwH,
+            bufTop: L.tank.top + dhwH + L.split.gap,
         };
     }
 
@@ -643,7 +650,60 @@
             // the return flows from the storage back to the heat pump
             { y: g.yRet, id: ids.hpReturn, tag: TAG.hpReturn, active: waterActive, back: true },
         ];
-        if (hasTank) {
+        if (hasTank && m.storage === 'separate') {
+            var sp = L.split;
+            var tankX = L.tank.x;
+            var bufH = g.tankBottom - g.bufTop;
+            var dhwLevels = levels.filter(function (level) {
+                return level.id !== ids.buffer;
+            });
+            tank(view.parts, tankX, L.tank.top, L.tank.w, g.dhwH, dhwLevels, m.labels.dhw, 0);
+            tank(
+                view.parts,
+                tankX,
+                g.bufTop,
+                L.tank.w,
+                bufH,
+                [{ id: ids.buffer, tag: TAG.buffer }],
+                m.labels.buffer,
+                m.parts.solar ? L.solar.reserve : 0,
+            );
+            // the hot water vessel is charged by the hot gas line where there is one, else from the heat pump flow (the valve M63
+            // chooses the side); its return joins the return pipe
+            var feedX = tankX - sp.feedX;
+            var returnX = tankX - sp.returnX;
+            var reachX = tankX + sp.reach;
+            if (!ids.hgl) {
+                line(
+                    view.pipes,
+                    [
+                        [feedX, g.yFlow],
+                        [feedX, sp.branchFeedY],
+                        [reachX, sp.branchFeedY],
+                    ],
+                    ids.hpFlow,
+                    waterActive,
+                );
+            }
+            line(
+                view.pipes,
+                [
+                    [reachX, sp.branchReturnY],
+                    [returnX, sp.branchReturnY],
+                    [returnX, g.yRet],
+                ],
+                ids.hpReturn,
+                waterActive,
+            );
+            if (ids.hgl) {
+                pipes.unshift({
+                    y: g.yHgl,
+                    id: ids.hgl,
+                    tag: TAG.hgl,
+                    active: ids.hglMixer ? { all: [ids.hglMixer, waterActive] } : waterActive,
+                });
+            }
+        } else if (hasTank) {
             var title =
                 m.parts.dhw && m.parts.buffer
                     ? `${m.labels.buffer} / ${m.labels.dhw}`
@@ -672,7 +732,8 @@
         var chipX = hasTank ? (hpRight + L.tank.x) / 2 : hpRight + 80;
         pipes.forEach(function (p) {
             if (hasTank) {
-                var tankSide = L.tank.x + L.tank.pipeInset;
+                // into a separate vessel the pipe reaches further: the rounded corner of a short vessel is further in
+                var tankSide = L.tank.x + (m.storage === 'separate' ? L.split.reach : L.tank.pipeInset);
                 // a pipe flows from its first to its last point, so the return is drawn from the storage to the heat pump
                 hline(view.pipes, p.back ? tankSide : hpRight, p.back ? hpRight : tankSide, p.y, p.id, p.active);
             }
