@@ -894,28 +894,30 @@
         }
         var ids = view.m.ids;
         var hpRight = L.hp.x + L.hp.w;
-        line(
-            view.pipes,
+        [
             [
                 [hpRight, g.yFlow],
                 [lane.feedX, g.yFlow],
             ],
-            ids.coldBuffer,
-            view.waterActive,
-            undefined,
-            'overlay',
-        );
-        line(
-            view.pipes,
             [
                 [lane.returnX, g.yRet],
                 [hpRight, g.yRet],
             ],
-            ids.coldBuffer,
-            view.waterActive,
-            undefined,
-            'overlay',
-        );
+        ].forEach(function (points) {
+            // a solid pipe in the colour of the page first: it hides the resting pipe below the dashes of the cold one
+            var d = points
+                .map(function (pt, k) {
+                    return `${(k ? 'L' : 'M') + pt[0]} ${pt[1]}`;
+                })
+                .join(' ');
+            var mask = rawPipe(view.pipes, d, 'var(--bg)');
+            mask.style.display = 'none';
+            bind(ids.coldBuffer, function () {
+                mask.style.display = view.cooling ? '' : 'none';
+            });
+            line(view.pipes, points, ids.coldBuffer, view.waterActive, undefined, 'overlay');
+        });
+        view.modeIds.push(ids.coldBuffer);
     }
 
     /* the rooms next to each heating circuit (model.js assigns them from the zone modules and the settings) */
