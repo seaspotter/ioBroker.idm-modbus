@@ -10,9 +10,9 @@
     /* flow pipes and their sensors are always warm, return ones always cold; anything else follows its temperature */
     var FLOW_COLOR = '#f08a3a';
     var RETURN_COLOR = '#3b82f6';
-    // in cooling operation the flow to the interconnection and the circuits carries cold water (blue), the return a little warmer
-    var COOL_FLOW_COLOR = '#2563eb';
-    var COOL_RETURN_COLOR = '#22c7d6';
+    // in cooling operation the cold stretch of flow and return has the blue used for cold water everywhere else
+    var COOL_FLOW_COLOR = RETURN_COLOR;
+    var COOL_RETURN_COLOR = RETURN_COLOR;
     // value of the operating mode register while the heat pump cools
     var COOLING_MODE = 2;
 
