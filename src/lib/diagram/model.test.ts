@@ -15,7 +15,17 @@ interface Model {
     heatSource: 'air' | 'ground';
     parts: Record<string, boolean>;
     ids: Record<string, string | null>;
-    circuits: { letter: string; name: string; flow: string; flowTag: string; roomTag: string }[];
+    circuits: {
+        letter: string;
+        name: string;
+        flow: string | null;
+        flowTag: string;
+        roomTag: string;
+        pump: string | null;
+        mixer: string | null;
+        pumpTag: string;
+        mixerTag: string;
+    }[];
     rooms: { zone: number; circuit: string | null; name: string; temperature: string; target: string | null }[];
     sensors: { id: string; tag: string; name: string; unit: string; group: string }[];
     hpModes: Record<string, string>;
@@ -235,6 +245,35 @@ describe('diagram model', () => {
             'web.io.analog_out.m71',
         );
         expect(build({ 'hp.hgl_flow_temp': 48 }).ids.hglMixer).to.equal(null);
+    });
+
+    it('gives every circuit its own pump and mixer, and lists a direct circuit that has a pump but no flow sensor', () => {
+        const model = build({
+            'hc.A.flow_temp': 31,
+            'web.io.digital_out.m31': 1,
+            'web.io.digital_out.m41': 'Aus',
+            // circuit B: a direct circuit (pump M32, no mixer, no flow sensor B52)
+            'web.io.digital_out.m32': 0,
+            'hc.C.flow_temp': 28,
+            'web.io.digital_out.m33': 1,
+            'web.io.digital_out.m43': 'Auf',
+        });
+        const byLetter = Object.fromEntries(model.circuits.map(c => [c.letter, c]));
+        expect(Object.keys(byLetter)).to.deep.equal(['A', 'B', 'C']);
+        expect(byLetter.A).to.include({
+            pump: 'web.io.digital_out.m31',
+            mixer: 'web.io.digital_out.m41',
+            pumpTag: 'M31',
+            mixerTag: 'M41',
+        });
+        expect(byLetter.B).to.include({ pump: 'web.io.digital_out.m32', mixer: null, flow: null, pumpTag: 'M32' });
+        expect(byLetter.C).to.include({
+            pump: 'web.io.digital_out.m33',
+            mixer: 'web.io.digital_out.m43',
+            mixerTag: 'M43',
+        });
+        // a pump alone does not appear without a circuit: nothing is listed where nothing reports
+        expect(build({}).circuits).to.have.length(0);
     });
 
     it('finds the mixer M41 of heating circuit A', () => {

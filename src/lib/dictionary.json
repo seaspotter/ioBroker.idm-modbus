@@ -7090,5 +7090,17 @@
         "pl": "Moc cieplna (licznik zewnętrzny)",
         "uk": "Теплова потужність (зовнішній лічильник)",
         "zh-cn": "热功率（外部热量表）"
+    },
+    "Direct circuit": {
+        "de": "Direktheizkreis",
+        "ru": "Прямой контур отопления",
+        "pt": "Circuito de aquecimento direto",
+        "nl": "Direct verwarmingscircuit",
+        "fr": "Circuit de chauffage direct",
+        "it": "Circuito di riscaldamento diretto",
+        "es": "Circuito de calefacción directo",
+        "pl": "Obieg grzewczy bezpośredni",
+        "uk": "Прямий контур опалення",
+        "zh-cn": "直接供暖回路"
     }
 }

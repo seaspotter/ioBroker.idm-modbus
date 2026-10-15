@@ -702,9 +702,9 @@
         var fromX = hasTank ? L.tank.x + L.tank.w - L.tank.pipeInset : L.hp.x + L.hp.w;
         var returnDy = c.pipeDy + (g.yRet - g.yFlow); // return pipe, from the top of a circuit block
         var roomsOf = roomsOfCircuits(m);
-        /* a circuit runs while its mode says so, circuit A also while its pump M31 runs */
+        /* a circuit runs while its mode says so or its pump runs (M31 for circuit A, M32 for B, ...) */
         var running = m.circuits.map(function (circuit) {
-            return circuit.letter === 'A' && ids.pumpM31 ? [circuit.active, ids.pumpM31] : [circuit.active];
+            return circuit.pump ? [circuit.active, circuit.pump] : [circuit.active];
         });
         var tops = [];
         var next = g.yFlow - c.pipeDy;
@@ -724,13 +724,18 @@
             hline(view.pipes, c.x, returnManifold, y + returnDy, ids.hpReturn, running[i], returnPhase);
             card(parts, c.x, y, c.w, c.h, circuit.name);
             dot(parts, c.x + c.w - 18, y + 22, running[i]);
-            if (circuit.letter === 'A' && ids.pumpM31) {
-                badge(parts, c.x + 12, y + 150, 'M31', ids.pumpM31, false);
+            // pump and mixer of every circuit that reports them; a direct circuit shows the pump only
+            if (circuit.pump) {
+                badge(parts, c.x + 12, y + 150, circuit.pumpTag, circuit.pump, false);
             }
-            if (circuit.letter === 'A' && ids.mixerM41) {
-                mixerBadge(parts, c.x + 104, y + 150, 'M41', ids.mixerM41, describeMixerText);
+            // a circuit with a pump and no mixer is a direct circuit; say so, its card has few values
+            if (circuit.pump && !circuit.mixer) {
+                text(parts, c.x + 12, y + 46, m.labels.directCircuit, 'small');
             }
-            var columns = [{ label: `${circuit.flowTag} ${m.labels.flow}`, id: circuit.flow }];
+            if (circuit.mixer) {
+                mixerBadge(parts, c.x + 104, y + 150, circuit.mixerTag, circuit.mixer, describeMixerText);
+            }
+            var columns = circuit.flow ? [{ label: `${circuit.flowTag} ${m.labels.flow}`, id: circuit.flow }] : [];
             if (circuit.setpoint) {
                 columns.push({ label: m.labels.setpoint, id: circuit.setpoint });
             }
@@ -738,7 +743,7 @@
                 columns.push({ label: `${circuit.roomTag} ${m.labels.room}`, id: circuit.room });
             }
             // the columns share the card; two columns get more room, so "Vorlauf" and "Soll" do not touch
-            var spacing = (c.w - 24) / columns.length;
+            var spacing = (c.w - 24) / Math.max(columns.length, 1);
             columns.forEach(function (column, k) {
                 labeled(
                     parts,

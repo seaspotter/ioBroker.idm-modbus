@@ -414,5 +414,18 @@
         "pl": "Obieg grzewczy {i}",
         "uk": "Контур опалення {i}",
         "zh-cn": "供暖回路 {i}"
+    },
+    "directCircuit": {
+        "en": "Direct circuit",
+        "de": "Direktheizkreis",
+        "ru": "Прямой контур отопления",
+        "pt": "Circuito de aquecimento direto",
+        "nl": "Direct verwarmingscircuit",
+        "fr": "Circuit de chauffage direct",
+        "it": "Circuito di riscaldamento diretto",
+        "es": "Circuito de calefacción directo",
+        "pl": "Obieg grzewczy bezpośredni",
+        "uk": "Прямий контур опалення",
+        "zh-cn": "直接供暖回路"
     }
 }

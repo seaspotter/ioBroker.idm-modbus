@@ -188,7 +188,11 @@
         for (var i = 0; i < CIRCUIT_LETTERS.length; i++) {
             var letter = CIRCUIT_LETTERS[i];
             var flow = pick([`hc.${letter}.flow_temp`]);
-            if (flow) {
+            // the circuit pump M31..M37 and the mixer M41..M47 (web tables); a direct circuit has a pump and no mixer and no flow sensor
+            var pump = pick([`web.io.digital_out.m${31 + i}`]);
+            var mixer = pick([`web.io.digital_out.m${41 + i}`]);
+            var active = pick([`hc.${letter}.active_mode`]);
+            if (flow || pump || mixer || active) {
                 var channel = objects[`hc.${letter}`];
                 var tags = circuitTags(letter);
                 circuits.push({
@@ -196,8 +200,12 @@
                     name: (channel && textOf(channel.common.name, language)) || labels.circuit.replace('{i}', letter),
                     flow: flow,
                     setpoint: pick([`hc.${letter}.setpoint_flow_temp`]),
-                    active: pick([`hc.${letter}.active_mode`]),
+                    active: active,
                     room: pick([`hc.${letter}.room_temp`]),
+                    pump: pump,
+                    mixer: mixer,
+                    pumpTag: `M${31 + i}`,
+                    mixerTag: `M${41 + i}`,
                     flowTag: tags.flow,
                     roomTag: tags.room,
                 });

@@ -128,6 +128,10 @@
         "circuit": {
             "en": "Heating circuit {i}",
             "de": "Heizkreis {i}"
+        },
+        "directCircuit": {
+            "en": "Direct circuit",
+            "de": "Direktheizkreis"
         }
     }
 }
