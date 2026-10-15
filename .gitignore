@@ -19,3 +19,4 @@ admin/i18n/flat.txt
 admin/i18n/*/flat.txt
 # IDM documents stay IDM's copyright: kept locally for reference, not published (see docs/sources/README.md)
 docs/sources/*.pdf
+docs/sources/manuals/*.pdf
