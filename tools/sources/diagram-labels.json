@@ -140,6 +140,22 @@
         "rod": {
             "en": "Heating rod",
             "de": "Heizstab"
+        },
+        "circuitPump": {
+            "en": "Heating circuit {i} pump",
+            "de": "Pumpe Heizkreis {i}"
+        },
+        "circuitMixer": {
+            "en": "Heating circuit {i} mixer",
+            "de": "Mischer Heizkreis {i}"
+        },
+        "circuitFlow": {
+            "en": "Heating circuit {i} flow temperature",
+            "de": "Vorlauftemperatur Heizkreis {i}"
+        },
+        "circuitRoom": {
+            "en": "Heating circuit {i} room device",
+            "de": "Raumgerät Heizkreis {i}"
         }
     }
 }

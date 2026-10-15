@@ -7126,5 +7126,41 @@
         "pl": "Grzałka elektryczna",
         "uk": "Електронагрівач",
         "zh-cn": "电加热棒"
+    },
+    "Heating circuit {i} pump": {
+        "de": "Pumpe Heizkreis {i}",
+        "ru": "Насос контура отопления {i}",
+        "pt": "Bomba do circuito de aquecimento {i}",
+        "nl": "Pomp verwarmingscircuit {i}",
+        "fr": "Pompe du circuit de chauffage {i}",
+        "it": "Pompa del circuito di riscaldamento {i}",
+        "es": "Bomba del circuito de calefacción {i}",
+        "pl": "Pompa obiegu grzewczego {i}",
+        "uk": "Насос контуру опалення {i}",
+        "zh-cn": "供暖回路 {i} 水泵"
+    },
+    "Heating circuit {i} mixer": {
+        "de": "Mischer Heizkreis {i}",
+        "ru": "Смеситель контура отопления {i}",
+        "pt": "Válvula misturadora do circuito de aquecimento {i}",
+        "nl": "Mengklep verwarmingscircuit {i}",
+        "fr": "Mélangeur du circuit de chauffage {i}",
+        "it": "Miscelatore del circuito di riscaldamento {i}",
+        "es": "Válvula mezcladora del circuito de calefacción {i}",
+        "pl": "Zawór mieszający obiegu grzewczego {i}",
+        "uk": "Змішувач контуру опалення {i}",
+        "zh-cn": "供暖回路 {i} 混合阀"
+    },
+    "Heating circuit {i} room device": {
+        "de": "Raumgerät Heizkreis {i}",
+        "ru": "Комнатный блок контура отопления {i}",
+        "pt": "Unidade ambiente do circuito de aquecimento {i}",
+        "nl": "Ruimteapparaat verwarmingscircuit {i}",
+        "fr": "Régulateur d'ambiance du circuit de chauffage {i}",
+        "it": "Unità ambiente del circuito di riscaldamento {i}",
+        "es": "Unidad de ambiente del circuito de calefacción {i}",
+        "pl": "Regulator pokojowy obiegu grzewczego {i}",
+        "uk": "Кімнатний пристрій контуру опалення {i}",
+        "zh-cn": "供暖回路 {i} 房间控制器"
     }
 }

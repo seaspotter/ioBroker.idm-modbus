@@ -264,11 +264,31 @@ describe('diagram model', () => {
             'hp.something': state('', 'No tag here'),
         };
         const german = build({}, { language: 'de', objects }).tagNames;
-        expect(german).to.deep.equal({ B38: 'Wärmespeichertemperatur', M73: 'Ladepumpe', M64: 'Zirkulationspumpe' });
+        expect(german).to.include({ B38: 'Wärmespeichertemperatur', M73: 'Ladepumpe', M64: 'Zirkulationspumpe' });
         expect(build({}, { language: 'en', objects }).tagNames.B38).to.equal('Heat storage temperature');
         // a language the object does not have falls back to English
         expect(build({}, { language: 'ru', objects }).tagNames.M73).to.equal('Charging pump');
-        expect(build({}).tagNames).to.deep.equal({});
+        // without any object only the names of the heating circuits exist
+        expect(Object.keys(build({}).tagNames).every(tag => /^(M3[1-7]|M4[1-7]|B5[1-7]|B6[1-7])$/.test(tag))).to.equal(
+            true,
+        );
+    });
+
+    it('names the tags of every heating circuit even where the Navigator delivers no name', () => {
+        const names = build({}, { language: 'de' }).tagNames;
+        expect(names).to.include({
+            M31: 'Pumpe Heizkreis A',
+            M32: 'Pumpe Heizkreis B',
+            M37: 'Pumpe Heizkreis G',
+            M42: 'Mischer Heizkreis B',
+            B53: 'Heizkreis C Vorlauftemperatur',
+            B67: 'Raumgerät Heizkreis G',
+        });
+        // the Navigator's own name wins
+        const objects = {
+            'web.io.digital_out.m32': state('', { en: 'M32 Pump heating circuit B', de: 'M32 Heizkreispumpe B' }),
+        };
+        expect(build({}, { language: 'de', objects }).tagNames.M32).to.equal('Heizkreispumpe B');
     });
 
     it('lists the heating rod stages that report and finds the circulation pump', () => {

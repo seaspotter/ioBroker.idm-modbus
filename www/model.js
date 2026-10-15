@@ -178,6 +178,23 @@
         return names;
     }
 
+    /* The tags of the heating circuits get a name of our own where the Navigator delivers none (a circuit that has no web table
+       entry, or none in this language): pump M31..M37, mixer M41..M47, flow sensor B51..B57, room device B61..B67. */
+    function withCircuitNames(names, labels) {
+        CIRCUIT_LETTERS.split('').forEach(function (letter, i) {
+            var named = function (tag, template) {
+                if (!names[tag] && template) {
+                    names[tag] = template.replace('{i}', letter);
+                }
+            };
+            named(`M${31 + i}`, labels.circuitPump);
+            named(`M${41 + i}`, labels.circuitMixer);
+            named(`B${51 + i}`, labels.circuitFlow);
+            named(`B${61 + i}`, labels.circuitRoom);
+        });
+        return names;
+    }
+
     function fillLabels(labels, language) {
         var result = {};
         Object.keys(labels || {}).forEach(function (key) {
@@ -333,7 +350,7 @@
             },
             ids: ids,
             circuits: circuits,
-            tagNames: findTagNames(objects, language),
+            tagNames: withCircuitNames(findTagNames(objects, language), labels),
             rods: ROD_STAGES.filter(function (stage) {
                 return hasValue(states, stage.id);
             }),
