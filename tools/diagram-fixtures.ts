@@ -41,6 +41,15 @@ const exported: { module: { exports: unknown } } = { module: { exports: {} } };
 vm.runInNewContext(fs.readFileSync(path.join(root, 'www', 'plant.js'), 'utf8'), exported);
 const plant = exported.module.exports as Plant;
 
+/**
+ * Can the plant cool? The tags that show it are the cold storage, humidity, changeover valves and the reversal valve.
+ *
+ * @param scheme a scheme of the manuals
+ */
+export function canCool(scheme: Scheme): boolean {
+    return scheme.tags.some(tag => ['B31', 'B40', 'M51', 'M61', 'M62', 'M74'].includes(tag));
+}
+
 /** Every scheme of the manuals. */
 export function loadSchemes(): Scheme[] {
     const file = path.join(root, 'tools', 'sources', 'diagram-schemes.json');
@@ -93,8 +102,9 @@ const registerById = new Map<string, RegisterEntry>(
  *
  * @param scheme a scheme of the manuals
  * @param language language of the page
+ * @param cooling the heat pump cools: operating mode cooling and cold water temperatures
  */
-export function buildSnapshot(scheme: Scheme, language = 'en'): Snapshot {
+export function buildSnapshot(scheme: Scheme, language = 'en', cooling = false): Snapshot {
     const states: Snapshot['states'] = {
         'info.connection': true,
         'system.outdoor_temp': 8,
@@ -159,6 +169,21 @@ export function buildSnapshot(scheme: Scheme, language = 'en'): Snapshot {
         states[id] = value;
         const name = reg ? reg.label : { en: WEB_NAMES[tag] ?? `${tag} ${id}` };
         objects[id] = { type: 'state', common: { name, ...(unit ? { unit } : {}), role: 'value' } };
+    }
+    if (cooling) {
+        states['hp.hp_operating_mode'] = 2;
+        for (const [id, value] of Object.entries(states)) {
+            if (typeof value !== 'number') {
+                continue;
+            }
+            if (id === 'hp.hp_flow_temp') {
+                states[id] = 12;
+            } else if (id === 'hp.hp_return_temp') {
+                states[id] = 17;
+            } else if (/^hc\.[A-G]\.flow_temp$/.test(id)) {
+                states[id] = 16;
+            }
+        }
     }
     const mode = registerById.get('hp.hp_operating_mode');
     if (mode) {

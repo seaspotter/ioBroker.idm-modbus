@@ -354,7 +354,10 @@
             // hot water without a heating buffer (a Hygienik with a direct circuit): the circuits are fed by the heat pump itself
             hotWaterOnly: parts.dhw && !parts.buffer,
             // the hot water vessel hangs below the pipes when there is no heating buffer or a separate one
-            hungDhw: parts.dhw && (settings.storage === 'separate' || !parts.buffer),
+            // (a fresh water station without hot water sensors still has a vessel: the schemes draw a Hygienik without B41 / B48)
+            hungDhw:
+                (parts.dhw || (parts.freshwater && !parts.buffer)) &&
+                (settings.storage === 'separate' || !parts.buffer),
             // a vessel in the middle: the heating buffer, with the hot water inside unless that hangs apart
             centralTank: parts.buffer,
             ids: ids,

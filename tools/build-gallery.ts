@@ -9,7 +9,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { buildSnapshot, loadSchemes } from './diagram-fixtures';
+import { buildSnapshot, canCool, loadSchemes } from './diagram-fixtures';
 
 const root = path.join(__dirname, '..');
 
@@ -50,9 +50,19 @@ export function buildGallery(folder: string, language: string): number {
             path.join(folder, 'snapshots', `${scheme.id}.json`),
             JSON.stringify(buildSnapshot(scheme, language)),
         );
+        if (canCool(scheme)) {
+            // a plant that can cool is drawn again while it cools
+            fs.writeFileSync(
+                path.join(folder, 'snapshots', `${scheme.id}-cooling.json`),
+                JSON.stringify(buildSnapshot(scheme, language, true)),
+            );
+        }
         const heading = [scheme.unit, scheme.code].filter(Boolean).join(' · ');
+        const cooling = canCool(scheme)
+            ? `<a href="index.html?scenario=${scheme.id}-cooling"><img loading="lazy" src="shots/${scheme.id}-cooling.png" alt=""></a>`
+            : '';
         cards.push(
-            `<figure><a href="index.html?scenario=${scheme.id}"><img loading="lazy" src="shots/${scheme.id}.png" alt=""></a>` +
+            `<figure><a href="index.html?scenario=${scheme.id}"><img loading="lazy" src="shots/${scheme.id}.png" alt=""></a>${cooling}` +
                 `<figcaption><b>${heading}</b><br>${scheme.title}<br><small>${scheme.manual}, page ${scheme.page}` +
                 `${scheme.storage === 'separate' ? ' · two vessels' : ''}</small></figcaption></figure>`,
         );

@@ -309,6 +309,8 @@ describe('diagram model', () => {
         });
         expect(build({ 'dhw.dhw_temp_top': 45 })).to.deep.include({ centralTank: false, hungDhw: true });
         expect(build({ 'dhw.storage_temp': 30 })).to.deep.include({ centralTank: true, hungDhw: false });
+        // a fresh water station without hot water sensors still has a vessel of its own
+        expect(build({ 'dhw.dhw_tapping_temp': 41 })).to.deep.include({ centralTank: false, hungDhw: true });
         // the cold storage (B40) is found by its state
         expect(build({ 'dhw.cold_storage_temp': 11 }).ids.coldBuffer).to.equal('dhw.cold_storage_temp');
     });

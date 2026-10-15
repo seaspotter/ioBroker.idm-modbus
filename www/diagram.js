@@ -10,6 +10,11 @@
     /* flow pipes and their sensors are always warm, return ones always cold; anything else follows its temperature */
     var FLOW_COLOR = '#f08a3a';
     var RETURN_COLOR = '#3b82f6';
+    // in cooling operation the flow to the interconnection and the circuits carries cold water (blue), the return a little warmer
+    var COOL_FLOW_COLOR = '#3f8fdc';
+    var COOL_RETURN_COLOR = '#8cc0f0';
+    // value of the operating mode register while the heat pump cools
+    var COOLING_MODE = 2;
 
     /* IDM measuring points shown next to their values, as in the plant diagram of the Navigator */
     var TAG = {
@@ -184,7 +189,30 @@
         return `rgb(${rgb.join(',')})`;
     }
     function colorOf(id, v) {
+        var cool = view.cooling && view.coolRole[id];
+        if (cool) {
+            return cool === 'flow' ? COOL_FLOW_COLOR : COOL_RETURN_COLOR;
+        }
         return view.roleColor[id] || tempColor(v);
+    }
+    /* the pipes whose colour changes with cooling: the heat pump flow and the flow of the circuits, and the return */
+    function coolRoles(m) {
+        var roles = {};
+        [m.ids.hpFlow]
+            .concat(
+                m.circuits.map(function (c) {
+                    return c.flow;
+                }),
+            )
+            .forEach(function (id) {
+                if (id) {
+                    roles[id] = 'flow';
+                }
+            });
+        if (m.ids.hpReturn) {
+            roles[m.ids.hpReturn] = 'return';
+        }
+        return roles;
     }
 
     /* ---------- drawing primitives ---------- */
@@ -323,30 +351,39 @@
         return ((length % DASH_PERIOD) + DASH_PERIOD) % DASH_PERIOD;
     }
     /* a pipe coloured by its sensor; it flows while one of the `activeIds` runs */
-    function pipe(parent, d, sensorId, activeIds, phase) {
+    function pipe(parent, d, sensorId, activeIds, phase, coolingOnly) {
         var p = rawPipe(parent, d, IDLE_COLOR);
         if (phase) {
             p.style.setProperty('--phase', `${phase}px`);
         }
         bind(sensorId, function (v) {
-            p.setAttribute('stroke', colorOf(sensorId, v));
+            // a pipe of the cold storage is only in use while the heat pump cools
+            p.setAttribute('stroke', coolingOnly && !view.cooling ? IDLE_COLOR : colorOf(sensorId, v));
         });
         // `{ all: [groupA, groupB] }`: flows only while both groups have something running
         (activeIds && activeIds.all ? whenAllRunning.bind(null, activeIds.all) : whenRunning.bind(null, activeIds))(
             function (running) {
-                p.classList.toggle('flowing', running);
+                p.classList.toggle('flowing', running && (!coolingOnly || view.cooling));
             },
         );
+        if (coolingOnly) {
+            view.modeIds.push(sensorId);
+            []
+                .concat(activeIds && activeIds.all ? [].concat.apply([], activeIds.all) : activeIds || [])
+                .forEach(function (id) {
+                    view.modeIds.push(id);
+                });
+        }
         return p;
     }
     /* a pipe made of straight pieces; `points` are [x, y] pairs */
-    function line(parent, points, sensorId, activeIds, phase) {
+    function line(parent, points, sensorId, activeIds, phase, coolingOnly) {
         var d = points
             .map(function (pt, k) {
                 return `${(k ? 'L' : 'M') + pt[0]} ${pt[1]}`;
             })
             .join(' ');
-        return pipe(parent, d, sensorId, activeIds, phase);
+        return pipe(parent, d, sensorId, activeIds, phase, coolingOnly);
     }
     function hline(parent, x1, x2, y, sensorId, activeIds, phase) {
         return line(
@@ -521,6 +558,10 @@
         return {
             m: m,
             roleColor: colorRoles(m),
+            coolRole: coolRoles(m),
+            cooling: false,
+            // ids whose bindings are run again when the operating mode changes
+            modeIds: Object.keys(coolRoles(m)),
             /* back to front: pipes, the station card with its storage pipes (above the other pipes, below the tank), parts */
             pipes: el('g', {}, root),
             mid: el('g', {}, root),
@@ -593,7 +634,11 @@
             });
         }
         g.hungBottom = g.hung.length ? g.hung[g.hung.length - 1].bottom : g.tankBottom;
-        g.dhwBottom = g.dhwBottom ? g.dhwBottom + (view.m.centralTank ? delta : delta) : 0;
+        var dhw = g.hung.find(function (vessel) {
+            return vessel.kind === 'dhw';
+        });
+        g.dhwTop = dhw ? dhw.top : 0;
+        g.dhwBottom = dhw ? dhw.bottom : 0;
     }
 
     function heatPumpRows(m) {
@@ -786,6 +831,8 @@
                 ]),
                 flowId,
                 byHgl ? hglActive : waterActive,
+                undefined,
+                !isDhw,
             );
             line(
                 view.pipes,
@@ -796,6 +843,8 @@
                 ],
                 isDhw ? ids.hpReturn : ids.coldBuffer,
                 waterActive,
+                undefined,
+                !isDhw,
             );
         });
         if (ids.hgl && (central || g.hung.length)) {
@@ -1147,6 +1196,11 @@
         view = createView(m);
         var g = gridOf(m);
         var hp = drawHeatPump(g);
+        // while the heat pump cools, the flow carries cold water: the colours follow the mode
+        bind(m.ids.hpMode, function (v) {
+            view.cooling = num(v) === COOLING_MODE;
+            [].concat(view.modeIds).forEach(fire);
+        });
         growForSolar(g, hp);
         var storage = drawStorage(g);
         var hasTank = storage.any;
