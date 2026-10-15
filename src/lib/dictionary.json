@@ -7162,5 +7162,17 @@
         "pl": "Regulator pokojowy obiegu grzewczego {i}",
         "uk": "Кімнатний пристрій контуру опалення {i}",
         "zh-cn": "供暖回路 {i} 房间控制器"
+    },
+    "Cold storage": {
+        "de": "Kältespeicher",
+        "ru": "Накопитель холода",
+        "pt": "Acumulador de frio",
+        "nl": "Koudebuffer",
+        "fr": "Ballon de froid",
+        "it": "Accumulo freddo",
+        "es": "Acumulador de frío",
+        "pl": "Zasobnik chłodu",
+        "uk": "Накопичувач холоду",
+        "zh-cn": "蓄冷罐"
     }
 }

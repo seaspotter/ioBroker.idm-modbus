@@ -55,6 +55,8 @@
         fanM13: ['web.io.analog_out.m13'],
         // the hot water circulation pump
         circulation: ['dhw.circulation_pump', 'web.io.digital_out.m64'],
+        // the cold storage (cooling buffer)
+        coldBuffer: ['dhw.cold_storage_temp'],
     };
 
     /* the stages of the electric heating rod (web outputs), each with the kW it stands for */
@@ -351,6 +353,10 @@
             parts: parts,
             // hot water without a heating buffer (a Hygienik with a direct circuit): the circuits are fed by the heat pump itself
             hotWaterOnly: parts.dhw && !parts.buffer,
+            // the hot water vessel hangs below the pipes when there is no heating buffer or a separate one
+            hungDhw: parts.dhw && (settings.storage === 'separate' || !parts.buffer),
+            // a vessel in the middle: the heating buffer, with the hot water inside unless that hangs apart
+            centralTank: parts.buffer,
             ids: ids,
             circuits: circuits,
             tagNames: withCircuitNames(findTagNames(objects, language), labels),

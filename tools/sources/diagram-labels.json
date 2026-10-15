@@ -156,6 +156,10 @@
         "circuitRoom": {
             "en": "Heating circuit {i} room device",
             "de": "Raumgerät Heizkreis {i}"
+        },
+        "coldStorage": {
+            "en": "Cold storage",
+            "de": "Kältespeicher"
         }
     }
 }
