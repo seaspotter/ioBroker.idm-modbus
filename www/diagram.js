@@ -1124,10 +1124,24 @@
        carries the tooltip, because the text itself is replaced with every value. */
     function addTagHovers() {
         var names = view.m.tagNames || {};
+        var stateWords = [view.m.labels.on, view.m.labels.off].map(function (word) {
+            return String(word).toLowerCase().replace(/\.$/, '');
+        });
+        // a word of a name has four letters or more (two Chinese characters); states ("Aus", "Auf", "Zu") and units are shorter
+        var isNameWord = function (word) {
+            var plain = word.toLowerCase().replace(/\.$/, '');
+            return (
+                stateWords.indexOf(plain) < 0 &&
+                (plain.length >= 4 || (/[\u4e00-\u9fff]/.test(plain) && plain.length >= 2))
+            );
+        };
         Array.prototype.forEach.call(svg.querySelectorAll('text'), function (node) {
-            var match = /^([BM]\d+[a-z]?)\b/.exec(node.textContent.trim());
+            var text = node.textContent.trim();
+            var match = /^([BM]\d+[a-z]?)\b/.exec(text);
             var name = match && names[match[1]];
-            if (!name) {
+            // a text that already names the part ("B37 Air intake temperature") needs no hover
+            var rest = text.slice(match ? match[0].length : 0).match(/[^\s\d.,:%°/()+\-–−]+/g) || [];
+            if (!name || rest.some(isNameWord)) {
                 return;
             }
             var box = node.getBBox();
