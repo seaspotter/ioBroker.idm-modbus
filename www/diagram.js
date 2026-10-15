@@ -351,22 +351,26 @@
         return ((length % DASH_PERIOD) + DASH_PERIOD) % DASH_PERIOD;
     }
     /* a pipe coloured by its sensor; it flows while one of the `activeIds` runs */
-    function pipe(parent, d, sensorId, activeIds, phase, coolingOnly) {
+    function pipe(parent, d, sensorId, activeIds, phase, only) {
         var p = rawPipe(parent, d, IDLE_COLOR);
         if (phase) {
             p.style.setProperty('--phase', `${phase}px`);
         }
+        // `only`: a pipe that carries water in cooling operation only (the cold storage) or in heating operation only (the hot water
+        // vessel: the heat pump cannot charge it while it cools); outside its operation it rests grey
+        var inUse = function () {
+            return only === 'cooling' ? view.cooling : only === 'heating' ? !view.cooling : true;
+        };
         bind(sensorId, function (v) {
-            // a pipe of the cold storage is only in use while the heat pump cools
-            p.setAttribute('stroke', coolingOnly && !view.cooling ? IDLE_COLOR : colorOf(sensorId, v));
+            p.setAttribute('stroke', inUse() ? colorOf(sensorId, v) : IDLE_COLOR);
         });
         // `{ all: [groupA, groupB] }`: flows only while both groups have something running
         (activeIds && activeIds.all ? whenAllRunning.bind(null, activeIds.all) : whenRunning.bind(null, activeIds))(
             function (running) {
-                p.classList.toggle('flowing', running && (!coolingOnly || view.cooling));
+                p.classList.toggle('flowing', running && inUse());
             },
         );
-        if (coolingOnly) {
+        if (only) {
             view.modeIds.push(sensorId);
             []
                 .concat(activeIds && activeIds.all ? [].concat.apply([], activeIds.all) : activeIds || [])
@@ -377,13 +381,13 @@
         return p;
     }
     /* a pipe made of straight pieces; `points` are [x, y] pairs */
-    function line(parent, points, sensorId, activeIds, phase, coolingOnly) {
+    function line(parent, points, sensorId, activeIds, phase, only) {
         var d = points
             .map(function (pt, k) {
                 return `${(k ? 'L' : 'M') + pt[0]} ${pt[1]}`;
             })
             .join(' ');
-        return pipe(parent, d, sensorId, activeIds, phase, coolingOnly);
+        return pipe(parent, d, sensorId, activeIds, phase, only);
     }
     function hline(parent, x1, x2, y, sensorId, activeIds, phase) {
         return line(
@@ -832,7 +836,7 @@
                 flowId,
                 byHgl ? hglActive : waterActive,
                 undefined,
-                !isDhw,
+                isDhw ? 'heating' : 'cooling',
             );
             line(
                 view.pipes,
@@ -844,7 +848,7 @@
                 isDhw ? ids.hpReturn : ids.coldBuffer,
                 waterActive,
                 undefined,
-                !isDhw,
+                isDhw ? 'heating' : 'cooling',
             );
         });
         if (ids.hgl && (central || g.hung.length)) {
