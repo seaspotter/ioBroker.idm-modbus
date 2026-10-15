@@ -36,18 +36,8 @@
         outdoorX: -150,
         hp: { x: -20, w: 330, minH: 270, rowGap: 50, iconSize: 96 },
         tank: { x: 520, w: 150, top: 80, h: 460, hSolar: 540, radius: 58, levelInset: 56, levelH: 30, pipeInset: 12 },
-        // two vessels: the heating buffer keeps its place and size, the hot water vessel hangs below it and is wired from below
-        split: {
-            gapBelow: 90,
-            dhwH: 190,
-            feedY: 30,
-            returnY: 55,
-            feedX: 22,
-            returnX: 36,
-            feedReach: 45,
-            returnReach: 110,
-            circuitShift: 180,
-        },
+        // two vessels: the heating buffer keeps its place and size, the hot water vessel hangs below it and is wired from the side
+        split: { gapBelow: 80, dhwH: 190, feedX: 22, returnX: 36, circuitShift: 180 },
         pipeGap: 100, // between hot gas line, flow and return pipe
         circuit: { x: 980, w: 216, h: 170, gap: 28, pipeDy: 40, manifold: 60 },
         room: { w: 114, h: 52, gap: 8 },
@@ -688,19 +678,19 @@
                 true,
             );
             // the hot water vessel is charged from the heat pump flow and returns into the return pipe: both pipes drop down left of
-            // the tanks and enter the vessel from above (the valve M63 chooses the side); the return is the outer one, so no pipe
-            // crosses the other
+            // the tanks and enter the vessel from the side, the feed at the height of the upper sensor, the return at the lower one;
+            // the return is the outer pipe, so no pipe crosses the other
             var feedX = tankX - sp.feedX;
             var returnX = tankX - sp.returnX;
-            var feedY = g.tankBottom + sp.feedY;
-            var returnY = g.tankBottom + sp.returnY;
+            var wall = tankX + L.tank.pipeInset;
+            var feedY = g.dhwTop + L.tank.levelInset;
+            var returnY = g.dhwBottom - L.tank.levelInset;
             line(
                 view.pipes,
                 [
                     [feedX, g.yFlow],
                     [feedX, feedY],
-                    [tankX + sp.feedReach, feedY],
-                    [tankX + sp.feedReach, g.dhwTop + 12],
+                    [wall, feedY],
                 ],
                 ids.hpFlow,
                 waterActive,
@@ -708,8 +698,7 @@
             line(
                 view.pipes,
                 [
-                    [tankX + sp.returnReach, g.dhwTop + 12],
-                    [tankX + sp.returnReach, returnY],
+                    [wall, returnY],
                     [returnX, returnY],
                     [returnX, g.yRet],
                 ],
