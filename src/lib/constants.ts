@@ -112,3 +112,5 @@ export const DIAGRAM_PARTS = ['buffer', 'dhw', 'freshwater', 'pv', 'solar', 'biv
 export const MAX_DIAGRAM_ZONE = 10;
 /** The COP rows of the diagram: one that follows the source setting, both (Navigator and external), or none. */
 export const DIAGRAM_COP_ROWS = ['source', 'both', 'none'] as const;
+/** How the diagram draws heating buffer and hot water: one vessel (Hygienik with stratification plate) or two (a separate TERMO). */
+export const DIAGRAM_STORAGE = ['combined', 'separate'] as const;

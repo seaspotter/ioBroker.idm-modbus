@@ -278,6 +278,9 @@
         return {
             language: language,
             heatSource: heatSource || (detectedGround ? 'ground' : 'air'),
+            // two vessels (hot water above, a separate heating buffer below) only where both exist
+            storage:
+                settings.storage === 'separate' && ids.dhwTop !== null && ids.buffer !== null ? 'separate' : 'combined',
             parts: {
                 buffer: ids.buffer !== null && show('buffer'),
                 dhw: ids.dhwTop !== null && show('dhw'),

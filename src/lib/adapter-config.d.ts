@@ -158,6 +158,8 @@ declare global {
             diagramSource: string;
             /** the COP rows: 'source' (one, from the source), 'both' or 'none' (the old values 'internal'/'external' still work) */
             diagramCop: string;
+            /** how buffer and hot water are drawn: 'combined' (one vessel, Hygienik with stratification plate) or 'separate' (two vessels) */
+            diagramStorage: string;
             /** parts to leave out of the diagram (buffer, dhw, freshwater, pv, solar, bivalence) */
             diagramHidden: string[];
             /** the heating circuit next to the rooms of a zone module */

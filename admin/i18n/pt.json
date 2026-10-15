@@ -221,5 +221,9 @@
     "zoneModulesHelp": "0 = nenhum, máximo 10",
     "diagramSource": "Origem da potência e do COP",
     "diagramSourceHelp": "A potência elétrica, a potência térmica e o COP vêm do Navigator ou dos seus contadores externos (separador Estatística). Se faltar um valor externo, é mostrado o valor do Navigator.",
-    "diagramCopSource": "Um COP (da origem acima)"
+    "diagramCopSource": "Um COP (da origem acima)",
+    "diagramStorage": "Acumulador no esquema",
+    "diagramStorageHelp": "Num Hygienik com placa de separação de camadas, o acumulador tampão e a água quente partilham um depósito; com um acumulador tampão separado (TERMO) ao lado de um Hygienik ou AQA são dois depósitos. Os pontos de medição não permitem distinguir os dois casos.",
+    "diagramStorageCombined": "Um depósito (Hygienik com placa de separação)",
+    "diagramStorageSeparate": "Dois depósitos (acumulador tampão separado)"
 }

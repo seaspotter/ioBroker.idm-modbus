@@ -221,5 +221,9 @@
     "zoneModulesHelp": "0 = geen, maximaal 10",
     "diagramSource": "Bron voor vermogen en COP",
     "diagramSourceHelp": "Elektrisch vermogen, thermisch vermogen en COP komen van de Navigator of van uw externe meters (tabblad Statistiek). Ontbreekt een externe waarde, dan wordt de waarde van de Navigator getoond.",
-    "diagramCopSource": "Eén COP (uit de bron hierboven)"
+    "diagramCopSource": "Eén COP (uit de bron hierboven)",
+    "diagramStorage": "Buffer in het schema",
+    "diagramStorageHelp": "Bij een Hygienik met gelaagdheidsplaat delen verwarmingsbuffer en warm water één vat; met een aparte verwarmingsbuffer (TERMO) naast een Hygienik of AQA zijn het twee vaten. De meetpunten kunnen dit niet onderscheiden.",
+    "diagramStorageCombined": "Eén vat (Hygienik met gelaagdheidsplaat)",
+    "diagramStorageSeparate": "Twee vaten (aparte verwarmingsbuffer)"
 }

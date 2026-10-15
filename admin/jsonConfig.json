@@ -1760,6 +1760,26 @@
                     "lg": 4,
                     "xl": 4
                 },
+                "diagramStorage": {
+                    "type": "select",
+                    "label": "diagramStorage",
+                    "help": "diagramStorageHelp",
+                    "options": [
+                        {
+                            "label": "diagramStorageCombined",
+                            "value": "combined"
+                        },
+                        {
+                            "label": "diagramStorageSeparate",
+                            "value": "separate"
+                        }
+                    ],
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
                 "diagramHidden": {
                     "type": "select",
                     "multiple": true,

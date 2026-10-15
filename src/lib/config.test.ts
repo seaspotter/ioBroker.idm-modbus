@@ -275,6 +275,21 @@ describe('readDiagramSettings', () => {
             zoneCircuit: [],
         });
     });
+    it('reads the storage layout and leaves the default (one vessel) out', () => {
+        expect(readDiagramSettings({ diagramStorage: 'separate' }).settings).to.deep.equal({
+            storage: 'separate',
+            hidden: [],
+            zoneCircuit: [],
+        });
+        expect(readDiagramSettings({ diagramStorage: 'combined' }).settings).to.deep.equal({
+            hidden: [],
+            zoneCircuit: [],
+        });
+        expect(readDiagramSettings({ diagramStorage: 'three' }).settings).to.deep.equal({
+            hidden: [],
+            zoneCircuit: [],
+        });
+    });
     it('survives values of the wrong type', () => {
         const wrong = { diagramHidden: '', diagramZoneCircuit: 'x' } as unknown as Partial<ioBroker.AdapterConfig>;
         expect(readDiagramSettings(wrong).settings).to.deep.equal({ hidden: [], zoneCircuit: [] });

@@ -221,5 +221,9 @@
     "zoneModulesHelp": "0 = 无，最多 10 个",
     "diagramSource": "功率与 COP 的来源",
     "diagramSourceHelp": "电功率、热功率和 COP 来自 Navigator 或您的外部电表（“统计”选项卡）。缺少外部数值时，显示 Navigator 的数值。",
-    "diagramCopSource": "单个 COP（来自上方的来源）"
+    "diagramCopSource": "单个 COP（来自上方的来源）",
+    "diagramStorage": "示意图中的储水罐",
+    "diagramStorageHelp": "带分层隔板的 Hygienik 中，采暖缓冲和热水共用一个水罐；若 Hygienik 或 AQA 旁另设采暖缓冲罐（TERMO），则为两个水罐。测量点无法区分这两种情况。",
+    "diagramStorageCombined": "一个水罐（带分层隔板的 Hygienik）",
+    "diagramStorageSeparate": "两个水罐（独立的采暖缓冲罐）"
 }
