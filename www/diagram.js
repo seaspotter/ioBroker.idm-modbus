@@ -236,7 +236,7 @@
     }
     /* a pump from the web interface or Modbus: a small pump symbol (green = running, grey = off) with the IDM tag; analog pumps
        show their speed */
-    function badge(parent, x, y, tag, id, showPercent, name) {
+    function badge(parent, x, y, tag, id, showPercent) {
         var r = 7;
         var cy = y - 4;
         var body = el('circle', { cx: x + r, cy: cy, r: r, class: 'pumpbody smallpump' }, parent);
@@ -250,16 +250,6 @@
             parent,
         );
         var label = text(parent, x + 2 * r + 6, y, `${tag} ${view.m.labels.off}`, 'small');
-        if (name) {
-            // the tooltip names the part (hover): a transparent area over the badge carries it, because the label's text is replaced
-            // with every value
-            var hover = el(
-                'rect',
-                { x: x - 2, y: y - 18, width: 84, height: 24, fill: 'transparent', 'pointer-events': 'all' },
-                parent,
-            );
-            el('title', {}, hover).textContent = name;
-        }
         bind(id, function (v) {
             var on = isRunning(v);
             arrow.style.fill = on ? 'var(--good)' : 'var(--muted)';
@@ -944,7 +934,7 @@
     }
     /* the hot water circulation pump M64: a pump badge whose tooltip names it */
     function circulationBadge(parent, x, y) {
-        badge(parent, x, y, 'M64', view.m.ids.circulation, false, view.m.labels.circulation);
+        badge(parent, x, y, 'M64', view.m.ids.circulation, false);
     }
     /* without a fresh water station (an AQA tank) the circulation pump stands beside the hot water part on its own */
     function drawCirculation(g) {
@@ -1127,6 +1117,34 @@
         svg.setAttribute('viewBox', `0 0 ${width} ${bottom + 20}`);
         svg.style.maxWidth = `${Math.round(width * L.displayScale)}px`;
         applyAll();
+        addTagHovers();
+    }
+
+    /* A hover with the name of the part on every text that starts with an IDM tag (B38, M73, ...): a transparent area over the text
+       carries the tooltip, because the text itself is replaced with every value. */
+    function addTagHovers() {
+        var names = view.m.tagNames || {};
+        Array.prototype.forEach.call(svg.querySelectorAll('text'), function (node) {
+            var match = /^([BM]\d+[a-z]?)\b/.exec(node.textContent.trim());
+            var name = match && names[match[1]];
+            if (!name) {
+                return;
+            }
+            var box = node.getBBox();
+            var area = el(
+                'rect',
+                {
+                    x: box.x - 2,
+                    y: box.y - 2,
+                    width: box.width + 4,
+                    height: box.height + 4,
+                    fill: 'transparent',
+                    'pointer-events': 'all',
+                },
+                node.parentNode,
+            );
+            el('title', {}, area).textContent = `${match[1]} ${name}`;
+        });
     }
 
     /* ---------- live values ---------- */

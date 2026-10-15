@@ -15,6 +15,7 @@ interface Model {
     heatSource: 'air' | 'ground';
     storage: 'combined' | 'separate';
     rods: { id: string; label: string }[];
+    tagNames: Record<string, string>;
     parts: Record<string, boolean>;
     ids: Record<string, string | null>;
     circuits: {
@@ -248,6 +249,26 @@ describe('diagram model', () => {
             'web.io.analog_out.m71',
         );
         expect(build({ 'hp.hgl_flow_temp': 48 }).ids.hglMixer).to.equal(null);
+    });
+
+    it('names every tag in the language of the page: Modbus labels first, web names for the rest', () => {
+        const objects = {
+            'dhw.storage_temp': state('°C', {
+                en: 'Heat storage temperature (B38)',
+                de: 'Wärmespeichertemperatur (B38)',
+            }),
+            'web.io.analog_out.m73': state('%', { en: 'M73 Charging pump', de: 'M73 Ladepumpe' }),
+            // the same tag from the web: the Modbus name wins
+            'web.io.sensors.b38': state('°C', { en: 'B38 Storage', de: 'B38 Speicher' }),
+            'web.io.digital_out.m64': state('', { en: 'M64 Circulation pump', de: 'M64 Zirkulationspumpe' }),
+            'hp.something': state('', 'No tag here'),
+        };
+        const german = build({}, { language: 'de', objects }).tagNames;
+        expect(german).to.deep.equal({ B38: 'Wärmespeichertemperatur', M73: 'Ladepumpe', M64: 'Zirkulationspumpe' });
+        expect(build({}, { language: 'en', objects }).tagNames.B38).to.equal('Heat storage temperature');
+        // a language the object does not have falls back to English
+        expect(build({}, { language: 'ru', objects }).tagNames.M73).to.equal('Charging pump');
+        expect(build({}).tagNames).to.deep.equal({});
     });
 
     it('lists the heating rod stages that report and finds the circulation pump', () => {
