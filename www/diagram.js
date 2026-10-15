@@ -11,8 +11,8 @@
     var FLOW_COLOR = '#f08a3a';
     var RETURN_COLOR = '#3b82f6';
     // in cooling operation the flow to the interconnection and the circuits carries cold water (blue), the return a little warmer
-    var COOL_FLOW_COLOR = '#3f8fdc';
-    var COOL_RETURN_COLOR = '#8cc0f0';
+    var COOL_FLOW_COLOR = '#2563eb';
+    var COOL_RETURN_COLOR = '#22c7d6';
     // value of the operating mode register while the heat pump cools
     var COOLING_MODE = 2;
 
@@ -369,13 +369,19 @@
         // `only`: a pipe that carries water in cooling operation only (the cold storage) or in heating operation only (the hot water
         // vessel: the heat pump cannot charge it while it cools); outside its operation it rests grey
         var inUse = function () {
-            if (view.cooling && String(view.coolRole[sensorId]).indexOf('idle-') === 0) {
+            if (only !== 'overlay' && view.cooling && String(view.coolRole[sensorId]).indexOf('idle-') === 0) {
                 return false;
             }
-            return only === 'cooling' || only === 'overlay' ? view.cooling : only === 'heating' ? !view.cooling : true;
+            return String(only).indexOf('cooling') === 0 || only === 'overlay'
+                ? view.cooling
+                : only === 'heating'
+                  ? !view.cooling
+                  : true;
         };
         bind(sensorId, function (v) {
-            p.setAttribute('stroke', inUse() ? colorOf(sensorId, v) : IDLE_COLOR);
+            // the pipes of the cold storage have the cold colours of flow and return
+            var cold = only === 'cooling-flow' ? COOL_FLOW_COLOR : only === 'cooling-return' ? COOL_RETURN_COLOR : null;
+            p.setAttribute('stroke', inUse() ? cold || colorOf(sensorId, v, only === 'overlay') : IDLE_COLOR);
             // an overlay is only there in cooling operation: it paints the shared stretch of the heat pump pipes cold
             if (only === 'overlay') {
                 p.style.display = inUse() ? '' : 'none';
@@ -857,7 +863,7 @@
                 flowId,
                 byHgl ? hglActive : waterActive,
                 undefined,
-                isDhw ? 'heating' : 'cooling',
+                isDhw ? 'heating' : 'cooling-flow',
             );
             line(
                 view.pipes,
@@ -869,7 +875,7 @@
                 isDhw ? ids.hpReturn : ids.coldBuffer,
                 waterActive,
                 undefined,
-                isDhw ? 'heating' : 'cooling',
+                isDhw ? 'heating' : 'cooling-return',
             );
         });
         if (ids.hgl && (central || g.hung.length)) {
@@ -898,17 +904,23 @@
         var ids = view.m.ids;
         var hpRight = L.hp.x + L.hp.w;
         [
-            [
-                [hpRight, g.yFlow],
-                [lane.feedX, g.yFlow],
-            ],
-            [
-                [lane.returnX, g.yRet],
-                [hpRight, g.yRet],
-            ],
-        ].forEach(function (points) {
+            {
+                id: ids.hpFlow,
+                points: [
+                    [hpRight, g.yFlow],
+                    [lane.feedX, g.yFlow],
+                ],
+            },
+            {
+                id: ids.hpReturn,
+                points: [
+                    [lane.returnX, g.yRet],
+                    [hpRight, g.yRet],
+                ],
+            },
+        ].forEach(function (row) {
             // a solid pipe in the colour of the page first: it hides the resting pipe below the dashes of the cold one
-            var d = points
+            var d = row.points
                 .map(function (pt, k) {
                     return `${(k ? 'L' : 'M') + pt[0]} ${pt[1]}`;
                 })
@@ -918,7 +930,8 @@
             bind(ids.coldBuffer, function () {
                 mask.style.display = view.cooling ? '' : 'none';
             });
-            line(view.pipes, points, ids.coldBuffer, view.waterActive, undefined, 'overlay');
+            // coloured like the chips: the flow deep blue, the return cyan
+            line(view.pipes, row.points, row.id, view.waterActive, undefined, 'overlay');
         });
         view.modeIds.push(ids.coldBuffer);
     }
