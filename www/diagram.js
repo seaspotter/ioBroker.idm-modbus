@@ -36,8 +36,18 @@
         outdoorX: -150,
         hp: { x: -20, w: 330, minH: 270, rowGap: 50, iconSize: 96 },
         tank: { x: 520, w: 150, top: 80, h: 460, hSolar: 540, radius: 58, levelInset: 56, levelH: 30, pipeInset: 12 },
-        // two vessels: the hot water vessel above takes this share of the height, a gap separates it from the heating buffer
-        split: { dhwShare: 0.34, gap: 50, branchFeedY: 216, branchReturnY: 230, feedX: 36, returnX: 22, reach: 40 },
+        // two vessels: the heating buffer keeps its place and size, the hot water vessel hangs below it and is wired from below
+        split: {
+            gapBelow: 90,
+            dhwH: 190,
+            feedY: 30,
+            returnY: 55,
+            feedX: 22,
+            returnX: 36,
+            feedReach: 45,
+            returnReach: 110,
+            circuitShift: 180,
+        },
         pipeGap: 100, // between hot gas line, flow and return pipe
         circuit: { x: 980, w: 216, h: 170, gap: 28, pipeDy: 40, manifold: 60 },
         room: { w: 114, h: 52, gap: 8 },
@@ -420,7 +430,7 @@
         });
     }
     /* the storage: a vertical gradient from hot to cold with a chip per sensor level */
-    function tank(parent, x, y, w, h, levels, title, reserveBottom) {
+    function tank(parent, x, y, w, h, levels, title, reserveBottom, titleBelow) {
         var gradientId = `tank-gradient-${tankCount++}`;
         var grad = el('linearGradient', { id: gradientId, x1: 0, y1: 0, x2: 0, y2: 1 }, el('defs', {}, parent));
         [
@@ -436,7 +446,7 @@
             { x: x, y: y, width: w, height: h, rx: L.tank.radius, fill: `url(#${gradientId})`, class: 'tank' },
             parent,
         );
-        text(parent, x + w / 2, y - 28, title, 'title', 'middle');
+        text(parent, x + w / 2, titleBelow ? y + h + 36 : y - 28, title, 'title', 'middle');
         levels.forEach(function (level, i) {
             var span = h - 2 * L.tank.levelInset - reserveBottom;
             var cy = levels.length === 1 ? y + h / 2 : y + L.tank.levelInset + (i * span) / (levels.length - 1);
@@ -514,16 +524,16 @@
     function gridOf(m) {
         var tankH = m.parts.solar ? L.tank.hSolar : L.tank.h;
         var yFlow = L.tank.top + tankH / 2;
-        var dhwH = Math.round(tankH * L.split.dhwShare);
+        var tankBottom = L.tank.top + tankH;
         return {
             tankH: tankH,
-            tankBottom: L.tank.top + tankH,
+            tankBottom: tankBottom,
             yHgl: yFlow - L.pipeGap,
             yFlow: yFlow,
             yRet: yFlow + L.pipeGap,
-            // the two vessels of a separate heating buffer: hot water above, the heating buffer below
-            dhwH: dhwH,
-            bufTop: L.tank.top + dhwH + L.split.gap,
+            // a separate hot water vessel hangs below the heating buffer
+            dhwTop: tankBottom + L.split.gapBelow,
+            dhwBottom: tankBottom + L.split.gapBelow + L.split.dhwH,
         };
     }
 
@@ -653,43 +663,54 @@
         if (hasTank && m.storage === 'separate') {
             var sp = L.split;
             var tankX = L.tank.x;
-            var bufH = g.tankBottom - g.bufTop;
-            var dhwLevels = levels.filter(function (level) {
-                return level.id !== ids.buffer;
-            });
-            tank(view.parts, tankX, L.tank.top, L.tank.w, g.dhwH, dhwLevels, m.labels.dhw, 0);
+            // the heating buffer keeps the place and size of the one-vessel layout; the hot water vessel hangs below it
             tank(
                 view.parts,
                 tankX,
-                g.bufTop,
+                L.tank.top,
                 L.tank.w,
-                bufH,
+                g.tankH,
                 [{ id: ids.buffer, tag: TAG.buffer }],
                 m.labels.buffer,
                 m.parts.solar ? L.solar.reserve : 0,
             );
-            // the hot water vessel is charged by the hot gas line where there is one, else from the heat pump flow (the valve M63
-            // chooses the side); its return joins the return pipe
+            tank(
+                view.parts,
+                tankX,
+                g.dhwTop,
+                L.tank.w,
+                sp.dhwH,
+                levels.filter(function (level) {
+                    return level.id !== ids.buffer;
+                }),
+                m.labels.dhw,
+                0,
+                true,
+            );
+            // the hot water vessel is charged from the heat pump flow and returns into the return pipe: both pipes drop down left of
+            // the tanks and enter the vessel from above (the valve M63 chooses the side); the return is the outer one, so no pipe
+            // crosses the other
             var feedX = tankX - sp.feedX;
             var returnX = tankX - sp.returnX;
-            var reachX = tankX + sp.reach;
-            if (!ids.hgl) {
-                line(
-                    view.pipes,
-                    [
-                        [feedX, g.yFlow],
-                        [feedX, sp.branchFeedY],
-                        [reachX, sp.branchFeedY],
-                    ],
-                    ids.hpFlow,
-                    waterActive,
-                );
-            }
+            var feedY = g.tankBottom + sp.feedY;
+            var returnY = g.tankBottom + sp.returnY;
             line(
                 view.pipes,
                 [
-                    [reachX, sp.branchReturnY],
-                    [returnX, sp.branchReturnY],
+                    [feedX, g.yFlow],
+                    [feedX, feedY],
+                    [tankX + sp.feedReach, feedY],
+                    [tankX + sp.feedReach, g.dhwTop + 12],
+                ],
+                ids.hpFlow,
+                waterActive,
+            );
+            line(
+                view.pipes,
+                [
+                    [tankX + sp.returnReach, g.dhwTop + 12],
+                    [tankX + sp.returnReach, returnY],
+                    [returnX, returnY],
                     [returnX, g.yRet],
                 ],
                 ids.hpReturn,
@@ -732,8 +753,7 @@
         var chipX = hasTank ? (hpRight + L.tank.x) / 2 : hpRight + 80;
         pipes.forEach(function (p) {
             if (hasTank) {
-                // into a separate vessel the pipe reaches further: the rounded corner of a short vessel is further in
-                var tankSide = L.tank.x + (m.storage === 'separate' ? L.split.reach : L.tank.pipeInset);
+                var tankSide = L.tank.x + L.tank.pipeInset;
                 // a pipe flows from its first to its last point, so the return is drawn from the storage to the heat pump
                 hline(view.pipes, p.back ? tankSide : hpRight, p.back ? hpRight : tankSide, p.y, p.id, p.active);
             }
@@ -756,7 +776,10 @@
         var m = view.m;
         var ids = m.ids;
         var parts = view.parts;
-        var c = L.circuit;
+        // beside a separate hot water vessel the station and its tap need the space left of the circuits: three or more circuits move
+        // right so that their cards do not run into the tap
+        var shift = m.storage === 'separate' && m.circuits.length >= 3 ? L.split.circuitShift : 0;
+        var c = Object.assign({}, L.circuit, { x: L.circuit.x + shift });
         var roomsX = c.x + c.w + 12;
         var flowManifold = c.x - c.manifold;
         var returnManifold = c.x - c.manifold - 18;
@@ -854,12 +877,13 @@
 
     /* the fresh water station beside the upper part of the storage: one heat exchanger with the storage water on its left (in at
        the top, back at the bottom) and the drinking water on its right (cold inlet below, outlet above leading to the tap) */
-    function drawStation() {
+    function drawStation(g) {
         var m = view.m;
         var ids = m.ids;
         var s = L.station;
         var x = L.tank.x + L.tank.w + s.gap;
-        var y = s.y;
+        // beside the upper part of the storage; with a separate hot water vessel beside that vessel
+        var y = m.storage === 'separate' ? g.dhwTop + 20 : s.y;
         var hxX = x + 22;
         var hxY = y + 20;
         var hxRight = hxX + s.hxW;
@@ -1033,9 +1057,13 @@
         var hp = drawHeatPump(g);
         var hasTank = drawStorage(g);
         var circuits = drawCircuits(g, hasTank);
-        var bottom = Math.max(hp.y + hp.h, hasTank ? g.tankBottom + 60 : 0, circuits.bottom);
+        var bottom = Math.max(
+            hp.y + hp.h,
+            hasTank ? (m.storage === 'separate' ? g.dhwBottom + 70 : g.tankBottom + 60) : 0,
+            circuits.bottom,
+        );
         if (m.parts.freshwater && hasTank) {
-            drawStation();
+            drawStation(g);
         }
         if (m.parts.solar && hasTank) {
             bottom = Math.max(bottom, drawSolar(g, hp));
