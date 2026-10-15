@@ -128,6 +128,7 @@ update the spec and register files afterwards, never the other way round.
 | `npm run lint` | ESLint |
 | `npm run dev-server` | local ioBroker sandbox on port 8084 (`dev-server setup` first run). `dev-server watch default -n` syncs `build/` but **not `admin/`**: after changing `admin/jsonConfig.json` or `admin/i18n`, copy them into `.dev-server/default/node_modules/iobroker.idm-modbus/admin/` and run `.dev-server/default/iobroker upload idm-modbus`, otherwise the admin page shows raw i18n keys. Do not rebuild while a scan runs (the adapter restarts). |
 | `npm run translate` | fill missing i18n languages |
+| `npm run build:gallery -- <folder> [lang]` | draws every plant scheme of the IDM manuals (`tools/sources/diagram-schemes.json`) with the diagram page into `<folder>`; serve it statically, screenshots go to `<folder>/shots/<id>.png` (see `gallery.html`) |
 
 ## Status
 

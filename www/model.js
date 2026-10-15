@@ -334,20 +334,23 @@
         var show = function (part) {
             return hidden.indexOf(part) < 0;
         };
+        var parts = {
+            buffer: ids.buffer !== null && show('buffer'),
+            dhw: ids.dhwTop !== null && show('dhw'),
+            freshwater: ids.dhwTap !== null && show('freshwater'),
+            pv: (ids.pvProduction !== null || ids.pvSurplus !== null) && show('pv'),
+            solar: ids.solarCollector !== null && show('solar'),
+            bivalence: ids.bivalence !== null && show('bivalence'),
+        };
         return {
             language: language,
             heatSource: heatSource || (detectedGround ? 'ground' : 'air'),
             // two vessels (hot water above, a separate heating buffer below) only where both exist
             storage:
                 settings.storage === 'separate' && ids.dhwTop !== null && ids.buffer !== null ? 'separate' : 'combined',
-            parts: {
-                buffer: ids.buffer !== null && show('buffer'),
-                dhw: ids.dhwTop !== null && show('dhw'),
-                freshwater: ids.dhwTap !== null && show('freshwater'),
-                pv: (ids.pvProduction !== null || ids.pvSurplus !== null) && show('pv'),
-                solar: ids.solarCollector !== null && show('solar'),
-                bivalence: ids.bivalence !== null && show('bivalence'),
-            },
+            parts: parts,
+            // hot water without a heating buffer (a Hygienik with a direct circuit): the circuits are fed by the heat pump itself
+            hotWaterOnly: parts.dhw && !parts.buffer,
             ids: ids,
             circuits: circuits,
             tagNames: withCircuitNames(findTagNames(objects, language), labels),

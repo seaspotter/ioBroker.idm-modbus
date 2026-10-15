@@ -14,6 +14,7 @@ interface Model {
     language: string;
     heatSource: 'air' | 'ground';
     storage: 'combined' | 'separate';
+    hotWaterOnly: boolean;
     rods: { id: string; label: string }[];
     tagNames: Record<string, string>;
     parts: Record<string, boolean>;
@@ -289,6 +290,13 @@ describe('diagram model', () => {
             'web.io.digital_out.m32': state('', { en: 'M32 Pump heating circuit B', de: 'M32 Heizkreispumpe B' }),
         };
         expect(build({}, { language: 'de', objects }).tagNames.M32).to.equal('Heizkreispumpe B');
+    });
+
+    it('knows a plant with hot water but no heating buffer', () => {
+        expect(build({ 'dhw.dhw_temp_top': 45 }).hotWaterOnly).to.equal(true);
+        expect(build({ 'dhw.dhw_temp_top': 45, 'dhw.storage_temp': 30 }).hotWaterOnly).to.equal(false);
+        expect(build({ 'dhw.storage_temp': 30 }).hotWaterOnly).to.equal(false);
+        expect(build({ 'dhw.dhw_temp_top': 45 }, { settings: { hidden: ['dhw'] } }).hotWaterOnly).to.equal(false);
     });
 
     it('lists the heating rod stages that report and finds the circulation pump', () => {
