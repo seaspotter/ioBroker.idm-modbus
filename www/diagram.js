@@ -251,10 +251,14 @@
         );
         var label = text(parent, x + 2 * r + 6, y, `${tag} ${view.m.labels.off}`, 'small');
         if (name) {
-            // the tooltip names the part (hover)
-            [body, label].forEach(function (node) {
-                el('title', {}, node).textContent = name;
-            });
+            // the tooltip names the part (hover): a transparent area over the badge carries it, because the label's text is replaced
+            // with every value
+            var hover = el(
+                'rect',
+                { x: x - 2, y: y - 18, width: 84, height: 24, fill: 'transparent', 'pointer-events': 'all' },
+                parent,
+            );
+            el('title', {}, hover).textContent = name;
         }
         bind(id, function (v) {
             var on = isRunning(v);
