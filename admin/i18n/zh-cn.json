@@ -225,5 +225,7 @@
     "diagramStorage": "示意图中的储水罐",
     "diagramStorageHelp": "带分层隔板的 Hygienik 中，采暖缓冲和热水共用一个水罐；若 Hygienik 或 AQA 旁另设采暖缓冲罐（TERMO），则为两个水罐。测量点无法区分这两种情况。",
     "diagramStorageCombined": "一个水罐（带分层隔板的 Hygienik）",
-    "diagramStorageSeparate": "两个水罐（独立的采暖缓冲罐）"
+    "diagramStorageSeparate": "两个水罐（独立的采暖缓冲罐）",
+    "diagramScale": "示意图大小 (%)",
+    "diagramScaleHelp": "示意图的绘制大小，为原始大小的百分比。默认值为 90；设为 100 时与早期版本一样大。"
 }

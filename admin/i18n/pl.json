@@ -225,5 +225,7 @@
     "diagramStorage": "Zasobnik na schemacie",
     "diagramStorageHelp": "W Hygieniku z płytą rozwarstwiającą zasobnik buforowy i ciepła woda użytkowa dzielą jeden zbiornik; przy osobnym zasobniku buforowym (TERMO) obok Hygieniku lub AQA są to dwa zbiorniki. Punkty pomiarowe nie pozwalają ich odróżnić.",
     "diagramStorageCombined": "Jeden zbiornik (Hygienik z płytą rozwarstwiającą)",
-    "diagramStorageSeparate": "Dwa zbiorniki (osobny zasobnik buforowy)"
+    "diagramStorageSeparate": "Dwa zbiorniki (osobny zasobnik buforowy)",
+    "diagramScale": "Rozmiar schematu (%)",
+    "diagramScaleHelp": "Rozmiar schematu w procentach rozmiaru pierwotnego. Domyślnie 90; przy 100 jest tak duży jak w poprzednich wersjach."
 }

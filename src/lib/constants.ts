@@ -114,3 +114,5 @@ export const MAX_DIAGRAM_ZONE = 10;
 export const DIAGRAM_COP_ROWS = ['source', 'both', 'none'] as const;
 /** How the diagram draws heating buffer and hot water: one vessel (Hygienik with stratification plate) or two (a separate TERMO). */
 export const DIAGRAM_STORAGE = ['combined', 'separate'] as const;
+/** Size of the diagram in percent of the original size: default (a tenth smaller than before) and limits. */
+export const DIAGRAM_SCALE = { default: 90, min: 40, max: 200 } as const;

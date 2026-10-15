@@ -225,5 +225,7 @@
     "diagramStorage": "Buffer in het schema",
     "diagramStorageHelp": "Bij een Hygienik met gelaagdheidsplaat delen verwarmingsbuffer en warm water één vat; met een aparte verwarmingsbuffer (TERMO) naast een Hygienik of AQA zijn het twee vaten. De meetpunten kunnen dit niet onderscheiden.",
     "diagramStorageCombined": "Eén vat (Hygienik met gelaagdheidsplaat)",
-    "diagramStorageSeparate": "Twee vaten (aparte verwarmingsbuffer)"
+    "diagramStorageSeparate": "Twee vaten (aparte verwarmingsbuffer)",
+    "diagramScale": "Grootte van het schema (%)",
+    "diagramScaleHelp": "Hoe groot het schema wordt getekend, in procent van de oorspronkelijke grootte. Standaard is 90; met 100 is het zo groot als in eerdere versies."
 }

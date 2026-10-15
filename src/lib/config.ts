@@ -1,6 +1,7 @@
 import {
     DEFAULT_CO2_G_PER_KWH,
     DIAGRAM_COP_ROWS,
+    DIAGRAM_SCALE,
     DIAGRAM_PARTS,
     MAX_DIAGRAM_ZONE,
     DEFAULT_DAILY_WRITE_WARN,
@@ -774,6 +775,8 @@ export interface DiagramSettings {
     cop?: 'both' | 'none';
     /** `separate`: the heating buffer is a vessel of its own next to the hot water vessel; left out for one combined vessel */
     storage?: 'separate';
+    /** size of the diagram in percent of the original size; left out for the default */
+    scale?: number;
     /** parts the user does not want to see */
     hidden: string[];
     /** which heating circuit the rooms of a zone module stand next to (a zone without an entry follows its number) */
@@ -814,6 +817,16 @@ export function readDiagramSettings(config: Partial<ioBroker.AdapterConfig>): {
             zoneCircuit.push({ zone, circuit });
         }
     }
+    // a size outside the limits is brought back to the nearest one, anything that is no number to the default
+    const wanted = Number(config.diagramScale ?? DIAGRAM_SCALE.default);
+    const scale = Number.isFinite(wanted)
+        ? Math.min(DIAGRAM_SCALE.max, Math.max(DIAGRAM_SCALE.min, Math.round(wanted)))
+        : DIAGRAM_SCALE.default;
+    if (Number.isFinite(wanted) && scale !== Math.round(wanted)) {
+        warnings.push(
+            `Diagram: size ${wanted} % is outside ${DIAGRAM_SCALE.min}-${DIAGRAM_SCALE.max} %, using ${scale} %`,
+        );
+    }
     const source = config.diagramHeatSource;
     // before the source setting existed, the COP row had its own choice: "external" meant the external meters
     const external = config.diagramSource === 'external' || config.diagramCop === 'external';
@@ -826,6 +839,7 @@ export function readDiagramSettings(config: Partial<ioBroker.AdapterConfig>): {
             ...(external ? { source: 'external' as const } : {}),
             ...(rows !== 'source' ? { cop: rows } : {}),
             ...(config.diagramStorage === 'separate' ? { storage: 'separate' as const } : {}),
+            ...(scale !== DIAGRAM_SCALE.default ? { scale } : {}),
             hidden,
             zoneCircuit,
         },

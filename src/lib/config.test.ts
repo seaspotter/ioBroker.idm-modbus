@@ -290,6 +290,23 @@ describe('readDiagramSettings', () => {
             zoneCircuit: [],
         });
     });
+    it('reads the size of the diagram: the default is left out, limits apply, rubbish falls back', () => {
+        expect(readDiagramSettings({ diagramScale: 90 }).settings).to.deep.equal({ hidden: [], zoneCircuit: [] });
+        expect(readDiagramSettings({ diagramScale: 120 }).settings).to.deep.equal({
+            scale: 120,
+            hidden: [],
+            zoneCircuit: [],
+        });
+        const high = readDiagramSettings({ diagramScale: 500 });
+        expect(high.settings.scale).to.equal(200);
+        expect(high.warnings).to.have.length(1);
+        expect(readDiagramSettings({ diagramScale: 10 }).settings.scale).to.equal(40);
+        expect(readDiagramSettings({ diagramScale: 'big' as unknown as number }).settings).to.deep.equal({
+            hidden: [],
+            zoneCircuit: [],
+        });
+        expect(readDiagramSettings({}).settings).to.deep.equal({ hidden: [], zoneCircuit: [] });
+    });
     it('survives values of the wrong type', () => {
         const wrong = { diagramHidden: '', diagramZoneCircuit: 'x' } as unknown as Partial<ioBroker.AdapterConfig>;
         expect(readDiagramSettings(wrong).settings).to.deep.equal({ hidden: [], zoneCircuit: [] });

@@ -225,5 +225,7 @@
     "diagramStorage": "Speicher im Schema",
     "diagramStorageHelp": "Bei einem Hygienik mit Schichttrennplatte teilen sich Heizungspuffer und Warmwasser einen Behälter; mit einem eigenen Heizungspuffer (TERMO) neben einem Hygienik oder AQA sind es zwei Behälter. Aus den Messstellen lässt sich das nicht unterscheiden.",
     "diagramStorageCombined": "Ein Behälter (Hygienik mit Schichttrennplatte)",
-    "diagramStorageSeparate": "Zwei Behälter (eigener Heizungspuffer)"
+    "diagramStorageSeparate": "Zwei Behälter (eigener Heizungspuffer)",
+    "diagramScale": "Größe des Schemas (%)",
+    "diagramScaleHelp": "Wie groß das Schema gezeichnet wird, in Prozent der ursprünglichen Größe. Standard ist 90; mit 100 ist es so groß wie in früheren Versionen."
 }

@@ -347,6 +347,8 @@
         return {
             language: language,
             heatSource: heatSource || (detectedGround ? 'ground' : 'air'),
+            // size of the drawing in percent of the original size
+            scale: Math.min(200, Math.max(40, Number(settings.scale) || 90)),
             // two vessels (hot water above, a separate heating buffer below) only where both exist
             storage:
                 settings.storage === 'separate' && ids.dhwTop !== null && ids.buffer !== null ? 'separate' : 'combined',

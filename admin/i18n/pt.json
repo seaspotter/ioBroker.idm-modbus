@@ -225,5 +225,7 @@
     "diagramStorage": "Acumulador no esquema",
     "diagramStorageHelp": "Num Hygienik com placa de separação de camadas, o acumulador tampão e a água quente partilham um depósito; com um acumulador tampão separado (TERMO) ao lado de um Hygienik ou AQA são dois depósitos. Os pontos de medição não permitem distinguir os dois casos.",
     "diagramStorageCombined": "Um depósito (Hygienik com placa de separação)",
-    "diagramStorageSeparate": "Dois depósitos (acumulador tampão separado)"
+    "diagramStorageSeparate": "Dois depósitos (acumulador tampão separado)",
+    "diagramScale": "Tamanho do esquema (%)",
+    "diagramScaleHelp": "Tamanho do esquema, em percentagem do tamanho original. O padrão é 90; com 100 fica tão grande como nas versões anteriores."
 }

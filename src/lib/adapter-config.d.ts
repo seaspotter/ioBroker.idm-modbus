@@ -160,6 +160,8 @@ declare global {
             diagramCop: string;
             /** how buffer and hot water are drawn: 'combined' (one vessel, Hygienik with stratification plate) or 'separate' (two vessels) */
             diagramStorage: string;
+            /** size of the diagram in percent of the original size (default 90) */
+            diagramScale: number;
             /** parts to leave out of the diagram (buffer, dhw, freshwater, pv, solar, bivalence) */
             diagramHidden: string[];
             /** the heating circuit next to the rooms of a zone module */

@@ -225,5 +225,7 @@
     "diagramStorage": "Acumulador en el esquema",
     "diagramStorageHelp": "En un Hygienik con placa de estratificación, el acumulador de inercia y el agua caliente comparten un depósito; con un acumulador de inercia separado (TERMO) junto a un Hygienik o AQA son dos depósitos. Los puntos de medida no permiten distinguirlos.",
     "diagramStorageCombined": "Un depósito (Hygienik con placa de estratificación)",
-    "diagramStorageSeparate": "Dos depósitos (acumulador de inercia separado)"
+    "diagramStorageSeparate": "Dos depósitos (acumulador de inercia separado)",
+    "diagramScale": "Tamaño del esquema (%)",
+    "diagramScaleHelp": "Tamaño del esquema como porcentaje del tamaño original. El valor predeterminado es 90; con 100 es tan grande como en versiones anteriores."
 }

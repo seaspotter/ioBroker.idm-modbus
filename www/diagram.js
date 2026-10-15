@@ -37,7 +37,7 @@
     var L = {
         originX: 170, // the drawing is shifted right by this much: room for the outdoor value left of the heat pump
         minWidth: 1170,
-        displayScale: 1.35, // the page shows the drawing at this size (a larger window does not stretch it further)
+        displayScale: 1.35, // the page shows the drawing at this size, times the size setting (a larger window does not stretch it further)
         marginRight: 24,
         outdoorX: -150,
         hp: { x: -20, w: 330, minH: 270, rowGap: 50, iconSize: 96 },
@@ -190,6 +190,9 @@
     }
     function colorOf(id, v) {
         var cool = view.cooling && view.coolRole[id];
+        if (cool === 'idle') {
+            return IDLE_COLOR;
+        }
         if (cool) {
             return cool === 'flow' ? COOL_FLOW_COLOR : COOL_RETURN_COLOR;
         }
@@ -198,6 +201,10 @@
     /* the pipes whose colour changes with cooling: the heat pump flow and the flow of the circuits, and the return */
     function coolRoles(m) {
         var roles = {};
+        // with a cold storage only the pipes to it are cold: the heating buffer and the circuits rest while the heat pump cools;
+        // without one the heat pump cools through the circuits, so the flow is cold
+        var flow = m.ids.coldBuffer ? 'idle' : 'flow';
+        var back = m.ids.coldBuffer ? 'idle' : 'return';
         [m.ids.hpFlow]
             .concat(
                 m.circuits.map(function (c) {
@@ -206,11 +213,11 @@
             )
             .forEach(function (id) {
                 if (id) {
-                    roles[id] = 'flow';
+                    roles[id] = flow;
                 }
             });
         if (m.ids.hpReturn) {
-            roles[m.ids.hpReturn] = 'return';
+            roles[m.ids.hpReturn] = back;
         }
         return roles;
     }
@@ -359,10 +366,17 @@
         // `only`: a pipe that carries water in cooling operation only (the cold storage) or in heating operation only (the hot water
         // vessel: the heat pump cannot charge it while it cools); outside its operation it rests grey
         var inUse = function () {
-            return only === 'cooling' ? view.cooling : only === 'heating' ? !view.cooling : true;
+            if (view.cooling && view.coolRole[sensorId] === 'idle') {
+                return false;
+            }
+            return only === 'cooling' || only === 'overlay' ? view.cooling : only === 'heating' ? !view.cooling : true;
         };
         bind(sensorId, function (v) {
             p.setAttribute('stroke', inUse() ? colorOf(sensorId, v) : IDLE_COLOR);
+            // an overlay is only there in cooling operation: it paints the shared stretch of the heat pump pipes cold
+            if (only === 'overlay') {
+                p.style.display = inUse() ? '' : 'none';
+            }
         });
         // `{ all: [groupA, groupB] }`: flows only while both groups have something running
         (activeIds && activeIds.all ? whenAllRunning.bind(null, activeIds.all) : whenRunning.bind(null, activeIds))(
@@ -370,7 +384,7 @@
                 p.classList.toggle('flowing', running && inUse());
             },
         );
-        if (only) {
+        if (only || view.coolRole[sensorId]) {
             view.modeIds.push(sensorId);
             []
                 .concat(activeIds && activeIds.all ? [].concat.apply([], activeIds.all) : activeIds || [])
@@ -776,6 +790,7 @@
         var flowRate = sensorByTag(m, TAG.flowRate);
         var water = [ids.pumpM73, flowRate && flowRate.id].filter(Boolean);
         var waterActive = water.length ? water : ids.compressor;
+        view.waterActive = waterActive;
         var hglActive = ids.hglMixer ? { all: [ids.hglMixer, waterActive] } : waterActive;
         var pipes = [
             { y: g.yFlow, id: ids.hpFlow, tag: TAG.hpFlow, active: waterActive },
@@ -819,6 +834,9 @@
             );
             var feedX = tankX - sp.feedX - i * sp.lane;
             var returnX = tankX - sp.returnX - i * sp.lane;
+            if (!isDhw) {
+                view.coldLane = { feedX: feedX, returnX: returnX };
+            }
             var wall = tankX + L.tank.pipeInset;
             var feedY = vessel.top + L.tank.levelInset;
             var returnY = vessel.bottom - L.tank.levelInset;
@@ -865,6 +883,39 @@
             tagChip(view.parts, chipX, p.y, p.id, p.tag);
         });
         return { central: central, any: central || g.hung.length > 0 };
+    }
+
+    /* While the heat pump cools, the stretch of its flow and return pipe up to the branch of the cold storage carries cold water; it is
+       drawn above everything else (the pipes beyond rest), and only in cooling operation. */
+    function drawColdOverlay(g) {
+        var lane = view.coldLane;
+        if (!lane) {
+            return;
+        }
+        var ids = view.m.ids;
+        var hpRight = L.hp.x + L.hp.w;
+        line(
+            view.pipes,
+            [
+                [hpRight, g.yFlow],
+                [lane.feedX, g.yFlow],
+            ],
+            ids.coldBuffer,
+            view.waterActive,
+            undefined,
+            'overlay',
+        );
+        line(
+            view.pipes,
+            [
+                [lane.returnX, g.yRet],
+                [hpRight, g.yRet],
+            ],
+            ids.coldBuffer,
+            view.waterActive,
+            undefined,
+            'overlay',
+        );
     }
 
     /* the rooms next to each heating circuit (model.js assigns them from the zone modules and the settings) */
@@ -1209,6 +1260,7 @@
         var storage = drawStorage(g);
         var hasTank = storage.any;
         var circuits = drawCircuits(g, storage.central);
+        drawColdOverlay(g);
         var bottom = Math.max(
             hp.y + hp.h,
             hasTank ? (g.hung.length ? g.hungBottom + 70 : g.tankBottom + 60) : 0,
@@ -1239,7 +1291,7 @@
         }
         var width = Math.max(L.minWidth, circuits.maxRight + L.originX + L.marginRight);
         svg.setAttribute('viewBox', `0 0 ${width} ${bottom + 20}`);
-        svg.style.maxWidth = `${Math.round(width * L.displayScale)}px`;
+        svg.style.maxWidth = `${Math.round((width * L.displayScale * m.scale) / 100)}px`;
         applyAll();
         addTagHovers();
     }

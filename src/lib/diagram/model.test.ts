@@ -15,6 +15,7 @@ interface Model {
     heatSource: 'air' | 'ground';
     storage: 'combined' | 'separate';
     hotWaterOnly: boolean;
+    scale: number;
     hungDhw: boolean;
     centralTank: boolean;
     rods: { id: string; label: string }[];
@@ -313,6 +314,13 @@ describe('diagram model', () => {
         expect(build({ 'dhw.dhw_tapping_temp': 41 })).to.deep.include({ centralTank: false, hungDhw: true });
         // the cold storage (B40) is found by its state
         expect(build({ 'dhw.cold_storage_temp': 11 }).ids.coldBuffer).to.equal('dhw.cold_storage_temp');
+    });
+
+    it('takes the size of the drawing from the settings, inside the limits', () => {
+        expect(build({}).scale).to.equal(90);
+        expect(build({}, { settings: { scale: 120 } as never }).scale).to.equal(120);
+        expect(build({}, { settings: { scale: 5 } as never }).scale).to.equal(40);
+        expect(build({}, { settings: { scale: 900 } as never }).scale).to.equal(200);
     });
 
     it('lists the heating rod stages that report and finds the circulation pump', () => {

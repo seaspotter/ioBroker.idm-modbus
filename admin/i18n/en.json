@@ -225,5 +225,7 @@
     "diagramStorage": "Storage in the diagram",
     "diagramStorageHelp": "In a Hygienik with stratification plate the heating buffer and the hot water share one vessel; with a separate heating buffer (TERMO) next to a Hygienik or AQA they are two vessels. The tags cannot tell the two apart.",
     "diagramStorageCombined": "One vessel (Hygienik with stratification plate)",
-    "diagramStorageSeparate": "Two vessels (separate heating buffer)"
+    "diagramStorageSeparate": "Two vessels (separate heating buffer)",
+    "diagramScale": "Size of the diagram (%)",
+    "diagramScaleHelp": "How large the diagram is drawn, in percent of the original size. The default is 90; with 100 it is as large as in earlier versions."
 }

@@ -238,6 +238,7 @@
         "diagramSource": "internal",
         "diagramCop": "source",
         "diagramStorage": "combined",
+        "diagramScale": 90,
         "diagramHidden": [],
         "diagramZoneCircuit": [],
         "webEnabled": false,

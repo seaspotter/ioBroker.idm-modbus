@@ -225,5 +225,7 @@
     "diagramStorage": "Accumulo nello schema",
     "diagramStorageHelp": "In un Hygienik con piastra di stratificazione l'accumulo inerziale e l'acqua calda condividono un unico serbatoio; con un accumulo inerziale separato (TERMO) accanto a un Hygienik o AQA i serbatoi sono due. I punti di misura non permettono di distinguere i due casi.",
     "diagramStorageCombined": "Un serbatoio (Hygienik con piastra di stratificazione)",
-    "diagramStorageSeparate": "Due serbatoi (accumulo inerziale separato)"
+    "diagramStorageSeparate": "Due serbatoi (accumulo inerziale separato)",
+    "diagramScale": "Dimensione dello schema (%)",
+    "diagramScaleHelp": "Dimensione dello schema in percentuale di quella originale. Il valore predefinito è 90; con 100 è grande come nelle versioni precedenti."
 }

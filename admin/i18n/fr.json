@@ -225,5 +225,7 @@
     "diagramStorage": "Ballon dans le schéma",
     "diagramStorageHelp": "Dans un Hygienik avec plaque de stratification, le ballon tampon et l'eau chaude partagent une même cuve ; avec un ballon tampon séparé (TERMO) à côté d'un Hygienik ou d'un AQA, ce sont deux cuves. Les points de mesure ne permettent pas de les distinguer.",
     "diagramStorageCombined": "Une cuve (Hygienik avec plaque de stratification)",
-    "diagramStorageSeparate": "Deux cuves (ballon tampon séparé)"
+    "diagramStorageSeparate": "Deux cuves (ballon tampon séparé)",
+    "diagramScale": "Taille du schéma (%)",
+    "diagramScaleHelp": "Taille du schéma en pourcentage de la taille d'origine. La valeur par défaut est 90 ; avec 100, il est aussi grand que dans les versions précédentes."
 }
