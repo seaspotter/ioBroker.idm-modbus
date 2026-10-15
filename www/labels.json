@@ -518,5 +518,70 @@
         "pl": "Zasobnik chłodu",
         "uk": "Накопичувач холоду",
         "zh-cn": "蓄冷罐"
+    },
+    "boiler": {
+        "en": "Boiler",
+        "de": "Heizkessel",
+        "ru": "Котёл",
+        "pt": "Caldeira",
+        "nl": "Ketel",
+        "fr": "Chaudière",
+        "it": "Caldaia",
+        "es": "Caldera",
+        "pl": "Kocioł",
+        "uk": "Котел",
+        "zh-cn": "锅炉"
+    },
+    "stove": {
+        "en": "Tiled stove",
+        "de": "Kachelofen",
+        "ru": "Изразцовая печь",
+        "pt": "Fogão a lenha",
+        "nl": "Tegelkachel",
+        "fr": "Poêle en faïence",
+        "it": "Stufa in ceramica",
+        "es": "Estufa de azulejos",
+        "pl": "Piec kaflowy",
+        "uk": "Кахельна піч",
+        "zh-cn": "瓷砖炉"
+    },
+    "cascade": {
+        "en": "Cascade",
+        "de": "Kaskade",
+        "ru": "Каскад",
+        "pt": "Cascata",
+        "nl": "Cascade",
+        "fr": "Cascade",
+        "it": "Cascata",
+        "es": "Cascada",
+        "pl": "Kaskada",
+        "uk": "Каскад",
+        "zh-cn": "级联"
+    },
+    "heating": {
+        "en": "Heating",
+        "de": "Heizbetrieb",
+        "ru": "Отопление",
+        "pt": "Aquecimento",
+        "nl": "Verwarmen",
+        "fr": "Chauffage",
+        "it": "Riscaldamento",
+        "es": "Calefacción",
+        "pl": "Ogrzewanie",
+        "uk": "Опалення",
+        "zh-cn": "供暖"
+    },
+    "cooling": {
+        "en": "Cooling",
+        "de": "Kühlbetrieb",
+        "ru": "Охлаждение",
+        "pt": "Arrefecimento",
+        "nl": "Koelen",
+        "fr": "Refroidissement",
+        "it": "Raffrescamento",
+        "es": "Refrigeración",
+        "pl": "Chłodzenie",
+        "uk": "Охолодження",
+        "zh-cn": "制冷"
     }
 }

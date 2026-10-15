@@ -9,7 +9,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { buildSnapshot, canCool, loadSchemes } from './diagram-fixtures';
+import { buildSnapshot, canCool, hasHotWater, loadSchemes, MODE } from './diagram-fixtures';
 
 const root = path.join(__dirname, '..');
 
@@ -46,23 +46,27 @@ export function buildGallery(folder: string, language: string): number {
     const schemes = loadSchemes();
     const cards: string[] = [];
     for (const scheme of schemes) {
-        fs.writeFileSync(
-            path.join(folder, 'snapshots', `${scheme.id}.json`),
-            JSON.stringify(buildSnapshot(scheme, language)),
-        );
-        if (canCool(scheme)) {
-            // a plant that can cool is drawn again while it cools
+        // the plant in the mode the manual scheme shows, again while it cools (if it can) and while it charges the hot water vessel
+        const variants = [
+            { suffix: '', mode: MODE.heating, drawn: true },
+            { suffix: '-cooling', mode: MODE.cooling, drawn: canCool(scheme) },
+            { suffix: '-dhw', mode: MODE.hotWater, drawn: hasHotWater(scheme) },
+        ].filter(variant => variant.drawn);
+        for (const variant of variants) {
             fs.writeFileSync(
-                path.join(folder, 'snapshots', `${scheme.id}-cooling.json`),
-                JSON.stringify(buildSnapshot(scheme, language, true)),
+                path.join(folder, 'snapshots', `${scheme.id}${variant.suffix}.json`),
+                JSON.stringify(buildSnapshot(scheme, language, variant.mode)),
             );
         }
         const heading = [scheme.unit, scheme.code].filter(Boolean).join(' · ');
-        const cooling = canCool(scheme)
-            ? `<a href="index.html?scenario=${scheme.id}-cooling"><img loading="lazy" src="shots/${scheme.id}-cooling.png" alt=""></a>`
-            : '';
+        const pictures = variants
+            .map(
+                variant =>
+                    `<a href="index.html?scenario=${scheme.id}${variant.suffix}"><img loading="lazy" src="shots/${scheme.id}${variant.suffix}.png" alt=""></a>`,
+            )
+            .join('');
         cards.push(
-            `<figure><a href="index.html?scenario=${scheme.id}"><img loading="lazy" src="shots/${scheme.id}.png" alt=""></a>${cooling}` +
+            `<figure>${pictures}` +
                 `<figcaption><b>${heading}</b><br>${scheme.title}<br><small>${scheme.manual}, page ${scheme.page}` +
                 `${scheme.storage === 'separate' ? ' · two vessels' : ''}</small></figcaption></figure>`,
         );

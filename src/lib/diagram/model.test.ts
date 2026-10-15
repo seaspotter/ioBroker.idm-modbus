@@ -14,10 +14,12 @@ interface Model {
     language: string;
     heatSource: 'air' | 'ground';
     storage: 'combined' | 'separate';
-    hotWaterOnly: boolean;
     scale: number;
     hungDhw: boolean;
     centralTank: boolean;
+    compressors: string[];
+    heatSources: { boiler: boolean; stove: boolean };
+    cascade: { rows: { mode: string; available: string; running: string }[] } | null;
     rods: { id: string; label: string }[];
     tagNames: Record<string, string>;
     parts: Record<string, boolean>;
@@ -231,6 +233,25 @@ describe('diagram model', () => {
         expect(model.hpModes).to.deep.equal({ 0: 'Off', 1: 'Heating' });
     });
 
+    it('reads the add-on parts from the same states as the plant detection', () => {
+        const exported: { module: { exports: unknown } } = { module: { exports: {} } };
+        vm.runInNewContext(
+            fs.readFileSync(path.join(__dirname, '..', '..', '..', 'www', 'plant.js'), 'utf8'),
+            exported,
+        );
+        const tagStates = (exported.module.exports as { TAG_STATES: Record<string, string[]> }).TAG_STATES;
+        const pairs: [string, string][] = [
+            ['solarPump1', 'M75'],
+            ['solarPump2', 'M76'],
+            ['boilerValve', 'M111'],
+            ['stovePump', 'M88'],
+            ['stoveTemp', 'B84'],
+        ];
+        for (const [name, tag] of pairs) {
+            expect(diagram.STATE_IDS[name], `${name} / ${tag}`).to.deep.equal(tagStates[tag]);
+        }
+    });
+
     it('only asks for states that the register files and the web module create', () => {
         const known = new Set(
             (['nav20', 'nav10', 'nav17'] as const).flatMap(family =>
@@ -295,10 +316,13 @@ describe('diagram model', () => {
     });
 
     it('knows a plant with hot water but no heating buffer', () => {
-        expect(build({ 'dhw.dhw_temp_top': 45 }).hotWaterOnly).to.equal(true);
-        expect(build({ 'dhw.dhw_temp_top': 45, 'dhw.storage_temp': 30 }).hotWaterOnly).to.equal(false);
-        expect(build({ 'dhw.storage_temp': 30 }).hotWaterOnly).to.equal(false);
-        expect(build({ 'dhw.dhw_temp_top': 45 }, { settings: { hidden: ['dhw'] } }).hotWaterOnly).to.equal(false);
+        const parts = (states: Record<string, Value>, hidden?: string[]): { dhw: boolean; buffer: boolean } => {
+            const model = build(states, hidden ? { settings: { hidden } } : {});
+            return { dhw: model.parts.dhw, buffer: model.parts.buffer };
+        };
+        expect(parts({ 'dhw.dhw_temp_top': 45 })).to.deep.equal({ dhw: true, buffer: false });
+        expect(parts({ 'dhw.dhw_temp_top': 45, 'dhw.storage_temp': 30 })).to.deep.equal({ dhw: true, buffer: true });
+        expect(parts({ 'dhw.dhw_temp_top': 45 }, ['dhw']).dhw).to.equal(false);
     });
 
     it('says which vessels stand in the middle and which hang below', () => {
@@ -437,5 +461,32 @@ describe('diagram labels', () => {
             power: 'calc.power_electrical_external',
             thermalPower: 'energy.thermal_power_flow_sensor', // no external heat meter: the Navigator's value
         });
+    });
+
+    it('lists the compressors that report, and the boiler and stove additions', () => {
+        const none = build({ 'hp.compressor_status_1': 1 });
+        expect(none.compressors).to.deep.equal(['hp.compressor_status_1']);
+        expect(none.heatSources).to.deep.equal({ boiler: false, stove: false });
+        const twin = build({
+            'hp.compressor_status_1': 1,
+            'hp.compressor_status_2': 0,
+            'web.io.digital_out.m111': 1,
+            'web.io.sensors.b84': 55,
+        });
+        expect(twin.compressors).to.deep.equal(['hp.compressor_status_1', 'hp.compressor_status_2']);
+        expect(twin.heatSources).to.deep.equal({ boiler: true, stove: true });
+    });
+
+    it('knows a cascade only where its registers answer, and lists the modes that have stages', () => {
+        expect(build({ 'hp.compressor_status_1': 1 }).cascade).to.equal(null);
+        const cascade = build({
+            'cascade.cascade_available_heating': 2,
+            'cascade.cascade_running_heating': 1,
+            'cascade.cascade_available_cooling': 0,
+            'cascade.cascade_available_dhw': 1,
+        }).cascade;
+        // no cooling row: the unit has no cooling stage
+        expect(cascade?.rows.map(row => row.mode)).to.deep.equal(['heating', 'dhw']);
+        expect(cascade?.rows.every(row => row.running.includes(row.mode))).to.equal(true);
     });
 });

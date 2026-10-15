@@ -10,11 +10,12 @@
     /* flow pipes and their sensors are always warm, return ones always cold; anything else follows its temperature */
     var FLOW_COLOR = '#f08a3a';
     var RETURN_COLOR = '#3b82f6';
-    // in cooling operation the cold stretch of flow and return has the blue used for cold water everywhere else
-    var COOL_FLOW_COLOR = RETURN_COLOR;
-    var COOL_RETURN_COLOR = RETURN_COLOR;
+    // in cooling operation the cold water has the blue used for cold water everywhere else
+    var COOL_COLOR = RETURN_COLOR;
     // value of the operating mode register while the heat pump cools
     var COOLING_MODE = 2;
+    // the solar loop counts as running when the charge pipe is at least this much (K) warmer than the return
+    var SOLAR_MIN_DIFF = 2;
 
     /* IDM measuring points shown next to their values, as in the plant diagram of the Navigator */
     var TAG = {
@@ -35,12 +36,12 @@
 
     /* layout in SVG units: the heat pump on the left, the storage in the middle, the circuits with their rooms on the right */
     var L = {
-        originX: 170, // the drawing is shifted right by this much: room for the outdoor value left of the heat pump
+        originX: 250, // the drawing is shifted right by this much: room for the outdoor value left of the heat pump
         minWidth: 1170,
         displayScale: 1.35, // the page shows the drawing at this size, times the size setting (a larger window does not stretch it further)
         marginRight: 24,
-        outdoorX: -150,
-        hp: { x: -20, w: 330, minH: 270, rowGap: 50, iconSize: 96 },
+        outdoorX: -230,
+        hp: { x: -100, w: 330, minH: 270, rowGap: 50, iconSize: 96 },
         tank: { x: 520, w: 150, top: 80, h: 460, hSolar: 540, radius: 58, levelInset: 56, levelH: 30, pipeInset: 12 },
         // two vessels: the heating buffer keeps its place and size, the hot water vessel hangs below it and is wired from the side
         split: {
@@ -61,6 +62,18 @@
         solar: { sensorGap: 40, reserve: 110 }, // reserve: room at the bottom of the tank for the solar coil
         cards: { wrap: 1000, w: 310, gap: 330, rowH: 44 },
         tile: { w: 176, h: 62, gap: 12 },
+        // the cards of the further generators and of the bivalence value in the row below the plant; rows: the lines of the cascade card
+        smallCard: { w: 220, h: 100, gap: 20, rowsTop: 54, rowsPad: 2, rowH: 22 },
+        // the risers that join a generator to the storage: one pair per generator, left of the lanes of the hung vessels
+        generator: {
+            riserInset: 36,
+            riserStep: 36,
+            returnGap: 16,
+            flowRow: 30,
+            returnRow: 50,
+            flowDy: 70,
+            returnInset: 36,
+        },
     };
 
     var FAUCET_PATHS = [
@@ -75,7 +88,7 @@
     var modelJson = '';
     var state = {}; // latest value per state id
     var bindings = {}; // state id -> functions that show the value
-    var tankCount = 0; // one gradient per vessel
+    var tankCount = 0; // one gradient per vessel; the count only grows, so a rebuilt drawing never reuses an id
     var view = null; // what the current render draws into: model, layers, colours of the flow and return sensors
 
     /* ---------- values and bindings ---------- */
@@ -101,38 +114,35 @@
     function isRunning(v) {
         return v === true || (num(v) !== null && v > 0);
     }
-    /* call `apply(true|false)` whenever one of the states changes; true while any of them is running */
-    function whenRunning(ids, apply) {
-        var list = [].concat(ids || []).filter(Boolean);
-        var refresh = function () {
-            apply(
-                list.some(function (id) {
-                    return isRunning(state[id]);
-                }),
-            );
-        };
-        list.forEach(function (id) {
-            bind(id, refresh);
-        });
-    }
-    /* like whenRunning, but true only while every group has something running (a mixer that is open AND a pump that runs) */
-    function whenAllRunning(groups, apply) {
-        var lists = groups.map(function (ids) {
+    /* The rule "is it running" of a pipe or a part as `{ fn, ids }` (`fn` is checked again whenever one of the states `ids` changes).
+       `spec` is one id or a list (running while any runs), `{ all: [groupA, groupB] }` (running while every group has something
+       running: a mixer that is open AND a pump that runs) or already `{ fn, ids }`. */
+    function activityOf(spec) {
+        if (spec && spec.fn) {
+            return spec;
+        }
+        var lists = (spec && spec.all ? spec.all : [spec]).map(function (ids) {
             return [].concat(ids || []).filter(Boolean);
         });
-        var refresh = function () {
-            apply(
-                lists.every(function (list) {
+        return {
+            fn: function () {
+                return lists.every(function (list) {
                     return list.some(function (id) {
                         return isRunning(state[id]);
                     });
-                }),
-            );
+                });
+            },
+            ids: [].concat.apply([], lists),
         };
-        lists.forEach(function (list) {
-            list.forEach(function (id) {
-                bind(id, refresh);
-            });
+    }
+    /* call `apply(true|false)` whenever the rule `spec` (see activityOf) changes its answer */
+    function whenRunning(spec, apply) {
+        var activity = activityOf(spec);
+        var refresh = function () {
+            apply(activity.fn());
+        };
+        activity.ids.forEach(function (id) {
+            bind(id, refresh);
         });
     }
     function fmt(v, decimals, unit) {
@@ -188,27 +198,18 @@
         }
         return `rgb(${rgb.join(',')})`;
     }
-    function colorOf(id, v, isChip) {
-        var cool = view.cooling && view.coolRole[id];
+    function colorOf(id, v) {
+        var cool = view.mode === COOLING_MODE && view.coolRole[id];
         if (cool) {
-            // 'flow' / 'return': cold; 'idle-flow' / 'idle-return': the pipe beyond the cold storage's branch rests, but the chip on the
-            // stretch shared with the cold storage stays cold
-            var cold = cool.replace('idle-', '');
-            if (cool.indexOf('idle-') === 0 && !isChip) {
-                return IDLE_COLOR;
-            }
-            return cold === 'flow' ? COOL_FLOW_COLOR : COOL_RETURN_COLOR;
+            return COOL_COLOR;
         }
         return view.roleColor[id] || tempColor(v);
     }
-    /* the pipes whose colour changes with cooling: the heat pump flow and the flow of the circuits, and the return */
+    /* the pipes whose colour changes with cooling: the heat pump flow and return and the flow of the circuits (while the heat pump
+       cools, cold water runs in all of them) */
     function coolRoles(m) {
         var roles = {};
-        // with a cold storage only the pipes to it are cold: the heating buffer and the circuits rest while the heat pump cools;
-        // without one the heat pump cools through the circuits, so the flow is cold
-        var flow = m.ids.coldBuffer ? 'idle-flow' : 'flow';
-        var back = m.ids.coldBuffer ? 'idle-return' : 'return';
-        [m.ids.hpFlow]
+        [m.ids.hpFlow, m.ids.hpReturn]
             .concat(
                 m.circuits.map(function (c) {
                     return c.flow;
@@ -216,13 +217,44 @@
             )
             .forEach(function (id) {
                 if (id) {
-                    roles[id] = flow;
+                    roles[id] = true;
                 }
             });
-        if (m.ids.hpReturn) {
-            roles[m.ids.hpReturn] = back;
-        }
         return roles;
+    }
+    /* Which way the water goes depends on the operating mode: heating charges the heating buffer and the circuits take their heat from
+       it, hot water charges the hot water vessel, cooling charges the cold storage and the circuits take their cold from it (without
+       a cold storage the heat pump cools straight through the circuits). Without a mode value both heating and hot water count. */
+    function pathOn(path) {
+        if (path === 'solar') {
+            // the solar loop works while its charge pipe is clearly warmer than its return (set by drawSolar; without both sensors always)
+            return view.solarOn ? view.solarOn() : true;
+        }
+        var mode = view.mode;
+        if (mode === null) {
+            return path !== 'cool';
+        }
+        return path === 'heat' ? mode === 1 : path === 'dhw' ? mode === 4 : mode === COOLING_MODE;
+    }
+    function inUse(uses) {
+        return !uses || uses.some(pathOn);
+    }
+    /* where the pipes meet the wall of the heating buffer */
+    function tankWallLeft() {
+        return L.tank.x + L.tank.pipeInset;
+    }
+    function tankWallRight() {
+        return L.tank.x + L.tank.w - L.tank.pipeInset;
+    }
+    /* the hung vessel of a kind ('dhw' or 'cold'), if there is one */
+    function hungOf(hung, kind) {
+        return hung.find(function (vessel) {
+            return vessel.kind === kind;
+        });
+    }
+    /* the compressors that report; a plant that reports none still shows its one compressor dot */
+    function compressorIds() {
+        return view.m.compressors.length ? view.m.compressors : [view.m.ids.compressor];
     }
 
     /* ---------- drawing primitives ---------- */
@@ -352,67 +384,74 @@
 
     /* ---------- pipes ---------- */
 
-    function rawPipe(parent, d, color) {
-        return el('path', { d: d, class: 'pipe', stroke: color }, parent);
-    }
     /* where in the dash pattern a pipe starts, so that a branch continues the dashes of the pipe it joins: the pattern position at
        the joint is the length of the pipe so far, modulo the period */
     function phaseOf(length) {
         return ((length % DASH_PERIOD) + DASH_PERIOD) % DASH_PERIOD;
     }
-    /* a pipe coloured by its sensor; it flows while one of the `activeIds` runs */
-    function pipe(parent, d, sensorId, activeIds, phase, only) {
-        var p = rawPipe(parent, d, IDLE_COLOR);
+    /* A pipe is a thin grey base (all bases lie in one layer below), a solid coloured line while the pipe is on the active path (`uses`
+       names the paths that use it: heat, dhw, cool), and light dashes that move along it while it runs (`activeIds`, see activityOf).
+       The colour comes from the sensor `sensorId` unless `fixedColor` is given. */
+    function pipe(parent, d, sensorId, activeIds, phase, uses, fixedColor) {
+        el('path', { d: d, class: 'pipe-base' }, parent === view.pipes ? view.pipesBase : parent);
+        var color = el('path', { d: d, class: 'pipe-color' }, parent);
+        var light = el('path', { d: d, class: 'pipe-light' }, parent);
         if (phase) {
-            p.style.setProperty('--phase', `${phase}px`);
+            light.style.setProperty('--phase', `${phase}px`);
         }
-        // `only`: a pipe that carries water in cooling operation only (the cold storage) or in heating operation only (the hot water
-        // vessel: the heat pump cannot charge it while it cools); outside its operation it rests grey
-        var inUse = function () {
-            if (only !== 'overlay' && view.cooling && String(view.coolRole[sensorId]).indexOf('idle-') === 0) {
-                return false;
+        var activity = activityOf(activeIds);
+        var running = false;
+        // what is on the screen, so that a temperature update that changes nothing writes nothing
+        var shown = null;
+        var flowing = null;
+        var stroke = null;
+        var update = function () {
+            var on = inUse(uses);
+            if (on !== shown) {
+                color.style.display = on ? '' : 'none';
+                light.style.display = on ? '' : 'none';
+                shown = on;
             }
-            return String(only).indexOf('cooling') === 0 || only === 'overlay'
-                ? view.cooling
-                : only === 'heating'
-                  ? !view.cooling
-                  : true;
+            var moves = on && running;
+            if (moves !== flowing) {
+                light.classList.toggle('flowing', moves);
+                flowing = moves;
+            }
+            if (on) {
+                var next = fixedColor || colorOf(sensorId, state[sensorId]);
+                if (next !== stroke) {
+                    color.setAttribute('stroke', next);
+                    stroke = next;
+                }
+            }
         };
-        bind(sensorId, function (v) {
-            // the pipes of the cold storage have the cold colours of flow and return
-            var cold = only === 'cooling-flow' ? COOL_FLOW_COLOR : only === 'cooling-return' ? COOL_RETURN_COLOR : null;
-            p.setAttribute('stroke', inUse() ? cold || colorOf(sensorId, v, only === 'overlay') : IDLE_COLOR);
-            // an overlay is only there in cooling operation: it paints the shared stretch of the heat pump pipes cold
-            if (only === 'overlay') {
-                p.style.display = inUse() ? '' : 'none';
-            }
+        var check = function () {
+            running = activity.fn();
+            update();
+        };
+        bind(sensorId, update);
+        activity.ids.forEach(function (id) {
+            bind(id, check);
         });
-        // `{ all: [groupA, groupB] }`: flows only while both groups have something running
-        (activeIds && activeIds.all ? whenAllRunning.bind(null, activeIds.all) : whenRunning.bind(null, activeIds))(
-            function (running) {
-                p.classList.toggle('flowing', running && inUse());
-            },
-        );
-        if (only || view.coolRole[sensorId]) {
-            view.modeIds.push(sensorId);
-            []
-                .concat(activeIds && activeIds.all ? [].concat.apply([], activeIds.all) : activeIds || [])
-                .forEach(function (id) {
-                    view.modeIds.push(id);
-                });
+        update();
+        if (uses) {
+            view.modeIds.add(sensorId);
+            activity.ids.forEach(function (id) {
+                view.modeIds.add(id);
+            });
         }
-        return p;
+        return color;
     }
     /* a pipe made of straight pieces; `points` are [x, y] pairs */
-    function line(parent, points, sensorId, activeIds, phase, only) {
+    function line(parent, points, sensorId, activeIds, phase, uses, fixedColor) {
         var d = points
             .map(function (pt, k) {
                 return `${(k ? 'L' : 'M') + pt[0]} ${pt[1]}`;
             })
             .join(' ');
-        return pipe(parent, d, sensorId, activeIds, phase, only);
+        return pipe(parent, d, sensorId, activeIds, phase, uses, fixedColor);
     }
-    function hline(parent, x1, x2, y, sensorId, activeIds, phase) {
+    function hline(parent, x1, x2, y, sensorId, activeIds, phase, uses, fixedColor) {
         return line(
             parent,
             [
@@ -422,17 +461,39 @@
             sensorId,
             activeIds,
             phase,
+            uses,
+            fixedColor,
+        );
+    }
+    function vline(parent, x, y1, y2, sensorId, activeIds, phase, uses, fixedColor) {
+        return line(
+            parent,
+            [
+                [x, y1],
+                [x, y2],
+            ],
+            sensorId,
+            activeIds,
+            phase,
+            uses,
+            fixedColor,
         );
     }
     /* a value chip with the IDM tag in front, sitting on a pipe */
-    function tagChip(parent, cx, cy, id, tag) {
+    function tagChip(parent, cx, cy, id, tag, uses) {
         var g = el('g', {}, parent);
         var r = el('rect', { x: cx - 52, y: cy - 13, width: 104, height: 26, rx: 13, fill: IDLE_COLOR }, g);
         var t = text(g, cx, cy + 5, tag, 'chiptext', 'middle');
+        // grey while the pipe it sits on rests
+        var refresh = function () {
+            r.setAttribute('fill', inUse(uses) ? colorOf(id, state[id]) : IDLE_COLOR);
+        };
         bind(id, function (v) {
-            r.setAttribute('fill', colorOf(id, v, true));
+            refresh();
             t.textContent = `${tag}  ${fmt(v, 1, '°C')}`;
         });
+        view.modeIds.add(id);
+        return refresh;
     }
 
     /* ---------- parts ---------- */
@@ -581,15 +642,18 @@
         document.title = m.labels.title;
         document.documentElement.lang = m.language;
         bindings = {};
+        var coolRole = coolRoles(m);
         var root = el('g', { transform: `translate(${L.originX} 0)` }, svg);
         return {
             m: m,
             roleColor: colorRoles(m),
-            coolRole: coolRoles(m),
-            cooling: false,
+            coolRole: coolRole,
+            // the operating mode (1 heating, 2 cooling, 4 hot water), null while the Navigator reports none
+            mode: null,
             // ids whose bindings are run again when the operating mode changes
-            modeIds: Object.keys(coolRoles(m)),
+            modeIds: new Set(Object.keys(coolRole)),
             /* back to front: pipes, the station card with its storage pipes (above the other pipes, below the tank), parts */
+            pipesBase: el('g', {}, root),
             pipes: el('g', {}, root),
             mid: el('g', {}, root),
             parts: el('g', {}, root),
@@ -604,18 +668,17 @@
         // the heating buffer, or below the pipes that run straight from the heat pump to the circuits where there is none
         var cursor = m.centralTank ? tankBottom + L.split.gapBelow : yFlow + L.pipeGap + L.split.hungGap;
         var hung = [];
+        // the cold storage hangs right below the heating buffer (it shares the pipes to the circuits), the hot water vessel below it
+        if (m.ids.coldBuffer) {
+            hung.push({ kind: 'cold', top: cursor, h: L.split.dhwH, bottom: cursor + L.split.dhwH });
+            cursor += L.split.dhwH + L.split.stackGap;
+        }
         if (m.hungDhw) {
             // taller where a solar coil sits at its bottom
             var dhwH = L.split.dhwH + (!m.centralTank && m.parts.solar ? L.solar.reserve : 0);
             hung.push({ kind: 'dhw', top: cursor, h: dhwH, bottom: cursor + dhwH });
-            cursor += dhwH + L.split.stackGap + (m.rods.length ? L.split.rodGap : 0);
         }
-        if (m.ids.coldBuffer) {
-            hung.push({ kind: 'cold', top: cursor, h: L.split.dhwH, bottom: cursor + L.split.dhwH });
-        }
-        var dhw = hung.find(function (vessel) {
-            return vessel.kind === 'dhw';
-        });
+        var dhw = hungOf(hung, 'dhw');
         if (!m.centralTank && hung.length) {
             // the solar coil sits in the hot water vessel
             tankBottom = (dhw || hung[0]).bottom;
@@ -661,9 +724,7 @@
             });
         }
         g.hungBottom = g.hung.length ? g.hung[g.hung.length - 1].bottom : g.tankBottom;
-        var dhw = g.hung.find(function (vessel) {
-            return vessel.kind === 'dhw';
-        });
+        var dhw = hungOf(g.hung, 'dhw');
         g.dhwTop = dhw ? dhw.top : 0;
         g.dhwBottom = dhw ? dhw.bottom : 0;
     }
@@ -724,11 +785,13 @@
         var statusY = y + h - 62 - extraRows * 20;
 
         card(parts, x, y, L.hp.w, h, m.labels.heatPump);
-        dot(parts, x + L.hp.w - 20, y + 22, ids.compressor);
+        compressorIds().forEach(function (id, i) {
+            dot(parts, x + L.hp.w - 20 - i * 16, y + 22, id);
+        });
         if (m.heatSource === 'ground') {
             pumpIcon(parts, x + 72, y + 118, L.hp.iconSize, [ids.pumpBrine, ids.pumpSource]);
         } else {
-            fan(parts, x + 72, y + 118, L.hp.iconSize, ids.compressor, ids.fanM13);
+            fan(parts, x + 72, y + 118, L.hp.iconSize, compressorIds(), ids.fanM13);
         }
         rows.forEach(function (row, i) {
             labeled(
@@ -794,18 +857,78 @@
         }
         var central = centralLevels.length > 0;
         var hpRight = L.hp.x + L.hp.w;
+        var wall = tankWallLeft();
         /* the water moves while the charging pump M73 or the flow sensor B2 says so (the pump runs on after the compressor stops);
            the hot gas line only carries water while its mixer M71 is open and the water moves (without an M71 value it follows the water) */
         var flowRate = sensorByTag(m, TAG.flowRate);
         var water = [ids.pumpM73, flowRate && flowRate.id].filter(Boolean);
-        var waterActive = water.length ? water : ids.compressor;
-        view.waterActive = waterActive;
+        var waterActive = water.length ? water : compressorIds();
         var hglActive = ids.hglMixer ? { all: [ids.hglMixer, waterActive] } : waterActive;
-        var pipes = [
-            { y: g.yFlow, id: ids.hpFlow, tag: TAG.hpFlow, active: waterActive },
-            // the return flows from the storage back to the heat pump
-            { y: g.yRet, id: ids.hpReturn, tag: TAG.hpReturn, active: waterActive, back: true },
-        ];
+        var coldStorage = !!hungOf(g.hung, 'cold');
+        // the paths that take the water of the heat pump: the heating buffer (and, without a cold storage, cooling through it) or, with
+        // no heating buffer, the pipes straight to the circuits; the hot water vessel and the cold storage on their own paths
+        var endUses = coldStorage ? ['heat'] : ['heat', 'cool'];
+        var usesOf = function (vessel) {
+            return vessel.kind === 'dhw' ? ['dhw'] : ['cool'];
+        };
+        // the vessels that hang below: charged by pipes that drop down left of the tanks and enter the side of the vessel, the feed at
+        // the height of the upper sensor and the return at the lower one; the return is the outer pipe, so none crosses another, and
+        // every further vessel takes the lane to the left of the one above
+        var lanes = g.hung.map(function (vessel, i) {
+            return {
+                vessel: vessel,
+                feedX: tankX - sp.feedX - i * sp.lane,
+                returnX: tankX - sp.returnX - i * sp.lane,
+                uses: usesOf(vessel),
+                // the hot water vessel is charged by the hot gas line where there is one and no heating buffer takes it
+                byHgl: vessel.kind === 'dhw' && ids.hgl && !central,
+            };
+        });
+        // the pipes from the heat pump are drawn in pieces between the lanes: a piece carries water for every vessel beyond it
+        var rows = function (y, id, laneKey, backward) {
+            var firstUses = endUses;
+            var far = lanes.slice().reverse(); // the farthest lane (the lowest vessel) is met first
+            var xs = [hpRight].concat(
+                far.map(function (lane) {
+                    return lane[laneKey];
+                }),
+            );
+            var last = central ? wall : lanes.length ? lanes[0][laneKey] : hpRight;
+            xs.push(last);
+            for (var k = 0; k < xs.length - 1; k++) {
+                if (xs[k + 1] === xs[k]) {
+                    continue;
+                }
+                // the piece serves the vessels beyond it (the lanes from the k-th on) and the end of the row
+                var uses = Array.from(
+                    new Set(
+                        [].concat.apply(
+                            endUses,
+                            far.slice(k).map(function (lane) {
+                                // a vessel on the hot gas line takes nothing from the flow pipe
+                                return lane.byHgl && !backward ? [] : lane.uses;
+                            }),
+                        ),
+                    ),
+                );
+                var from = xs[k];
+                var to = xs[k + 1];
+                hline(view.pipes, backward ? to : from, backward ? from : to, y, id, waterActive, undefined, uses);
+                if (k === 0) {
+                    firstUses = uses;
+                }
+            }
+            return firstUses;
+        };
+        var flowChipUses = endUses;
+        var returnChipUses = endUses;
+        if (central || lanes.length) {
+            flowChipUses = rows(g.yFlow, ids.hpFlow, 'feedX', false);
+            returnChipUses = rows(g.yRet, ids.hpReturn, 'returnX', true);
+            if (ids.hgl && central) {
+                hline(view.pipes, hpRight, wall, g.yHgl, ids.hgl, hglActive, undefined, ['heat', 'dhw']);
+            }
+        }
         if (central) {
             var title =
                 m.parts.dhw && !m.hungDhw && m.parts.buffer
@@ -824,10 +947,8 @@
                 m.parts.solar ? L.solar.reserve : 0,
             );
         }
-        // the vessels that hang below: charged by pipes that drop down left of the tanks and enter the side of the vessel, the feed at
-        // the height of the upper sensor and the return at the lower one; the return is the outer pipe, so none crosses another, and
-        // every further vessel takes the lane to the left of the one above
-        g.hung.forEach(function (vessel, i) {
+        lanes.forEach(function (lane) {
+            var vessel = lane.vessel;
             var isDhw = vessel.kind === 'dhw';
             tank(
                 view.parts,
@@ -841,99 +962,58 @@
                 true,
                 !isDhw,
             );
-            var feedX = tankX - sp.feedX - i * sp.lane;
-            var returnX = tankX - sp.returnX - i * sp.lane;
-            if (!isDhw) {
-                view.coldLane = { feedX: feedX, returnX: returnX };
-            }
-            var wall = tankX + L.tank.pipeInset;
             var feedY = vessel.top + L.tank.levelInset;
             var returnY = vessel.bottom - L.tank.levelInset;
             // the hot water vessel is charged by the hot gas line where there is one and no heating buffer takes it
-            var byHgl = isDhw && ids.hgl && !central;
+            var byHgl = lane.byHgl;
             var sourceY = byHgl ? g.yHgl : g.yFlow;
-            var flowId = isDhw ? (byHgl ? ids.hgl : ids.hpFlow) : ids.coldBuffer;
             line(
                 view.pipes,
                 (byHgl ? [[hpRight, sourceY]] : []).concat([
-                    [feedX, sourceY],
-                    [feedX, feedY],
+                    [lane.feedX, sourceY],
+                    [lane.feedX, feedY],
                     [wall, feedY],
                 ]),
-                flowId,
+                byHgl ? ids.hgl : ids.hpFlow,
                 byHgl ? hglActive : waterActive,
                 undefined,
-                isDhw ? 'heating' : 'cooling-flow',
+                lane.uses,
             );
             line(
                 view.pipes,
                 [
                     [wall, returnY],
-                    [returnX, returnY],
-                    [returnX, g.yRet],
+                    [lane.returnX, returnY],
+                    [lane.returnX, g.yRet],
                 ],
-                isDhw ? ids.hpReturn : ids.coldBuffer,
+                ids.hpReturn,
                 waterActive,
                 undefined,
-                isDhw ? 'heating' : 'cooling-return',
+                lane.uses,
             );
         });
-        if (ids.hgl && (central || g.hung.length)) {
-            pipes.unshift({ y: g.yHgl, id: ids.hgl, tag: TAG.hgl, active: hglActive });
+        var farthest = lanes.length ? lanes[lanes.length - 1].feedX : tankX;
+        var chipX = central || lanes.length ? (hpRight + farthest) / 2 : hpRight + 80;
+        var chipPipes = [
+            { y: g.yFlow, id: ids.hpFlow, tag: TAG.hpFlow, uses: flowChipUses },
+            { y: g.yRet, id: ids.hpReturn, tag: TAG.hpReturn, uses: returnChipUses },
+        ];
+        if (ids.hgl && (central || lanes.length)) {
+            chipPipes.unshift({ y: g.yHgl, id: ids.hgl, tag: TAG.hgl, uses: central ? ['heat', 'dhw'] : ['dhw'] });
         }
-        var chipX = central || g.hung.length ? (hpRight + L.tank.x) / 2 : hpRight + 80;
-        pipes.forEach(function (p) {
-            // without a heating buffer the pipes to the circuits run straight from the heat pump (the circuits draw them)
-            if (central) {
-                var tankSide = L.tank.x + L.tank.pipeInset;
-                // a pipe flows from its first to its last point, so the return is drawn from the storage to the heat pump
-                hline(view.pipes, p.back ? tankSide : hpRight, p.back ? hpRight : tankSide, p.y, p.id, p.active);
-            }
-            tagChip(view.parts, chipX, p.y, p.id, p.tag);
+        chipPipes.forEach(function (p) {
+            tagChip(view.parts, chipX, p.y, p.id, p.tag, p.uses);
         });
-        return { central: central, any: central || g.hung.length > 0 };
-    }
-
-    /* While the heat pump cools, the stretch of its flow and return pipe up to the branch of the cold storage carries cold water; it is
-       drawn above everything else (the pipes beyond rest), and only in cooling operation. */
-    function drawColdOverlay(g) {
-        var lane = view.coldLane;
-        if (!lane) {
-            return;
-        }
-        var ids = view.m.ids;
-        var hpRight = L.hp.x + L.hp.w;
-        [
-            {
-                id: ids.hpFlow,
-                points: [
-                    [hpRight, g.yFlow],
-                    [lane.feedX, g.yFlow],
-                ],
-            },
-            {
-                id: ids.hpReturn,
-                points: [
-                    [lane.returnX, g.yRet],
-                    [hpRight, g.yRet],
-                ],
-            },
-        ].forEach(function (row) {
-            // a solid pipe in the colour of the page first: it hides the resting pipe below the dashes of the cold one
-            var d = row.points
-                .map(function (pt, k) {
-                    return `${(k ? 'L' : 'M') + pt[0]} ${pt[1]}`;
-                })
-                .join(' ');
-            var mask = rawPipe(view.pipes, d, 'var(--bg)');
-            mask.style.display = 'none';
-            bind(ids.coldBuffer, function () {
-                mask.style.display = view.cooling ? '' : 'none';
-            });
-            // coloured like the chips: the flow deep blue, the return cyan
-            line(view.pipes, row.points, row.id, view.waterActive, undefined, 'overlay');
-        });
-        view.modeIds.push(ids.coldBuffer);
+        // where the pipes to the circuits start: at the heating buffer, else where the straight pipes leave the lanes
+        view.storage = {
+            central: central,
+            flowX: central ? wall : lanes.length ? lanes[0].feedX : hpRight,
+            returnX: central ? wall : lanes.length ? lanes[0].returnX : hpRight,
+            cold: hungOf(g.hung, 'cold'),
+            // a heating buffer keeps feeding the circuits while the heat pump charges the hot water vessel
+            trunkUses: central ? endUses.concat(['dhw']) : endUses,
+        };
+        return { central: central, any: central || lanes.length > 0 };
     }
 
     /* the rooms next to each heating circuit (model.js assigns them from the zone modules and the settings) */
@@ -946,7 +1026,7 @@
     }
     /* the heating circuits, one block each: the card with its rooms (two columns) beside it, a branch of flow and return pipe,
        and the trunk from the storage that flows while any circuit runs */
-    function drawCircuits(g, hasTank) {
+    function drawCircuits(g) {
         var m = view.m;
         var ids = m.ids;
         var parts = view.parts;
@@ -957,7 +1037,14 @@
         var roomsX = c.x + c.w + 12;
         var flowManifold = c.x - c.manifold;
         var returnManifold = c.x - c.manifold - 18;
-        var fromX = hasTank ? L.tank.x + L.tank.w - L.tank.pipeInset : L.hp.x + L.hp.w;
+        var fromX = view.storage.flowX;
+        var fromReturnX = view.storage.returnX;
+        var cold = view.storage.cold;
+        var trunkUses = view.storage.trunkUses;
+        // the circuits are fed by the heating buffer (heating and hot water) or by the cold storage (cooling); without a heating buffer the
+        // pipes come straight from the heat pump, which cannot feed them while it charges the hot water vessel
+        var circuitUses = view.storage.central ? ['heat', 'dhw', 'cool'] : ['heat', 'cool'];
+        var wallRight = tankWallRight();
         var returnDy = c.pipeDy + (g.yRet - g.yFlow); // return pipe, from the top of a circuit block
         var roomsOf = roomsOfCircuits(m);
         /* a circuit runs while its mode says so or its pump runs (M31 for circuit A, M32 for B, ...) */
@@ -978,8 +1065,17 @@
             // the branches continue the dashes of the trunk they join (the trunk runs from the storage and, for the return, ends there)
             var flowPhase = phaseOf(flowManifold - fromX + (y + c.pipeDy - g.yFlow));
             var returnPhase = phaseOf(tops[tops.length - 1] - y - (c.x - returnManifold));
-            hline(view.pipes, flowManifold, c.x, y + c.pipeDy, circuit.flow, running[i], flowPhase);
-            hline(view.pipes, c.x, returnManifold, y + returnDy, ids.hpReturn, running[i], returnPhase);
+            hline(
+                view.pipes,
+                flowManifold,
+                c.x,
+                y + c.pipeDy,
+                circuit.flow || ids.hpFlow,
+                running[i],
+                flowPhase,
+                circuitUses,
+            );
+            hline(view.pipes, c.x, returnManifold, y + returnDy, ids.hpReturn, running[i], returnPhase, circuitUses);
             card(parts, c.x, y, c.w, c.h, circuit.name);
             dot(parts, c.x + c.w - 18, y + 22, running[i]);
             // pump and mixer of every circuit that reports them; a direct circuit shows the pump only
@@ -1025,26 +1121,28 @@
         if (m.circuits.length) {
             var any = [].concat.apply([], running);
             var lastTop = tops[tops.length - 1];
-            line(
-                view.pipes,
-                [
-                    [fromX, g.yFlow],
-                    [flowManifold, g.yFlow],
-                    [flowManifold, lastTop + c.pipeDy],
-                ],
-                ids.hpFlow,
-                any,
-            );
-            line(
-                view.pipes,
-                [
-                    [returnManifold, lastTop + returnDy],
-                    [returnManifold, g.yRet],
-                    [fromX, g.yRet],
-                ],
-                ids.hpReturn,
-                any,
-            );
+            var flowBottom = lastTop + c.pipeDy;
+            var returnBottom = lastTop + returnDy;
+            // the pipes from the heat pump or the heating buffer (heating, and cooling where there is no cold storage) ...
+            hline(view.pipes, fromX, flowManifold, g.yFlow, ids.hpFlow, any, undefined, trunkUses);
+            hline(view.pipes, returnManifold, fromReturnX, g.yRet, ids.hpReturn, any, undefined, trunkUses);
+            // ... and, where there is one, from the cold storage (cooling): its pipes join the manifolds on the right of the vessels
+            var flowEnd = cold ? Math.max(flowBottom, cold.bottom - L.tank.levelInset) : flowBottom;
+            var returnEnd = cold ? Math.max(returnBottom, cold.top + L.tank.levelInset) : returnBottom;
+            vline(view.pipes, flowManifold, g.yFlow, flowBottom, ids.hpFlow, any, undefined, circuitUses);
+            vline(view.pipes, returnManifold, returnBottom, g.yRet, ids.hpReturn, any, undefined, circuitUses);
+            if (cold) {
+                var coldFlowY = cold.bottom - L.tank.levelInset;
+                var coldReturnY = cold.top + L.tank.levelInset;
+                if (flowEnd > flowBottom) {
+                    vline(view.pipes, flowManifold, flowBottom, flowEnd, ids.hpFlow, any, undefined, ['cool']);
+                }
+                if (returnEnd > returnBottom) {
+                    vline(view.pipes, returnManifold, returnEnd, returnBottom, ids.hpReturn, any, undefined, ['cool']);
+                }
+                hline(view.pipes, wallRight, flowManifold, coldFlowY, ids.hpFlow, any, undefined, ['cool']);
+                hline(view.pipes, returnManifold, wallRight, coldReturnY, ids.hpReturn, any, undefined, ['cool']);
+            }
         }
         return { bottom: m.circuits.length ? next : 0, maxRight: maxRight };
     }
@@ -1065,7 +1163,7 @@
         var outY = hxY + s.hxH - 16;
         var tankInside = L.tank.x + L.tank.w - 60; // the storage pipes start where the tank wall is straight
         /* the station runs while the hot water flow switch B1 or the station pump M22 says so (else with the compressor) */
-        var active = ids.dhwFlow || ids.pumpM22 ? [ids.dhwFlow, ids.pumpM22] : [ids.compressor];
+        var active = ids.dhwFlow || ids.pumpM22 ? [ids.dhwFlow, ids.pumpM22] : compressorIds();
         // the card is wider by the circulation pump badge beside the station pump
         var w = s.w + (ids.circulation ? s.circulationExtra : 0);
         var coldEnd = x + w + 54;
@@ -1078,15 +1176,18 @@
             badge(view.mid, x + 14, y + 126, 'M22', ids.pumpM22, true);
         }
         if (ids.circulation) {
-            circulationBadge(view.mid, x + 14 + (ids.pumpM22 ? s.circulationGap : 0), y + 126);
+            badge(view.mid, x + 14 + (ids.pumpM22 ? s.circulationGap : 0), y + 126, 'M64', ids.circulation, false);
         }
-        hline(view.mid, tankInside, hxX, inY, ids.dhwTop, active);
-        hline(view.mid, hxX, tankInside, outY, ids.dhwBottom || ids.buffer, active);
+        // hot in, back cooler, also where the vessel has no sensors
+        hline(view.mid, tankInside, hxX, inY, ids.dhwTop, active, undefined, undefined, FLOW_COLOR);
+        hline(view.mid, hxX, tankInside, outY, ids.dhwBottom || ids.buffer, active, undefined, undefined, RETURN_COLOR);
         el('rect', { x: hxX, y: hxY, width: s.hxW, height: s.hxH, rx: 6, class: 'hx' }, view.parts);
         el('path', { d: `M${hxX} ${hxY + s.hxH} L${hxRight} ${hxY}`, class: 'hxline' }, view.parts);
 
-        rawPipe(view.parts, `M${hxRight} ${inY} H${tapX + 2}`, FLOW_COLOR);
-        rawPipe(view.parts, `M${coldEnd} ${outY} H${hxRight}`, tempColor(10));
+        // the drinking water runs through the heat exchanger as soon as the station works: cold in, hot out to the tap
+        pipe(view.parts, `M${hxRight} ${inY} H${tapX + 2}`, null, active, undefined, undefined, FLOW_COLOR);
+        pipe(view.parts, `M${coldEnd} ${outY} H${hxRight}`, null, active, undefined, undefined, tempColor(10));
+
         text(view.parts, coldEnd, outY + 22, m.labels.coldWater, 'small', 'middle');
         faucet(view.parts, tapX, tapY, ids.dhwFlow);
         labeled(view.parts, tapX + 56, tapY + 12, TAG.tap, ids.dhwTap, 1, '°C');
@@ -1117,17 +1218,13 @@
             });
         });
     }
-    /* the hot water circulation pump M64: a pump badge whose tooltip names it */
-    function circulationBadge(parent, x, y) {
-        badge(parent, x, y, 'M64', view.m.ids.circulation, false);
-    }
     /* without a fresh water station (an AQA tank) the circulation pump stands beside the hot water part on its own */
     function drawCirculation(g) {
         var m = view.m;
         var x = L.tank.x + L.tank.w + L.station.gap;
         var y = (m.hungDhw ? g.dhwTop + 20 : L.station.y) + 40;
         text(view.parts, x + 14, y - 22, m.labels.circulation, 'small');
-        circulationBadge(view.parts, x + 14, y);
+        badge(view.parts, x + 14, y, 'M64', m.ids.circulation, false);
     }
 
     /* solar thermal below the heat pump, connected to the lower part of the storage by a flow and a return pipe with a coil
@@ -1144,7 +1241,13 @@
         var others = all.filter(function (sensor) {
             return sensor !== charge && sensor !== back;
         });
-        var h = others.length ? 126 + others.length * L.solar.sensorGap : 110;
+        var solarPumps = [
+            ['M75', m.ids.solarPump1],
+            ['M76', m.ids.solarPump2],
+        ].filter(function (pump) {
+            return pump[1];
+        });
+        var h = (others.length ? 126 + others.length * L.solar.sensorGap : 110) + (solarPumps.length ? 26 : 0);
         var y = Math.max(hp.y + hp.h + 24, g.tankBottom - h - 20);
         var flowY = Math.min(y + 36, g.tankBottom - 30);
         var returnY = Math.min(y + 76, g.tankBottom - 24);
@@ -1152,6 +1255,9 @@
         var chipX = (right + L.tank.x) / 2;
 
         card(parts, x, y, L.hp.w, h, m.labels.solar);
+        solarPumps.forEach(function (pump, i) {
+            badge(parts, x + 16 + i * 104, y + h - 14, pump[0], pump[1], false);
+        });
         labeled(
             parts,
             x + 16,
@@ -1166,13 +1272,34 @@
         others.forEach(function (sensor, i) {
             sensorValue(parts, x + 16, y + 126 + i * L.solar.sensorGap, sensor);
         });
-        hline(view.pipes, right, L.tank.x + 40, flowY, m.ids.solarCollector);
-        hline(view.pipes, L.tank.x + 40, right, returnY, (back || {}).id || m.ids.solarCollector);
-        if (charge) {
-            tagChip(parts, chipX, flowY, charge.id, TAG.solarCharge);
-        }
-        if (back) {
-            tagChip(parts, chipX, returnY, back.id, TAG.solarReturn);
+        // where the solar pumps report, they say whether the loop runs; else the loop works while its charge pipe is clearly warmer
+        // than its return
+        var loop = solarPumps.length
+            ? activityOf(
+                  solarPumps.map(function (pump) {
+                      return pump[1];
+                  }),
+              )
+            : charge && back
+              ? {
+                    fn: function () {
+                        var hot = num(state[charge.id]);
+                        var cold = num(state[back.id]);
+                        return hot !== null && cold !== null && hot - cold >= SOLAR_MIN_DIFF;
+                    },
+                    ids: [charge.id, back.id],
+                }
+              : undefined;
+        view.solarOn = loop ? loop.fn : null;
+        hline(view.pipes, right, L.tank.x + 40, flowY, m.ids.solarCollector, loop, undefined, ['solar']);
+        hline(view.pipes, L.tank.x + 40, right, returnY, (back || {}).id || m.ids.solarCollector, loop, undefined, [
+            'solar',
+        ]);
+        var refreshCharge = charge ? tagChip(parts, chipX, flowY, charge.id, TAG.solarCharge, ['solar']) : null;
+        var refreshBack = back ? tagChip(parts, chipX, returnY, back.id, TAG.solarReturn, ['solar']) : null;
+        if (charge && back) {
+            bind(back.id, refreshCharge);
+            bind(charge.id, refreshBack);
         }
         /* the heat exchanger coil inside the storage, between the flow and the return pipe */
         var left = L.tank.x + 30;
@@ -1220,12 +1347,126 @@
     }
     function drawBivalence(top) {
         var m = view.m;
-        card(view.parts, L.hp.x, top, 220, 100, m.labels.bivalence);
+        card(view.parts, L.hp.x, top, L.smallCard.w, L.smallCard.h, m.labels.bivalence);
         var t = text(view.parts, L.hp.x + 16, top + 80, '–', 'big');
         bind(m.ids.bivalence, function (v) {
             t.textContent = v === null || v === undefined ? '–' : String(v);
         });
-        return top + 120;
+        return top + L.smallCard.h + L.smallCard.gap;
+    }
+    /* The pipes of a further generator (boiler, stove, cascade member) from the card whose right edge is at `cardRight`: the flow joins at
+       the top of the heating buffer, the return comes back at its bottom; without a heating buffer both join the pipes of the heat pump
+       (ALM 2-15 p. 49). `index` staggers the risers of several generators. `spec`: `flowSensor` / `returnSensor` (the sensors the colours
+       come from, or `flowColor` / `returnColor` where fixed), the `uses` paths and the `active` rule (see activityOf). */
+    function generatorPipes(g, cardRight, top, index, spec) {
+        var storage = view.storage;
+        if (!storage) {
+            return; // no storage drawn (drawStorage sets it): nothing to join
+        }
+        var gen = L.generator;
+        var flowX =
+            L.tank.x -
+            L.split.returnX -
+            Math.max(g.hung.length, 1) * L.split.lane -
+            gen.riserInset -
+            index * gen.riserStep;
+        var returnX = flowX - gen.returnGap;
+        var wall = tankWallLeft();
+        var flowY = storage.central ? L.tank.top + gen.flowDy : g.yFlow;
+        var returnY = storage.central ? g.tankBottom - gen.returnInset : g.yRet;
+        var flowPoints = [
+            [cardRight, top + gen.flowRow],
+            [flowX, top + gen.flowRow],
+            [flowX, flowY],
+        ];
+        var returnPoints = [
+            [returnX, returnY],
+            [returnX, top + gen.returnRow],
+            [cardRight, top + gen.returnRow],
+        ];
+        if (storage.central) {
+            flowPoints.push([wall, flowY]);
+            returnPoints.unshift([wall, returnY]);
+        }
+        line(view.pipes, flowPoints, spec.flowSensor, spec.active, undefined, spec.uses, spec.flowColor);
+        line(view.pipes, returnPoints, spec.returnSensor, spec.active, undefined, spec.uses, spec.returnColor);
+    }
+    /* the cascade: the stages that run of the stages that are available per mode. The members' own sensors are not exposed, so the card
+       shows counts; its pipes join the heat pump's and run while any stage runs. */
+    function drawCascade(x, top, g, index) {
+        var m = view.m;
+        var parts = view.parts;
+        var sc = L.smallCard;
+        var rows = m.cascade.rows;
+        card(parts, x, top, sc.w, sc.rowsTop + sc.rowsPad + rows.length * sc.rowH, m.labels.cascade);
+        rows.forEach(function (row, i) {
+            var y = top + sc.rowsTop + i * sc.rowH;
+            text(parts, x + 16, y, m.labels[row.mode], 'label');
+            var count = text(parts, x + sc.w - 16, y, '–', 'mid', 'end');
+            var refresh = function () {
+                var running = num(state[row.running]);
+                var available = num(state[row.available]);
+                count.textContent = `${running === null ? '–' : running} / ${available === null ? '–' : available}`;
+            };
+            bind(row.running, refresh);
+            bind(row.available, refresh);
+        });
+        generatorPipes(g, x + sc.w, top, index, {
+            flowSensor: m.ids.hpFlow,
+            returnSensor: m.ids.hpReturn,
+            uses: ['heat', 'cool'],
+            active: rows.map(function (row) {
+                return row.running;
+            }),
+        });
+        return sc.rowsTop + sc.rowsPad + rows.length * sc.rowH;
+    }
+    /* further heat generators in a row below the plant: a cascade, an oil / gas boiler with its priority valve M111 and a tiled stove with
+       its pump M88 and sensor B84, as cards with their state. The boiler's valves M111.1 / M111.2 choose the vessel (no state tells
+       which), so it is drawn to the buffer. The pipes run while the pump or valve runs. */
+    function drawHeatSources(top, g) {
+        var m = view.m;
+        var ids = m.ids;
+        var parts = view.parts;
+        var sc = L.smallCard;
+        var x = L.hp.x;
+        var height = sc.h;
+        var index = 0;
+        var onOff = function (v) {
+            var on = isRunning(v);
+            return { text: on ? m.labels.on : m.labels.off, active: on };
+        };
+        // a boiler or a stove heats: orange flow, blue return, running while its pump or valve runs
+        var heats = function (runId) {
+            return {
+                flowSensor: runId,
+                returnSensor: runId,
+                flowColor: FLOW_COLOR,
+                returnColor: RETURN_COLOR,
+                active: runId,
+            };
+        };
+        if (m.cascade) {
+            height = Math.max(height, drawCascade(x, top, g, index++));
+            x += sc.w + sc.gap;
+        }
+        if (m.heatSources.boiler) {
+            card(parts, x, top, sc.w, sc.h, m.labels.boiler);
+            mixerBadge(parts, x + 16, top + 78, 'M111', ids.boilerValve, onOff);
+            generatorPipes(g, x + sc.w, top, index++, heats(ids.boilerValve));
+            x += sc.w + sc.gap;
+        }
+        if (m.heatSources.stove) {
+            card(parts, x, top, sc.w, sc.h, m.labels.stove);
+            if (ids.stoveTemp) {
+                labeled(parts, x + 16, top + 54, 'B84', ids.stoveTemp, 1, '°C', 'big', 22);
+            }
+            if (ids.stovePump) {
+                badge(parts, x + 130, top + 78, 'M88', ids.stovePump, false);
+                generatorPipes(g, x + sc.w, top, index++, heats(ids.stovePump));
+            }
+        }
+        return top + height + sc.gap;
     }
     /* the rooms of a plant without heating circuits, in rows of five */
     function drawFreeRooms(top) {
@@ -1269,16 +1510,15 @@
         view = createView(m);
         var g = gridOf(m);
         var hp = drawHeatPump(g);
-        // while the heat pump cools, the flow carries cold water: the colours follow the mode
+        // the water takes the path of the operating mode: the pipes follow it
         bind(m.ids.hpMode, function (v) {
-            view.cooling = num(v) === COOLING_MODE;
-            [].concat(view.modeIds).forEach(fire);
+            view.mode = num(v);
+            view.modeIds.forEach(fire);
         });
         growForSolar(g, hp);
         var storage = drawStorage(g);
         var hasTank = storage.any;
-        var circuits = drawCircuits(g, storage.central);
-        drawColdOverlay(g);
+        var circuits = drawCircuits(g);
         var bottom = Math.max(
             hp.y + hp.h,
             hasTank ? (g.hung.length ? g.hungBottom + 70 : g.tankBottom + 60) : 0,
@@ -1296,6 +1536,9 @@
         }
         if (m.parts.solar && hasTank) {
             bottom = Math.max(bottom, drawSolar(g, hp));
+        }
+        if (m.cascade || m.heatSources.boiler || m.heatSources.stove) {
+            bottom = drawHeatSources(bottom + 24, g);
         }
         bottom = drawSensorCards(bottom + 24);
         if (m.parts.bivalence) {
@@ -1329,16 +1572,19 @@
                 (plain.length >= 4 || (/[\u4e00-\u9fff]/.test(plain) && plain.length >= 2))
             );
         };
+        var hovers = [];
         Array.prototype.forEach.call(svg.querySelectorAll('text'), function (node) {
-            var text = node.textContent.trim();
-            var match = /^([BM]\d+[a-z]?)\b/.exec(text);
+            var content = node.textContent.trim();
+            var match = /^([BM]\d+[a-z]?)\b/.exec(content);
             var name = match && names[match[1]];
             // a text that already names the part ("B37 Air intake temperature") needs no hover
-            var rest = text.slice(match ? match[0].length : 0).match(/[^\s\d.,:%°/()+\-–−]+/g) || [];
-            if (!name || rest.some(isNameWord)) {
-                return;
+            var rest = content.slice(match ? match[0].length : 0).match(/[^\s\d.,:%°/()+\-–−]+/g) || [];
+            if (name && !rest.some(isNameWord)) {
+                hovers.push({ node: node, title: `${match[1]} ${name}`, box: node.getBBox() });
             }
-            var box = node.getBBox();
+        });
+        hovers.forEach(function (hover) {
+            var box = hover.box;
             var area = el(
                 'rect',
                 {
@@ -1349,9 +1595,9 @@
                     fill: 'transparent',
                     'pointer-events': 'all',
                 },
-                node.parentNode,
+                hover.node.parentNode,
             );
-            el('title', {}, area).textContent = `${match[1]} ${name}`;
+            el('title', {}, area).textContent = hover.title;
         });
     }
 
@@ -1365,6 +1611,8 @@
         });
         updateStatus();
     }
+    // the time formatter of the status line: building one costs more than the status update itself, and states arrive in bursts
+    var clock = null;
     function updateStatus() {
         if (!model) {
             return;
@@ -1372,9 +1620,15 @@
         var connected = socketUp && state[model.ids.connection] === true;
         var labels = model.labels;
         document.getElementById('dot').classList.toggle('on', connected);
+        if (!clock || clock.language !== model.language) {
+            clock = {
+                language: model.language,
+                format: new Intl.DateTimeFormat(model.language, { timeStyle: 'medium' }),
+            };
+        }
         document.getElementById('statusText').textContent = `${
             connected ? labels.connected : labels.disconnected
-        } · ${labels.updated} ${new Date().toLocaleTimeString(model.language)}`;
+        } · ${labels.updated} ${clock.format.format(new Date())}`;
     }
     /* ---------- data ---------- */
 

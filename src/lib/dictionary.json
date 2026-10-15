@@ -7174,5 +7174,29 @@
         "pl": "Zasobnik chłodu",
         "uk": "Накопичувач холоду",
         "zh-cn": "蓄冷罐"
+    },
+    "Boiler": {
+        "de": "Heizkessel",
+        "ru": "Котёл",
+        "pt": "Caldeira",
+        "nl": "Ketel",
+        "fr": "Chaudière",
+        "it": "Caldaia",
+        "es": "Caldera",
+        "pl": "Kocioł",
+        "uk": "Котел",
+        "zh-cn": "锅炉"
+    },
+    "Tiled stove": {
+        "de": "Kachelofen",
+        "ru": "Изразцовая печь",
+        "pt": "Fogão a lenha",
+        "nl": "Tegelkachel",
+        "fr": "Poêle en faïence",
+        "it": "Stufa in ceramica",
+        "es": "Estufa de azulejos",
+        "pl": "Piec kaflowy",
+        "uk": "Кахельна піч",
+        "zh-cn": "瓷砖炉"
     }
 }

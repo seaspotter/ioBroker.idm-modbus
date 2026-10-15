@@ -160,6 +160,26 @@
         "coldStorage": {
             "en": "Cold storage",
             "de": "Kältespeicher"
+        },
+        "boiler": {
+            "en": "Boiler",
+            "de": "Heizkessel"
+        },
+        "stove": {
+            "en": "Tiled stove",
+            "de": "Kachelofen"
+        },
+        "cascade": {
+            "en": "Cascade",
+            "de": "Kaskade"
+        },
+        "heating": {
+            "en": "Heating",
+            "de": "Heizbetrieb"
+        },
+        "cooling": {
+            "en": "Cooling",
+            "de": "Kühlbetrieb"
         }
     }
 }

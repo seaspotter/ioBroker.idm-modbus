@@ -46,7 +46,6 @@ describe('plant schemes of the IDM manuals (tools/sources/diagram-schemes.json)'
                 settings: snapshot.settings,
             });
             expect(model.heatSource, 'drawn heat source').to.equal(scheme.family === 'air' ? 'air' : 'ground');
-            expect(model.hotWaterOnly, 'hot water without buffer').to.equal(model.parts.dhw && !model.parts.buffer);
             expect(model.circuits.length, 'circuits').to.be.greaterThan(0);
         });
     }
