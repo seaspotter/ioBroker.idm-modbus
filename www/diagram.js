@@ -188,13 +188,16 @@
         }
         return `rgb(${rgb.join(',')})`;
     }
-    function colorOf(id, v) {
+    function colorOf(id, v, isChip) {
         var cool = view.cooling && view.coolRole[id];
-        if (cool === 'idle') {
-            return IDLE_COLOR;
-        }
         if (cool) {
-            return cool === 'flow' ? COOL_FLOW_COLOR : COOL_RETURN_COLOR;
+            // 'flow' / 'return': cold; 'idle-flow' / 'idle-return': the pipe beyond the cold storage's branch rests, but the chip on the
+            // stretch shared with the cold storage stays cold
+            var cold = cool.replace('idle-', '');
+            if (cool.indexOf('idle-') === 0 && !isChip) {
+                return IDLE_COLOR;
+            }
+            return cold === 'flow' ? COOL_FLOW_COLOR : COOL_RETURN_COLOR;
         }
         return view.roleColor[id] || tempColor(v);
     }
@@ -203,8 +206,8 @@
         var roles = {};
         // with a cold storage only the pipes to it are cold: the heating buffer and the circuits rest while the heat pump cools;
         // without one the heat pump cools through the circuits, so the flow is cold
-        var flow = m.ids.coldBuffer ? 'idle' : 'flow';
-        var back = m.ids.coldBuffer ? 'idle' : 'return';
+        var flow = m.ids.coldBuffer ? 'idle-flow' : 'flow';
+        var back = m.ids.coldBuffer ? 'idle-return' : 'return';
         [m.ids.hpFlow]
             .concat(
                 m.circuits.map(function (c) {
@@ -366,7 +369,7 @@
         // `only`: a pipe that carries water in cooling operation only (the cold storage) or in heating operation only (the hot water
         // vessel: the heat pump cannot charge it while it cools); outside its operation it rests grey
         var inUse = function () {
-            if (view.cooling && view.coolRole[sensorId] === 'idle') {
+            if (view.cooling && String(view.coolRole[sensorId]).indexOf('idle-') === 0) {
                 return false;
             }
             return only === 'cooling' || only === 'overlay' ? view.cooling : only === 'heating' ? !view.cooling : true;
@@ -421,7 +424,7 @@
         var r = el('rect', { x: cx - 52, y: cy - 13, width: 104, height: 26, rx: 13, fill: IDLE_COLOR }, g);
         var t = text(g, cx, cy + 5, tag, 'chiptext', 'middle');
         bind(id, function (v) {
-            r.setAttribute('fill', colorOf(id, v));
+            r.setAttribute('fill', colorOf(id, v, true));
             t.textContent = `${tag}  ${fmt(v, 1, '°C')}`;
         });
     }
