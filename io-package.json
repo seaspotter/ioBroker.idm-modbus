@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "idm-modbus",
-        "version": "0.1.8",
+        "version": "0.1.9",
         "news": {
+            "0.1.9": {
+                "en": "diagram: draws the plant by its operating mode (pipes coloured and moving while heating, charging hot water or cooling), two vessels for a separate heating buffer or a cold storage, pump and mixer of every heating circuit, heating rod, circulation pump, solar pumps, boiler, tiled stove and cascade of heat pumps, names on hover, adjustable size",
+                "de": "Diagramm: zeichnet die Anlage nach der Betriebsart (Leitungen gefärbt und bewegt beim Heizen, Warmwasserladen oder Kühlen), zwei Behälter bei eigenem Heizungspuffer oder Kältespeicher, Pumpe und Mischer jedes Heizkreises, Heizstab, Zirkulationspumpe, Solarpumpen, Kessel, Kachelofen und Kaskade von Wärmepumpen, Namen beim Darüberfahren, einstellbare Größe",
+                "ru": "схема: рисует установку по режиму работы (трубы окрашены и движутся при отоплении, нагреве воды или охлаждении), два бака при отдельном буфере отопления или накопителе холода, насос и смеситель каждого контура отопления, тэн, циркуляционный насос, солнечные насосы, котёл, печь-камин и каскад тепловых насосов, названия при наведении, настраиваемый размер",
+                "pt": "diagrama: desenha a instalação conforme o modo de funcionamento (tubos coloridos e em movimento ao aquecer, carregar a água quente ou arrefecer), dois depósitos com um depósito de inércia separado ou um depósito de frio, bomba e misturadora de cada circuito de aquecimento, resistência elétrica, bomba de circulação, bombas solares, caldeira, recuperador de calor e cascata de bombas de calor, nomes ao passar o rato, tamanho ajustável",
+                "nl": "diagram: tekent de installatie volgens de bedrijfsmodus (leidingen gekleurd en in beweging bij verwarmen, warmwater laden of koelen), twee vaten bij een aparte verwarmingsbuffer of koudeopslag, pomp en menger van elke verwarmingskring, verwarmingselement, circulatiepomp, zonnepompen, ketel, kachelofen en cascade van warmtepompen, namen bij aanwijzen, instelbare grootte",
+                "fr": "schéma : dessine l'installation selon le mode de fonctionnement (conduites colorées et animées pendant le chauffage, la charge d'eau chaude ou le refroidissement), deux ballons avec un ballon tampon séparé ou un stockage de froid, pompe et mélangeur de chaque circuit de chauffage, résistance électrique, pompe de circulation, pompes solaires, chaudière, poêle en faïence et cascade de pompes à chaleur, noms au survol, taille réglable",
+                "it": "schema: disegna l'impianto in base alla modalità di funzionamento (tubi colorati e in movimento durante riscaldamento, carica dell'acqua calda o raffrescamento), due serbatoi con un puffer separato o un accumulo di freddo, pompa e miscelatore di ogni circuito di riscaldamento, resistenza elettrica, pompa di ricircolo, pompe solari, caldaia, stufa a piastrelle e cascata di pompe di calore, nomi al passaggio del mouse, dimensione regolabile",
+                "es": "diagrama: dibuja la instalación según el modo de funcionamiento (tuberías coloreadas y en movimiento al calentar, cargar agua caliente o enfriar), dos depósitos con un depósito de inercia separado o un almacén de frío, bomba y mezcladora de cada circuito de calefacción, resistencia eléctrica, bomba de circulación, bombas solares, caldera, estufa de azulejos y cascada de bombas de calor, nombres al pasar el ratón, tamaño ajustable",
+                "pl": "schemat: rysuje instalację według trybu pracy (rury kolorowe i w ruchu podczas ogrzewania, ładowania ciepłej wody lub chłodzenia), dwa zbiorniki przy osobnym buforze grzewczym lub magazynie chłodu, pompa i mieszacz każdego obiegu grzewczego, grzałka, pompa cyrkulacyjna, pompy solarne, kocioł, piec kaflowy i kaskada pomp ciepła, nazwy po najechaniu, regulowany rozmiar",
+                "uk": "схема: малює установку за режимом роботи (труби забарвлені й рухаються під час опалення, нагрівання води або охолодження), дві ємності при окремому буфері опалення чи накопичувачі холоду, насос і змішувач кожного контуру опалення, тен, циркуляційний насос, сонячні насоси, котел, кахельна піч і каскад теплових насосів, назви при наведенні, регульований розмір",
+                "zh-cn": "示意图：按运行模式绘制设备（制热、加热热水或制冷时管道着色并流动）、独立的采暖缓冲罐或冷储罐对应的两个储罐、每个采暖回路的水泵和混合阀、电加热棒、循环泵、太阳能泵、锅炉、瓷砖壁炉和热泵级联、悬停显示名称、可调大小"
+            },
             "0.1.8": {
                 "en": "states are never deleted any more (only switching a register off removes them); the web copy of a part appears whenever Modbus reports no value for it (for example the charging pump M73 while it stands)",
                 "de": "Datenpunkte werden nie mehr gelöscht (nur das Abschalten eines Registers entfernt sie); die Web-Variante eines Teils erscheint, sobald Modbus keinen Wert dafür meldet (zum Beispiel die Ladepumpe M73 im Stillstand)",
@@ -54,19 +67,6 @@
                 "pl": "schemat: symbole pompy (zielona pracuje, szara wyłączona), stan mieszacza M71 i M41, przewód gorącego gazu porusza się wraz z mieszaczem M71",
                 "uk": "діаграма: символи насоса (зелений працює, сірий не світиться), стан змішувача M71 і M41, лінія гарячого газу рухається разом із змішувачем M71",
                 "zh-cn": "示意图：泵符号（绿色运行，灰色关闭），M71 和 M41 的混合器状态，热气管线与其混合器 M71 一起移动"
-            },
-            "0.1.4": {
-                "en": "diagram: long labels fit, wider boxes, the dashes of the circuit pipes run through the junction, the COP appears without reloading, choose the COP shown (Navigator, external meters, both)",
-                "de": "Diagramm: Lange Beschriftungen passen, breitere Kästchen, die Striche der Leitungen des Stromkreises verlaufen durch die Verbindungsstelle, der COP erscheint ohne Neuladen, wählen Sie den angezeigten COP (Navigator, externe Zähler, beides)",
-                "ru": "схема: подходят длинные метки, более широкие коробки, черточки контурных труб проходят через разветвление, появляется КС без перезагрузки, выбираем показанный КС (Навигатор, внешние счетчики, оба)",
-                "pt": "diagrama: cabem etiquetas longas, caixas mais largas, os traços dos tubos do circuito passam pela junção, o COP aparece sem recarregar, escolha o COP mostrado (Navegador, medidores externos, ambos)",
-                "nl": "diagram: lange labels passen, bredere dozen, de streepjes van de circuitleidingen lopen door de kruising, de COP verschijnt zonder herladen, kies de getoonde COP (Navigator, externe meters, beide)",
-                "fr": "schéma : étiquettes longues s'ajustent, cases plus larges, les tirets des canalisations du circuit traversent la jonction, le COP apparaît sans rechargement, choisir le COP affiché (Navigateur, compteurs externes, les deux)",
-                "it": "schema: si adattano le etichette lunghe, scatole più larghe, i trattini dei tubi del circuito attraversano la giunzione, il COP appare senza ricaricare, scegliere il COP visualizzato (Navigatore, contatori esterni, entrambi)",
-                "es": "diagrama: caben etiquetas largas, cajas más anchas, los guiones de las tuberías del circuito pasan por el empalme, aparece el COP sin recargar, elija el COP que se muestra (Navegador, medidores externos, ambos)",
-                "pl": "schemat: pasują długie etykiety, szersze ramki, kreski rur obwodu przebiegają przez skrzyżowanie, COP pojawia się bez przeładowywania, wybierz pokazany COP (Nawigator, liczniki zewnętrzne, oba)",
-                "uk": "схема: довгі написи підходять, ширші коробки, штрихи контурних труб проходять через з’єднання, COP з’являється без перезавантаження, виберіть показаний COP (Навігатор, зовнішні лічильники, обидва)",
-                "zh-cn": "图表：长标签适合，更宽的盒子，电路管道的虚线穿过连接处，COP出现而无需重新加载，选择所示的COP（导航器，外部仪表，两者）"
             }
         },
         "titleLang": {
@@ -95,16 +95,8 @@
             "uk": "Підключає теплові насоси IDM із керуванням Navigator до ioBroker локально через Modbus TCP: зчитування, керування та подача значень кімнати, PV та автоматизації будівель",
             "zh-cn": "通过 Modbus TCP 将带有 Navigator 控制的 IDM 热泵本地连接到 ioBroker：读取、控制和馈送室、PV 和楼宇自动化值"
         },
-        "authors": [
-            "SeaSpotter <seatowage@gmail.com>"
-        ],
-        "keywords": [
-            "idm",
-            "heatpump",
-            "modbus",
-            "navigator",
-            "pv"
-        ],
+        "authors": ["SeaSpotter <seatowage@gmail.com>"],
+        "keywords": ["idm", "heatpump", "modbus", "navigator", "pv"],
         "licenseInformation": {
             "type": "free",
             "license": "MIT"
@@ -250,12 +242,8 @@
         "dailyWriteWarn": 24,
         "writeZones": false
     },
-    "encryptedNative": [
-        "webPin"
-    ],
-    "protectedNative": [
-        "webPin"
-    ],
+    "encryptedNative": ["webPin"],
+    "protectedNative": ["webPin"],
     "objects": [],
     "instanceObjects": [
         {

@@ -61,6 +61,14 @@ This is an independent community project. IDM and Navigator are trademarks of th
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.9 (2026-10-16)
+
+- (SeaSpotter) diagram: the plant is drawn by its operating mode: pipes are coloured and move while the heat pump heats, charges hot water or cools, and rest (grey) where they carry nothing; cold water is blue in both flow and return
+- (SeaSpotter) diagram: two vessels for a separate heating buffer, a cold storage for cooling, hot water without a heating buffer, a storage layout setting and an adjustable size
+- (SeaSpotter) diagram: pump and mixer of every heating circuit, direct circuits, heating rod stages, circulation pump, solar pumps, one dot per compressor
+- (SeaSpotter) diagram: oil or gas boiler, tiled stove and cascade of heat pumps with their pipes; names appear when the mouse is over a value label
+- (SeaSpotter) the plant description (heat source, hot gas line, storage, cooling, circuits, additions) is worked out from the values the Navigator reports
+
 ### 0.1.8 (2026-10-13)
 
 - (SeaSpotter) states are never deleted any more (only switching a register off removes them); the web copy of a part appears whenever Modbus reports no value for it, fixing the missing charging pump M73
