@@ -60,6 +60,9 @@ async function waitForPositive(harness, id, timeoutMs) {
 
 // Run integration tests - See https://github.com/ioBroker/testing for a detailed explanation and further options
 tests.integration(path.join(__dirname, '..'), {
+    // the released js-controller, not the daily development build (the default): an alpha that breaks the test setup would otherwise
+    // fail every pull request (2026-10-16: 8.0.0-alpha.8 left no iobroker.json in the test directory)
+    controllerVersion: 'latest',
     defineAdditionalTests({ suite }) {
         suite('Polling a mock Navigator (no real device involved)', getHarness => {
             let harness;
