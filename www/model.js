@@ -59,6 +59,7 @@
         coldBuffer: ['dhw.cold_storage_temp'],
         // the solar pumps (web outputs), the priority valve M111 of an oil / gas boiler, the tiled stove pump M88 and its sensor B84
         // (the manuals name them; the state keys follow the web module's rule and are not confirmed on a device)
+        // (plant.js TAG_STATES lists the same ids by tag; a unit test keeps the two equal)
         solarPump1: ['web.io.digital_out.m75'],
         solarPump2: ['web.io.digital_out.m76'],
         boilerValve: ['web.io.digital_out.m111'],
@@ -118,6 +119,34 @@
                 return Number(states[row.available]) > 0;
             });
         return rows.length ? { rows: rows } : null;
+    }
+    /* The further heat generators the plant reports, each with the states that say it runs (`run`; the pipes of a generator flow while
+       one of them does): the other heat pumps of a cascade (master and members; only the stage counts are exposed, no sensors of the
+       members), an oil / gas boiler (priority valve M111) and a tiled stove (pump M88, sensor B84). */
+    function generatorsOf(states, ids) {
+        var generators = [];
+        var cascade = cascadeOf(states);
+        if (cascade) {
+            generators.push({
+                kind: 'cascade',
+                rows: cascade.rows,
+                run: cascade.rows.map(function (row) {
+                    return row.running;
+                }),
+            });
+        }
+        if (ids.boilerValve) {
+            generators.push({ kind: 'boiler', valve: ids.boilerValve, run: [ids.boilerValve] });
+        }
+        if (ids.stovePump || ids.stoveTemp) {
+            generators.push({
+                kind: 'stove',
+                temp: ids.stoveTemp,
+                pump: ids.stovePump,
+                run: ids.stovePump ? [ids.stovePump] : [],
+            });
+        }
+        return generators;
     }
     /* a name that is a string or an object with the texts by language */
     function textOf(name, language) {
@@ -376,10 +405,7 @@
             storage:
                 settings.storage === 'separate' && ids.dhwTop !== null && ids.buffer !== null ? 'separate' : 'combined',
             parts: parts,
-            // several heat pumps in a cascade (master and members): only the stage counts are exposed, no sensors of the members
-            cascade: cascadeOf(states),
-            // further heat generators the plant reports: an oil / gas boiler (priority valve M111) and a tiled stove (pump M88, sensor B84)
-            heatSources: { boiler: ids.boilerValve !== null, stove: ids.stovePump !== null || ids.stoveTemp !== null },
+            generators: generatorsOf(states, ids),
             // the hot water vessel hangs below the pipes when there is no heating buffer or a separate one
             // (a fresh water station without hot water sensors still has a vessel: the schemes draw a Hygienik without B41 / B48)
             hungDhw:

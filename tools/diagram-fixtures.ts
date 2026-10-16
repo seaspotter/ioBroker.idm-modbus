@@ -23,6 +23,12 @@ export interface Scheme {
     title: string;
     tags: string[];
     storage: 'combined' | 'separate';
+    /** Units with more than one compressor (a Twin, a Max). */
+    compressors?: number;
+    /** Two units in a cascade (master and member). */
+    cascade?: boolean;
+    /** The number of heating circuits the title names; the other circuits are drawn dashed (optional) in the scheme. */
+    circuits?: number;
 }
 
 /** What the diagram page gets from the data layer. */
@@ -144,22 +150,22 @@ export function buildSnapshot(scheme: Scheme, language = 'en', mode: number = MO
     ['B33', 'B34', 'M73'].forEach(tag => tags.add(tag));
     (scheme.family === 'air' ? ['B37', 'M13'] : ['B36', 'B43', 'M16']).forEach(tag => tags.add(tag));
     // the schemes draw a dashed box for optional further circuits; a scheme titled "1 HK" has circuit A only, "2 HK" A and C
-    const count = /(\d)\s*(?:x\s*)?(?:HK|Heizkreis|circuits?)\b/i.exec(scheme.title)?.[1];
-    if (count && !/circuits A to G/i.test(scheme.title)) {
-        const keep = ['A', 'C', 'D', 'E', 'F', 'G'].slice(0, Number(count));
+    const count = scheme.circuits;
+    if (count) {
+        const keep = ['A', 'C', 'D', 'E', 'F', 'G'].slice(0, count);
         'ABCDEFG'.split('').forEach((letter, i) => {
             if (!keep.includes(letter) && letter !== 'B') {
                 [`B${51 + i}`, `B${61 + i}`, `M${31 + i}`, `M${41 + i}`].forEach(tag => tags.delete(tag));
             }
         });
-        if (Number(count) === 1 && !/Direktheizkreis|direct/i.test(scheme.title)) {
+        if (count === 1 && !/Direktheizkreis|direct/i.test(scheme.title)) {
             ['B52', 'B62', 'M32'].forEach(tag => tags.delete(tag));
         }
     }
-    if (/Twin|Max/i.test(`${scheme.unit} ${scheme.title}`)) {
-        states['hp.compressor_status_2'] = 1;
+    for (let n = 2; n <= (scheme.compressors ?? 1); n++) {
+        states[`hp.compressor_status_${n}`] = 1;
     }
-    if (/cascade/i.test(scheme.title)) {
+    if (scheme.cascade) {
         // two units: stages available and running by mode (the cooling row only where the plant cools)
         const cools = canCool(scheme);
         Object.assign(states, {

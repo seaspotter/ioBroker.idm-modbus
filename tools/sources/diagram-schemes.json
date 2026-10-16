@@ -1,5 +1,5 @@
 {
-    "$comment": "Plant schemes of the IDM installation manuals (docs/sources/manuals/README.md): the unit, the manual page, the scheme code where the manual prints one, a short title and the IDM tags (Bxx sensors, Mxx actors) drawn in the scheme. Facts only. Used by tools/build-gallery.ts to draw every scheme and by src/lib/diagram/schemes.test.ts. `storage` is what the diagram setting would be for the scheme (separate = a TERMO next to a Hygienik or AQA).",
+    "$comment": "Plant schemes of the IDM installation manuals (docs/sources/manuals/README.md): the unit, the manual page, the scheme code where the manual prints one, a short title and the IDM tags (Bxx sensors, Mxx actors) drawn in the scheme. Facts only. Used by tools/build-gallery.ts to draw every scheme and by src/lib/diagram/schemes.test.ts. `storage` is what the diagram setting would be for the scheme (separate = a TERMO next to a Hygienik or AQA). Optional: `compressors` (more than one compressor: a Twin or Max unit), `cascade` (two units, master and member) and `circuits` (the number of heating circuits the title names; the manuals draw further circuits dashed).",
     "schemes": [
         {
             "id": "alm-2-15-p46",
@@ -32,7 +32,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "circuits": 1
         },
         {
             "id": "alm-2-15-p47",
@@ -74,7 +75,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "circuits": 1
         },
         {
             "id": "alm-2-15-p49",
@@ -85,7 +87,8 @@
             "code": "L7.1-5-1-0-0",
             "title": "AERO ALM 2-15+ Kachelofen + Hygienik für Warmwasser und Heizung + 1 HK (L7.1-5-1-0-0)",
             "tags": ["B32", "B33", "B34", "B41", "B48", "B51", "B61", "B84", "M31", "M41", "M63", "M73", "M88"],
-            "storage": "combined"
+            "storage": "combined",
+            "circuits": 1
         },
         {
             "id": "alm-2-15-p50",
@@ -123,7 +126,8 @@
                 "M76",
                 "M78"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "circuits": 1
         },
         {
             "id": "alm-2-15-p51",
@@ -134,7 +138,8 @@
             "code": "L7.1-0-2+6-2-0",
             "title": "AERO ALM 2-15 + Hygienik nur für Warmwasser + TERMO 100 + 1 HK + Kühlen (L7.1-0-2+6-2-0)",
             "tags": ["B31", "B32", "B33", "B34", "B38", "B40", "B42", "B48", "B51", "B61", "M22", "M63", "M73"],
-            "storage": "separate"
+            "storage": "separate",
+            "circuits": 1
         },
         {
             "id": "alm-2-15-p52",
@@ -168,7 +173,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "circuits": 1
         },
         {
             "id": "alm-2-8-4-12-p38",
@@ -297,7 +303,8 @@
                 "M73",
                 "M125"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "circuits": 1
         },
         {
             "id": "alm-10-24-p42",
@@ -336,7 +343,8 @@
                 "M73",
                 "M125"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "circuits": 1
         },
         {
             "id": "alm-10-24-p43",
@@ -373,7 +381,8 @@
                 "M73",
                 "M125"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "circuits": 1
         },
         {
             "id": "alm-10-24-p44",
@@ -419,7 +428,8 @@
                 "M78",
                 "M125"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "circuits": 1
         },
         {
             "id": "alm-10-24-p45",
@@ -459,7 +469,8 @@
                 "M111",
                 "M125"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "circuits": 1
         },
         {
             "id": "alm-10-24-p46",
@@ -496,7 +507,8 @@
                 "M73",
                 "M125"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "circuits": 1
         },
         {
             "id": "alm-10-50-max-p34",
@@ -527,7 +539,9 @@
                 "M44",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2,
+            "circuits": 1
         },
         {
             "id": "alm-10-50-max-p35",
@@ -577,7 +591,9 @@
                 "M64",
                 "M73"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "compressors": 2,
+            "circuits": 1
         },
         {
             "id": "alm-10-50-max-p36",
@@ -619,7 +635,9 @@
                 "M64",
                 "M73"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "compressors": 2,
+            "circuits": 1
         },
         {
             "id": "alm-10-50-max-p37",
@@ -656,7 +674,9 @@
                 "M64",
                 "M73"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "compressors": 2,
+            "circuits": 2
         },
         {
             "id": "slm-p44",
@@ -1277,7 +1297,8 @@
             "code": "",
             "title": "TERRA SW Twin HGL + Hygienik for hot water only (no buffer), direct circuit",
             "tags": ["B32", "B33", "B34", "B35", "B36", "B41", "B42", "B43", "B48", "B51", "B61", "M16", "M22", "M73"],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "sw-twin-p24",
@@ -1312,7 +1333,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "compressors": 2
         },
         {
             "id": "sw-twin-p25",
@@ -1347,7 +1369,8 @@
                 "M73",
                 "M74"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "sw-twin-p26",
@@ -1385,7 +1408,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "sw-twin-p27",
@@ -1423,7 +1447,8 @@
                 "M73",
                 "M74"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "sw-twin-p28",
@@ -1460,7 +1485,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "compressors": 2
         },
         {
             "id": "sw-twin-p29",
@@ -1500,7 +1526,8 @@
                 "M84",
                 "M89"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "al-twin-p25",
@@ -1529,7 +1556,8 @@
                 "M44",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "al-twin-p26",
@@ -1565,7 +1593,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "al-twin-p27",
@@ -1599,7 +1628,8 @@
                 "M73",
                 "M111"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "al-twin-p28",
@@ -1635,7 +1665,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "al-twin-p29",
@@ -1669,7 +1700,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "al-60-max-p26",
@@ -1698,7 +1730,8 @@
                 "M44",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "al-60-max-p27",
@@ -1743,7 +1776,8 @@
                 "M63",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "al-60-max-p28",
@@ -1776,7 +1810,8 @@
                 "M62",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2
         },
         {
             "id": "al-60-max-p29",
@@ -1806,7 +1841,9 @@
                 "M44",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2,
+            "cascade": true
         },
         {
             "id": "al-60-max-p30",
@@ -1840,7 +1877,9 @@
                 "M63",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2,
+            "cascade": true
         },
         {
             "id": "sw-complete-p23",
@@ -1967,7 +2006,9 @@
                 "M64",
                 "M73"
             ],
-            "storage": "combined"
+            "storage": "combined",
+            "compressors": 2,
+            "circuits": 1
         },
         {
             "id": "sw-h-p25",
@@ -2003,7 +2044,9 @@
                 "M64",
                 "M73"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "compressors": 2,
+            "circuits": 1
         },
         {
             "id": "sw-h-p26",
@@ -2038,7 +2081,9 @@
                 "M64",
                 "M73"
             ],
-            "storage": "separate"
+            "storage": "separate",
+            "compressors": 2,
+            "circuits": 1
         }
     ]
 }
