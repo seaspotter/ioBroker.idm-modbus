@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "idm-modbus",
-        "version": "0.1.14",
+        "version": "0.1.15",
         "news": {
+            "0.1.15": {
+                "en": "the objects of the web interface (inputs and outputs, rooms) follow the current wording after an update: a renamed part such as the station pump M22 (Pump hot water station) now also changes on installations that created it earlier",
+                "de": "die Objekte der Weboberfläche (Ein- und Ausgänge, Räume) folgen nach einem Update dem aktuellen Wortlaut: ein umbenanntes Teil wie die Stationspumpe M22 (Pumpe Warmwasserstation) ändert sich jetzt auch bei Installationen, die es früher angelegt haben",
+                "ru": "объекты веб-интерфейса (входы и выходы, комнаты) после обновления следуют текущим названиям: переименованный элемент, например насос станции M22 (Pumpe Warmwasserstation), теперь меняется и в установках, создавших его раньше",
+                "pt": "os objetos da interface web (entradas e saídas, divisões) seguem a redação atual após uma atualização: uma peça renomeada como a bomba da estação M22 (Pumpe Warmwasserstation) também muda agora em instalações que a criaram antes",
+                "nl": "de objecten van de webinterface (in- en uitgangen, kamers) volgen na een update de huidige benaming: een hernoemd onderdeel zoals de stationspomp M22 (Pumpe Warmwasserstation) verandert nu ook bij installaties die het eerder aanmaakten",
+                "fr": "les objets de l'interface web (entrées et sorties, pièces) suivent la formulation actuelle après une mise à jour : un élément renommé comme la pompe de la station M22 (Pumpe Warmwasserstation) change désormais aussi sur les installations qui l'avaient créé plus tôt",
+                "it": "gli oggetti dell'interfaccia web (ingressi e uscite, stanze) seguono la dicitura attuale dopo un aggiornamento: un componente rinominato come la pompa della stazione M22 (Pumpe Warmwasserstation) cambia ora anche nelle installazioni che l'avevano creato prima",
+                "es": "los objetos de la interfaz web (entradas y salidas, habitaciones) siguen la redacción actual tras una actualización: una pieza renombrada como la bomba de la estación M22 (Pumpe Warmwasserstation) cambia ahora también en instalaciones que la crearon antes",
+                "pl": "obiekty interfejsu web (wejścia i wyjścia, pokoje) po aktualizacji przyjmują aktualne brzmienie: zmieniona nazwa elementu, np. pompy stacji M22 (Pumpe Warmwasserstation), zmienia się teraz także w instalacjach, które utworzyły go wcześniej",
+                "uk": "об'єкти веб-інтерфейсу (входи й виходи, кімнати) після оновлення відповідають поточним назвам: перейменований елемент, наприклад насос станції M22 (Pumpe Warmwasserstation), тепер змінюється й у встановленнях, що створили його раніше",
+                "zh-cn": "更新后，网页接口的对象（输入输出、房间）会采用当前名称：被重命名的部件（例如换热站水泵 M22，Pumpe Warmwasserstation）现在也会在早先已创建它的安装中更新"
+            },
             "0.1.14": {
                 "en": "diagram: with Modbus only (no web interface) the diagram draws from the best information left and claims no more than it knows: the fresh water station and circuits without a pump state are coloured but not animated, and the dot of such a circuit shows its operating mode",
                 "de": "Diagramm: nur mit Modbus (ohne Weboberfläche) zeichnet das Diagramm nach der besten verbleibenden Information und behauptet nicht mehr, als es weiß: Frischwasserstation und Heizkreise ohne Pumpenwert sind gefärbt, aber nicht bewegt, und der Punkt eines solchen Heizkreises zeigt seine Betriebsart",
@@ -54,19 +67,6 @@
                 "pl": "schemat: przepływ w obiegu grzewczym zależy od jego pompy (M31, M32, ...), a nie od trybu pracy, a białe kreski przepływu pojawiają się tylko wtedy, gdy rura naprawdę przepływa",
                 "uk": "схема: потік у контурі опалення визначається його насосом (M31, M32, ...), а не режимом роботи, а білі штрихи потоку видно лише поки в трубі справді тече вода",
                 "zh-cn": "示意图：采暖回路的水流取决于其水泵（M31、M32 等），而不是运行模式；白色流动短线只在管道真正有水流时显示"
-            },
-            "0.1.10": {
-                "en": "new adapter logo and a five-blade fan in the diagram; the pipes of an idle fresh water station, boiler, stove and cascade stay grey; a mixer that reports \"Zu\" is no longer shown as driven; hot water charging colours the pipes of a combined vessel; the solar labels follow the solar pumps; an empty size field means the default",
-                "de": "neues Adapter-Logo und ein Lüfter mit fünf Flügeln im Diagramm; die Leitungen einer ruhenden Frischwasserstation, eines Kessels, Kachelofens und einer Kaskade bleiben grau; ein Mischer, der „Zu“ meldet, wird nicht mehr als angesteuert gezeigt; beim Warmwasserladen werden die Leitungen eines gemeinsamen Behälters gefärbt; die Solar-Schilder folgen den Solarpumpen; ein leeres Größenfeld bedeutet den Standardwert",
-                "ru": "новый логотип адаптера и пятилопастный вентилятор на схеме; трубы неработающей станции пресной воды, котла, печи и каскада остаются серыми; смеситель, сообщающий «Zu», больше не показывается как управляемый; при нагреве воды окрашиваются трубы общего бака; метки солнечного контура следуют за солнечными насосами; пустое поле размера означает значение по умолчанию",
-                "pt": "novo logótipo do adaptador e ventoinha de cinco pás no diagrama; os tubos de uma estação de água doce, caldeira, recuperador e cascata em repouso ficam cinzentos; uma misturadora que indica «Zu» deixa de ser mostrada como acionada; ao carregar a água quente os tubos de um depósito comum ficam coloridos; as etiquetas solares seguem as bombas solares; um campo de tamanho vazio significa o valor predefinido",
-                "nl": "nieuw adapterlogo en een ventilator met vijf bladen in het diagram; de leidingen van een stilstaand verswaterstation, ketel, kachel en cascade blijven grijs; een menger die «Zu» meldt wordt niet meer als aangestuurd getoond; bij warmwaterladen kleuren de leidingen van een gecombineerd vat; de zonne-labels volgen de zonnepompen; een leeg veld voor de grootte betekent de standaardwaarde",
-                "fr": "nouveau logo de l'adaptateur et ventilateur à cinq pales dans le schéma ; les conduites d'une station d'eau douce, d'une chaudière, d'un poêle et d'une cascade à l'arrêt restent grises ; un mélangeur qui indique « Zu » n'est plus affiché comme commandé ; lors de la charge d'eau chaude, les conduites d'un ballon commun sont colorées ; les étiquettes solaires suivent les pompes solaires ; un champ de taille vide signifie la valeur par défaut",
-                "it": "nuovo logo dell'adattatore e ventola a cinque pale nello schema; i tubi di una stazione acqua dolce, caldaia, stufa e cascata ferme restano grigi; un miscelatore che segnala «Zu» non viene più mostrato come comandato; durante la carica dell'acqua calda i tubi di un serbatoio comune si colorano; le etichette solari seguono le pompe solari; un campo dimensione vuoto significa il valore predefinito",
-                "es": "nuevo logotipo del adaptador y ventilador de cinco aspas en el diagrama; las tuberías de una estación de agua dulce, caldera, estufa y cascada en reposo se quedan grises; una mezcladora que indica «Zu» ya no se muestra como accionada; al cargar el agua caliente se colorean las tuberías de un depósito común; las etiquetas solares siguen a las bombas solares; un campo de tamaño vacío significa el valor predeterminado",
-                "pl": "nowe logo adaptera i pięciołopatkowy wentylator na schemacie; rury nieczynnej stacji świeżej wody, kotła, pieca i kaskady pozostają szare; mieszacz zgłaszający «Zu» nie jest już pokazywany jako sterowany; podczas ładowania ciepłej wody kolorują się rury wspólnego zbiornika; etykiety solarne podążają za pompami solarnymi; puste pole rozmiaru oznacza wartość domyślną",
-                "uk": "новий логотип адаптера та п'ятилопатевий вентилятор на схемі; труби станції прісної води, котла, печі та каскаду, що не працюють, залишаються сірими; змішувач, який повідомляє «Zu», більше не показується як керований; під час нагрівання води забарвлюються труби спільного бака; позначки сонячного контуру слідують за сонячними насосами; порожнє поле розміру означає значення за замовчуванням",
-                "zh-cn": "新的适配器徽标，示意图中的风扇改为五叶；闲置的淡水站、锅炉、壁炉和级联的管道保持灰色；报告“Zu”的混合阀不再显示为受控；加热热水时，共用水箱的管道会着色；太阳能标签跟随太阳能泵；尺寸栏为空时使用默认值"
             }
         },
         "titleLang": {

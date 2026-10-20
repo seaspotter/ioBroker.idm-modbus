@@ -69,6 +69,10 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.15 (2026-10-20)
+
+- (SeaSpotter) the objects of the web interface (inputs and outputs, rooms) follow the current wording after an update: a renamed part such as the station pump M22 ("Pump hot water station") now also changes on installations that created it earlier (before, only new installations got the name)
+
 ### 0.1.14 (2026-10-19)
 
 - (SeaSpotter) diagram: with Modbus only (no web interface) the diagram draws from the best information left and claims no more than it knows: the fresh water station and circuits without a pump state are coloured but not animated, and the dot of such a circuit shows its operating mode; the manuals list what is missing without the web interface
