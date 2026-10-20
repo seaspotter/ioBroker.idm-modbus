@@ -1,6 +1,6 @@
 {
   "name": "iobroker.idm-modbus",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Connects IDM heat pumps with Navigator control to ioBroker locally via Modbus TCP: read, control and feed room, PV and building-automation values",
   "author": {
     "name": "SeaSpotter",
