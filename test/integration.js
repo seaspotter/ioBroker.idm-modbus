@@ -514,24 +514,14 @@ tests.integration(path.join(__dirname, '..'), {
                         pvEnabled: true,
                         pvIntervalS: 10,
                         pvMaxAgeS: 300,
-                        pvSources: [
-                            {
-                                register: 'pv_surplus',
-                                stateId: '0_userdata.0.test.surplus_w',
-                                factor: 0.001,
-                                invert: false,
-                                min: 0,
-                                max: null,
-                            },
-                            {
-                                register: 'battery_soc',
-                                stateId: '0_userdata.0.test.soc',
-                                factor: 1,
-                                invert: false,
-                                min: null,
-                                max: null,
-                            },
-                        ],
+                        // the fixed fields of the settings page (text fields: a comma works as a decimal separator too)
+                        pvSurplusStateId: '0_userdata.0.test.surplus_w',
+                        pvSurplusFactor: '0,001',
+                        pvSurplusInvert: false,
+                        pvSurplusMin: '0',
+                        pvSurplusMax: '',
+                        pvSocStateId: '0_userdata.0.test.soc',
+                        pvSocFactor: '1',
                     },
                 });
             });

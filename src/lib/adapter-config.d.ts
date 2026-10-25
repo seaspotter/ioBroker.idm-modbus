@@ -68,13 +68,13 @@ declare global {
             /** which heat meter counts: navigator or external */
             thermalSource: string;
             /** electricity price per kWh (fixed) or a state delivering it, and the currency shown on the cost states */
-            pricePerKwh: number;
+            pricePerKwh: number | string;
             /** how the price (fixed and state) is given: 'currency' per kWh (default) or 'cent' */
             priceUnit: string;
             priceStateId: string;
             currency: string;
             /** CO2 factor in g/kWh */
-            co2GramsPerKwh: number;
+            co2GramsPerKwh: number | string;
             /** how the CO2 factor (fixed and state) is given: 'g' per kWh (default) or 'kg' */
             co2Unit: string;
             /** state with the current CO₂ intensity of the electricity in g/kWh (optional) */
@@ -106,39 +106,68 @@ declare global {
             pvMaxAgeS: number;
             /** `direct`: the surplus state is written as it is; `calculated`: production minus house consumption */
             pvSurplusMode: string;
+            /** source state of the PV surplus (74); empty = not sent */
+            pvSurplusStateId: string;
+            pvSurplusFactor: number | string;
+            pvSurplusInvert: boolean;
+            pvSurplusMin: number | string | null;
+            pvSurplusMax: number | string | null;
+            /** source state of the PV production (78); empty = not sent */
+            pvProductionStateId: string;
+            pvProductionFactor: number | string;
+            pvProductionInvert: boolean;
+            pvProductionMin: number | string | null;
+            pvProductionMax: number | string | null;
+            /** source state of the PV house consumption (82); empty = not sent */
+            pvHouseStateId: string;
+            pvHouseFactor: number | string;
+            pvHouseInvert: boolean;
+            pvHouseMin: number | string | null;
+            pvHouseMax: number | string | null;
+            /** source state of the PV battery discharge (84); empty = not sent */
+            pvBatteryStateId: string;
+            pvBatteryFactor: number | string;
+            pvBatteryInvert: boolean;
+            pvBatteryMin: number | string | null;
+            pvBatteryMax: number | string | null;
+            /** source state of the PV battery level % (86); empty = not sent */
+            pvSocStateId: string;
+            pvSocFactor: number | string;
+            /** the table of rows of versions before 0.1.16; moved to the fields above at the first start */
             pvSources: {
                 register: string;
                 stateId: string;
-                factor: number;
+                /** text fields (a decimal point or comma works); older configurations hold numbers */
+                factor: number | string;
                 invert: boolean;
-                min: number | null;
-                max: number | null;
+                min: number | string | null;
+                max: number | string | null;
             }[];
             /** room temperature feeding (spec Modul C) */
             roomsEnabled: boolean;
             roomSources: {
                 circuit: string;
                 stateId: string;
-                factor: number;
-                offset: number;
+                factor: number | string;
+                offset: number | string;
                 heartbeatS: number;
-                toleranceC: number;
-                min: number;
-                max: number;
+                toleranceC: number | string;
+                min: number | string;
+                max: number | string;
                 maxAgeS: number;
                 onStale: string;
-                fixedValue: number | null;
+                fixedValue: number | string | null;
             }[];
             /** other building automation values (spec Modul E) */
             gltEnabled: boolean;
             gltSources: {
                 function: string;
                 stateId: string;
-                factor: number;
-                offset: number;
+                factor: number | string;
+                offset: number | string;
                 heartbeatS: number | null;
-                min: number | null;
-                max: number | null;
+                min: number | string | null;
+                max: number | string | null;
                 maxAgeS: number | null;
             }[];
             /** hot water boost through the hot water demand (spec Modul E) */

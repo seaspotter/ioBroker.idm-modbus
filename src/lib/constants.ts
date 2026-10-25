@@ -76,6 +76,20 @@ export const DEFAULT_DAILY_WRITE_WARN = 24;
 /** PV values for the Navigator (spec Modul D): default and minimum write interval, maximum age of a source value. */
 export const DEFAULT_PV_INTERVAL_S = 30;
 export const MIN_PV_INTERVAL_S = 10;
+/**
+ * What the PV module writes for a configured register whose source is missing or too old. The Navigator wants every value it was
+ * given again in every cycle (a register that goes quiet is reported as "no data"), so a missing source is not left out: "nothing"
+ * is 0 (a PV system or smart meter that is off at night produces and reports nothing), the battery level "not available" is -1; the
+ * defaults IDM lists for the registers 82, 84 and 86.
+ */
+export const PV_NEUTRAL_VALUES: Readonly<Record<string, number>> = {
+    pv_surplus: 0,
+    electric_heater_power: 0,
+    pv_production: 0,
+    house_consumption: 0,
+    battery_discharge: 0,
+    battery_soc: -1,
+};
 export const DEFAULT_PV_MAX_AGE_S = 120;
 /** Every n-th PV cycle the written registers are read back to detect a second writer (spec Modul D). */
 export const PV_READBACK_EVERY = 4;

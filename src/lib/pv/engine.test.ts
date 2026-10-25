@@ -69,14 +69,36 @@ describe('planPvWrites', () => {
         ]);
     });
 
-    it('writes 0 for an old or missing surplus and leaves other registers alone', () => {
+    it('keeps writing a register whose source is old or missing: 0, and -1 for the battery level (the Navigator wants every value again)', () => {
         const plan = planPvWrites(
-            settings([src('pv_surplus', 's'), src('pv_production', 'p')]),
-            inputs({ s: 2, p: 3 }, 500000),
+            settings([
+                src('pv_surplus', 's'),
+                src('pv_production', 'p'),
+                src('house_consumption', 'h'),
+                src('battery_discharge', 'b'),
+                src('battery_soc', 'c'),
+            ]),
+            inputs({ s: 2, p: 3, h: 1, b: 0.5, c: 80 }, 500000),
             NOW,
         );
-        expect(plan.writes).to.deep.equal([{ register: 'pv_surplus', value: 0, note: 'source stale' }]);
-        expect(plan.skipped.map(s => s.register)).to.deep.equal(['pv_surplus', 'pv_production']);
+        expect(plan.writes.map(w => [w.register, w.value, w.note])).to.deep.equal([
+            ['pv_surplus', 0, 'source stale'],
+            ['pv_production', 0, 'source stale'],
+            ['house_consumption', 0, 'source stale'],
+            ['battery_discharge', 0, 'source stale'],
+            ['battery_soc', -1, 'source stale'],
+        ]);
+        expect(plan.skipped.map(s => s.register)).to.have.length(5); // still reported, once, by the runner
+        // a source that was never delivered is written as missing, a register without a configured source is not written at all
+        const partial = planPvWrites(
+            settings([src('pv_surplus', 's'), src('battery_soc', 'c')]),
+            inputs({ s: 1 }),
+            NOW,
+        );
+        expect(partial.writes.map(w => [w.register, w.value, w.note])).to.deep.equal([
+            ['pv_surplus', 1, undefined],
+            ['battery_soc', -1, 'source invalid'],
+        ]);
     });
 
     it('calculates the surplus as production minus house consumption, never below the lower limit', () => {
