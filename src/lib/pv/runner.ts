@@ -1,5 +1,5 @@
 import type { PvSettings } from '../config';
-import { PV_CONFLICT_AFTER, PV_READBACK_EVERY } from '../constants';
+import { PV_CONFLICT_AFTER, PV_NEUTRAL_VALUES, PV_READBACK_EVERY } from '../constants';
 import type { FloatWordOrder } from '../constants';
 import { checkWrite } from '../control/rules';
 import type { Result } from '../modbus/result';
@@ -129,7 +129,7 @@ export class PvRunner {
                 if (!this.warned.has(key)) {
                     this.warned.add(key);
                     this.host.log.warn(
-                        `PV source of ${skipped.register} is ${skipped.reason === 'stale' ? 'too old' : 'missing or not a number'}${skipped.register === 'pv_surplus' ? ', writing 0' : ', not written'}`,
+                        `PV source of ${skipped.register} is ${skipped.reason === 'stale' ? 'too old' : 'missing or not a number'}, writing ${PV_NEUTRAL_VALUES[skipped.register] ?? 0}`,
                     );
                 }
             }

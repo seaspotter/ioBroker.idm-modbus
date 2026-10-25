@@ -1,4 +1,5 @@
 import type { PvSettings, PvSource } from '../config';
+import { PV_NEUTRAL_VALUES } from '../constants';
 
 /** The latest value of a foreign state. */
 export interface PvInput {
@@ -89,10 +90,13 @@ export function planPvWrites(settings: PvSettings, inputs: ReadonlyMap<string, P
         }
         if ('value' in result) {
             plan.writes.push({ register: source.register, value: result.value });
-        } else if (source.register === 'pv_surplus') {
-            plan.writes.push({ register: 'pv_surplus', value: 0, note: `source ${result.missing}` });
-            plan.skipped.push({ register: source.register, reason: result.missing });
         } else {
+            // not left out: the Navigator wants every configured value in every cycle (see PV_NEUTRAL_VALUES)
+            plan.writes.push({
+                register: source.register,
+                value: PV_NEUTRAL_VALUES[source.register] ?? 0,
+                note: `source ${result.missing}`,
+            });
             plan.skipped.push({ register: source.register, reason: result.missing });
         }
     }

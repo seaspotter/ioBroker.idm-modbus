@@ -903,10 +903,8 @@
                     "xl": 12
                 },
                 "pricePerKwh": {
-                    "type": "number",
+                    "type": "text",
                     "label": "pricePerKwh",
-                    "min": 0,
-                    "step": 0.01,
                     "newLine": true,
                     "xs": 12,
                     "sm": 6,
@@ -946,9 +944,8 @@
                     "newLine": false
                 },
                 "co2GramsPerKwh": {
-                    "type": "number",
+                    "type": "text",
                     "label": "co2GramsPerKwh",
-                    "min": 0,
                     "newLine": true,
                     "xs": 12,
                     "sm": 6,
@@ -1311,85 +1308,278 @@
                     "lg": 6,
                     "xl": 6
                 },
-                "pvSources": {
-                    "type": "table",
-                    "label": "pvSources",
-                    "help": "pvSourcesHelp",
+                "pvFieldsHelp": {
+                    "type": "staticText",
+                    "text": "pvFieldsHelp",
                     "newLine": true,
-                    "showSecondAddAt": 5,
                     "xs": 12,
                     "sm": 12,
                     "md": 12,
                     "lg": 12,
-                    "xl": 12,
-                    "items": [
-                        {
-                            "attr": "register",
-                            "type": "select",
-                            "title": "colRegister",
-                            "width": "20%",
-                            "default": "pv_surplus",
-                            "options": [
-                                {
-                                    "label": "pvRegSurplus",
-                                    "value": "pv_surplus"
-                                },
-                                {
-                                    "label": "pvRegHeater",
-                                    "value": "electric_heater_power"
-                                },
-                                {
-                                    "label": "pvRegProduction",
-                                    "value": "pv_production"
-                                },
-                                {
-                                    "label": "pvRegHouse",
-                                    "value": "house_consumption"
-                                },
-                                {
-                                    "label": "pvRegBatteryPower",
-                                    "value": "battery_discharge"
-                                },
-                                {
-                                    "label": "pvRegBatterySoc",
-                                    "value": "battery_soc"
-                                }
-                            ]
-                        },
-                        {
-                            "attr": "stateId",
-                            "type": "objectId",
-                            "types": "state",
-                            "title": "colState",
-                            "width": "35%"
-                        },
-                        {
-                            "attr": "factor",
-                            "type": "number",
-                            "title": "colFactor",
-                            "width": "8%",
-                            "default": 1
-                        },
-                        {
-                            "attr": "invert",
-                            "type": "checkbox",
-                            "title": "colInvert",
-                            "width": "7%",
-                            "default": false
-                        },
-                        {
-                            "attr": "min",
-                            "type": "number",
-                            "title": "colMin",
-                            "width": "8%"
-                        },
-                        {
-                            "attr": "max",
-                            "type": "number",
-                            "title": "colMax",
-                            "width": "8%"
-                        }
-                    ]
+                    "xl": 12
+                },
+                "pvHeadSurplus": {
+                    "type": "header",
+                    "text": "pvRegSurplus",
+                    "size": 5,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "pvSurplusStateId": {
+                    "type": "objectId",
+                    "types": "state",
+                    "label": "colState",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 5,
+                    "lg": 5,
+                    "xl": 5
+                },
+                "pvSurplusFactor": {
+                    "type": "text",
+                    "label": "colFactor",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvSurplusInvert": {
+                    "type": "checkbox",
+                    "label": "colInvert",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 1,
+                    "lg": 1,
+                    "xl": 1
+                },
+                "pvSurplusMin": {
+                    "type": "text",
+                    "label": "colMin",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvSurplusMax": {
+                    "type": "text",
+                    "label": "colMax",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvHeadProduction": {
+                    "type": "header",
+                    "text": "pvRegProduction",
+                    "size": 5,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "pvProductionStateId": {
+                    "type": "objectId",
+                    "types": "state",
+                    "label": "colState",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 5,
+                    "lg": 5,
+                    "xl": 5
+                },
+                "pvProductionFactor": {
+                    "type": "text",
+                    "label": "colFactor",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvProductionInvert": {
+                    "type": "checkbox",
+                    "label": "colInvert",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 1,
+                    "lg": 1,
+                    "xl": 1
+                },
+                "pvProductionMin": {
+                    "type": "text",
+                    "label": "colMin",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvProductionMax": {
+                    "type": "text",
+                    "label": "colMax",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvHeadHouse": {
+                    "type": "header",
+                    "text": "pvRegHouse",
+                    "size": 5,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "pvHouseStateId": {
+                    "type": "objectId",
+                    "types": "state",
+                    "label": "colState",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 5,
+                    "lg": 5,
+                    "xl": 5
+                },
+                "pvHouseFactor": {
+                    "type": "text",
+                    "label": "colFactor",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvHouseInvert": {
+                    "type": "checkbox",
+                    "label": "colInvert",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 1,
+                    "lg": 1,
+                    "xl": 1
+                },
+                "pvHouseMin": {
+                    "type": "text",
+                    "label": "colMin",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvHouseMax": {
+                    "type": "text",
+                    "label": "colMax",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvHeadBattery": {
+                    "type": "header",
+                    "text": "pvRegBatteryPower",
+                    "size": 5,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "pvBatteryStateId": {
+                    "type": "objectId",
+                    "types": "state",
+                    "label": "colState",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 5,
+                    "lg": 5,
+                    "xl": 5
+                },
+                "pvBatteryFactor": {
+                    "type": "text",
+                    "label": "colFactor",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvBatteryInvert": {
+                    "type": "checkbox",
+                    "label": "colInvert",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 1,
+                    "lg": 1,
+                    "xl": 1
+                },
+                "pvBatteryMin": {
+                    "type": "text",
+                    "label": "colMin",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvBatteryMax": {
+                    "type": "text",
+                    "label": "colMax",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "pvHeadSoc": {
+                    "type": "header",
+                    "text": "pvRegBatterySoc",
+                    "size": 5,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "pvSocStateId": {
+                    "type": "objectId",
+                    "types": "state",
+                    "label": "colState",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 8,
+                    "xl": 8
+                },
+                "pvSocFactor": {
+                    "type": "text",
+                    "label": "colFactor",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
                 }
             }
         },
@@ -1465,14 +1655,14 @@
                         },
                         {
                             "attr": "factor",
-                            "type": "number",
+                            "type": "text",
                             "title": "colFactor",
                             "width": "6%",
                             "default": 1
                         },
                         {
                             "attr": "offset",
-                            "type": "number",
+                            "type": "text",
                             "title": "colOffset",
                             "width": "6%",
                             "default": 0
@@ -1486,21 +1676,21 @@
                         },
                         {
                             "attr": "toleranceC",
-                            "type": "number",
+                            "type": "text",
                             "title": "colTolerance",
                             "width": "9%",
                             "default": 0.2
                         },
                         {
                             "attr": "min",
-                            "type": "number",
+                            "type": "text",
                             "title": "colMin",
                             "width": "6%",
                             "default": 15
                         },
                         {
                             "attr": "max",
-                            "type": "number",
+                            "type": "text",
                             "title": "colMax",
                             "width": "6%",
                             "default": 30
@@ -1531,7 +1721,7 @@
                         },
                         {
                             "attr": "fixedValue",
-                            "type": "number",
+                            "type": "text",
                             "title": "colFixedValue",
                             "width": "8%"
                         }
@@ -1627,14 +1817,14 @@
                         },
                         {
                             "attr": "factor",
-                            "type": "number",
+                            "type": "text",
                             "title": "colFactor",
                             "width": "7%",
                             "default": 1
                         },
                         {
                             "attr": "offset",
-                            "type": "number",
+                            "type": "text",
                             "title": "colOffset",
                             "width": "7%",
                             "default": 0
@@ -1647,13 +1837,13 @@
                         },
                         {
                             "attr": "min",
-                            "type": "number",
+                            "type": "text",
                             "title": "colMin",
                             "width": "7%"
                         },
                         {
                             "attr": "max",
-                            "type": "number",
+                            "type": "text",
                             "title": "colMax",
                             "width": "7%"
                         },

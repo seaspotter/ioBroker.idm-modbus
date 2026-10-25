@@ -38,6 +38,32 @@ import { HEATING_CIRCUITS, type PlantConfig } from './registers/plant';
 import type { PollGroup } from './registers/types';
 import { clampTimerMs } from './timers';
 
+/**
+ * Was something typed into the field (the value is not empty)?
+ *
+ * @param value a number or the text of a field
+ */
+const isFilled = (value: unknown): boolean =>
+    typeof value === 'number' || (typeof value === 'string' && value.trim() !== '');
+
+/**
+ * A number as the user typed it. The admin's number field cannot be edited with a decimal point (the point is gone as soon as it is
+ * typed), so the columns and fields that take decimals are text fields: a point or a comma works, an empty field is "not set".
+ *
+ * @param value a number (older configurations) or the text of the field
+ * @returns the number, or `null` for an empty or unreadable value
+ */
+export function readDecimal(value: unknown): number | null {
+    if (typeof value === 'number') {
+        return Number.isFinite(value) ? value : null;
+    }
+    if (typeof value !== 'string' || value.trim() === '') {
+        return null;
+    }
+    const parsed = Number(value.trim().replace(',', '.'));
+    return Number.isFinite(parsed) ? parsed : null;
+}
+
 /** The part of the adapter configuration that describes the installation and the polling. */
 export interface PlantSettings {
     /** selected Navigator generation */
@@ -263,19 +289,13 @@ export function readStatsSettings(config: Partial<ioBroker.AdapterConfig>): Stat
     // The units only say how the user types the numbers; everything inside the adapter is currency per kWh and g/kWh.
     const priceFactor = config.priceUnit === 'cent' ? 0.01 : 1;
     const co2Factor = config.co2Unit === 'kg' ? 1000 : 1;
-    const price =
-        typeof config.pricePerKwh === 'number' && Number.isFinite(config.pricePerKwh) && config.pricePerKwh >= 0
-            ? config.pricePerKwh * priceFactor
-            : null;
-    if (config.pricePerKwh !== undefined && config.pricePerKwh !== null && price === null) {
+    const priceInput = readDecimal(config.pricePerKwh);
+    const price = priceInput !== null && priceInput >= 0 ? priceInput * priceFactor : null;
+    if (isFilled(config.pricePerKwh) && price === null) {
         warnings.push('Price per kWh must be a number of at least 0, no cost is calculated');
     }
-    const co2 =
-        typeof config.co2GramsPerKwh === 'number' &&
-        Number.isFinite(config.co2GramsPerKwh) &&
-        config.co2GramsPerKwh >= 0
-            ? config.co2GramsPerKwh * co2Factor
-            : DEFAULT_CO2_G_PER_KWH;
+    const co2Input = readDecimal(config.co2GramsPerKwh);
+    const co2 = co2Input !== null && co2Input >= 0 ? co2Input * co2Factor : DEFAULT_CO2_G_PER_KWH;
     const maxAgeS =
         typeof config.externalMaxAgeS === 'number' &&
         Number.isFinite(config.externalMaxAgeS) &&
@@ -409,6 +429,70 @@ export const PV_REGISTERS = [
     'battery_soc',
 ] as const;
 
+/**
+ * The fields of the settings page by register: one block per register (the electric heating rod, register 76, is not offered: the
+ * Navigator delivers it itself). A block without a source state sends nothing.
+ */
+export const PV_FIELDS = {
+    pv_surplus: 'pvSurplus',
+    pv_production: 'pvProduction',
+    house_consumption: 'pvHouse',
+    battery_discharge: 'pvBattery',
+    battery_soc: 'pvSoc',
+} as const;
+
+type PvRow = NonNullable<Partial<ioBroker.AdapterConfig>['pvSources']>[number];
+
+/**
+ * The rows the fixed fields of the settings page describe: one for every register that has a source state.
+ *
+ * @param config adapter configuration
+ */
+function pvFieldRows(config: Partial<ioBroker.AdapterConfig>): PvRow[] {
+    const values = config as Record<string, unknown>;
+    const rows: PvRow[] = [];
+    for (const [register, prefix] of Object.entries(PV_FIELDS)) {
+        const stateId = values[`${prefix}StateId`];
+        if (typeof stateId !== 'string' || stateId.trim() === '') {
+            continue;
+        }
+        rows.push({
+            register,
+            stateId,
+            factor: values[`${prefix}Factor`] as PvRow['factor'],
+            invert: values[`${prefix}Invert`] === true,
+            min: (values[`${prefix}Min`] ?? null) as PvRow['min'],
+            max: (values[`${prefix}Max`] ?? null) as PvRow['max'],
+        });
+    }
+    return rows;
+}
+
+/**
+ * The fixed fields for the rows of an older configuration (a table of rows before 0.1.16), to move them once. The first row of a
+ * register counts; rows of the electric heating rod (76) or of unknown registers are dropped.
+ *
+ * @param rows the old `pvSources`
+ */
+export function pvRowsToFields(rows: readonly unknown[]): Record<string, unknown> {
+    const fields: Record<string, unknown> = {};
+    for (const raw of rows) {
+        const row = raw as Partial<PvRow> | null;
+        const prefix = PV_FIELDS[row?.register as keyof typeof PV_FIELDS];
+        if (!prefix || fields[`${prefix}StateId`] !== undefined || typeof row?.stateId !== 'string') {
+            continue;
+        }
+        fields[`${prefix}StateId`] = row.stateId;
+        fields[`${prefix}Factor`] = row.factor === undefined || row.factor === null ? '1' : String(row.factor);
+        if (prefix !== 'pvSoc') {
+            fields[`${prefix}Invert`] = row.invert === true;
+            fields[`${prefix}Min`] = row.min === undefined || row.min === null ? '' : String(row.min);
+            fields[`${prefix}Max`] = row.max === undefined || row.max === null ? '' : String(row.max);
+        }
+    }
+    return fields;
+}
+
 /** One PV register and where its value comes from. */
 export interface PvSource {
     /** register id */
@@ -441,9 +525,6 @@ export interface PvSettings {
     warnings: string[];
 }
 
-const finiteOrNull = (value: unknown): number | null =>
-    typeof value === 'number' && Number.isFinite(value) ? value : null;
-
 /**
  * Read the PV settings. A row with an unknown register, a duplicate register, no state or a factor of 0 is dropped with a
  * warning; the module never starts with a half-understood row (CLAUDE.md rule 18). There are no default scalings (spec Modul D).
@@ -454,7 +535,9 @@ export function readPvSettings(config: Partial<ioBroker.AdapterConfig>): PvSetti
     const warnings: string[] = [];
     const sources: PvSource[] = [];
     const seen = new Set<string>();
-    const rows = Array.isArray(config.pvSources) ? config.pvSources : [];
+    // the fixed fields of the settings page; an older configuration with table rows (before 0.1.16) is read as long as it is not moved
+    const fieldRows = pvFieldRows(config);
+    const rows = fieldRows.length ? fieldRows : Array.isArray(config.pvSources) ? config.pvSources : [];
     for (const row of rows) {
         const register = PV_REGISTERS.find(id => id === row?.register);
         const stateId = typeof row?.stateId === 'string' ? row.stateId.trim() : '';
@@ -466,10 +549,15 @@ export function readPvSettings(config: Partial<ioBroker.AdapterConfig>): PvSetti
             warnings.push(`PV row for ${register} ignored: the register is configured twice`);
             continue;
         }
-        const factor = typeof row.factor === 'number' && Number.isFinite(row.factor) ? row.factor : NaN;
+        const factor = readDecimal(row.factor) ?? NaN;
         if (!factor) {
             warnings.push(`PV row for ${register} ignored: the factor is missing or 0`);
             continue;
+        }
+        for (const limit of ['min', 'max'] as const) {
+            if (isFilled(row[limit]) && readDecimal(row[limit]) === null) {
+                warnings.push(`PV row for ${register}: ${limit} "${String(row[limit])}" is not a number, ignored`);
+            }
         }
         seen.add(register);
         sources.push({
@@ -477,11 +565,31 @@ export function readPvSettings(config: Partial<ioBroker.AdapterConfig>): PvSetti
             stateId,
             factor,
             invert: row.invert === true,
-            min: finiteOrNull(row.min),
-            max: finiteOrNull(row.max),
+            min: readDecimal(row.min),
+            max: readDecimal(row.max),
         });
     }
     const surplusMode = config.pvSurplusMode === 'calculated' ? 'calculated' : 'direct';
+    if (config.pvEnabled === true) {
+        // the Navigator reports missing data when the values it needs do not arrive: say what is not set up
+        const has = (register: (typeof PV_REGISTERS)[number]): boolean => sources.some(s => s.register === register);
+        if (!sources.length) {
+            warnings.push(
+                'PV values are switched on but no source row is configured: nothing is sent to the Navigator',
+            );
+        } else if (surplusMode === 'direct' && !has('pv_surplus')) {
+            warnings.push('PV surplus (register 74) has no source row: the Navigator gets no surplus');
+        } else if (surplusMode === 'calculated' && !(has('pv_production') && has('house_consumption'))) {
+            warnings.push(
+                'The calculated surplus needs rows for PV production (78) and house consumption (82): no surplus is sent',
+            );
+        }
+        if (has('battery_soc') && !has('battery_discharge')) {
+            warnings.push(
+                'Battery level (86) without battery power (84): the Navigator 10 shows its battery widget with both',
+            );
+        }
+    }
     return {
         enabled: config.pvEnabled === true,
         intervalMs:
@@ -541,8 +649,7 @@ export function readRoomSettings(config: Partial<ioBroker.AdapterConfig>): RoomS
     const warnings: string[] = [];
     const sources: RoomSource[] = [];
     const seen = new Set<string>();
-    const num = (value: unknown, fallback: number): number =>
-        typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+    const num = (value: unknown, fallback: number): number => readDecimal(value) ?? fallback;
     for (const row of Array.isArray(config.roomSources) ? config.roomSources : []) {
         const circuit = HEATING_CIRCUITS.find(letter => letter === row?.circuit);
         const stateId = typeof row?.stateId === 'string' ? row.stateId.trim() : '';
@@ -573,8 +680,8 @@ export function readRoomSettings(config: Partial<ioBroker.AdapterConfig>): RoomS
             min,
             max,
             maxAgeMs: Math.max(60, num(row.maxAgeS, DEFAULT_ROOM_MAX_AGE_S)) * 1000,
-            onStale: row.onStale === 'fixed' && typeof row.fixedValue === 'number' ? 'fixed' : 'stop',
-            fixedValue: typeof row.fixedValue === 'number' && Number.isFinite(row.fixedValue) ? row.fixedValue : null,
+            onStale: row.onStale === 'fixed' && readDecimal(row.fixedValue) !== null ? 'fixed' : 'stop',
+            fixedValue: readDecimal(row.fixedValue),
         });
     }
     if (config.roomsEnabled === true && !sources.length) {
@@ -618,8 +725,7 @@ export function readGltSettings(config: Partial<ioBroker.AdapterConfig>): GltSet
     const warnings: string[] = [];
     const sources: RoomSource[] = [];
     const seen = new Set<string>();
-    const num = (value: unknown, fallback: number): number =>
-        typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+    const num = (value: unknown, fallback: number): number => readDecimal(value) ?? fallback;
     for (const row of Array.isArray(config.gltSources) ? config.gltSources : []) {
         const name = String(row?.function) as keyof typeof GLT_FUNCTIONS;
         const def = GLT_FUNCTIONS[name];

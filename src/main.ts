@@ -6,6 +6,7 @@ import {
     readGltSettings,
     readWebSettings,
     readPlantSettings,
+    pvRowsToFields,
     readPvSettings,
     readRoomSettings,
     readStatsSettings,
@@ -163,6 +164,10 @@ class IdmModbus extends utils.Adapter {
             },
             native: {},
         });
+
+        if (await this.movePvRows()) {
+            return; // the instance restarts with the new settings
+        }
 
         await this.publishDiagramSettings();
 
@@ -578,6 +583,34 @@ class IdmModbus extends utils.Adapter {
         );
         await runner.start();
         return runner;
+    }
+
+    /**
+     * Versions before 0.1.16 had the PV sources as a table of rows; the settings page now has a fixed block per register. Moves the
+     * rows of an existing configuration into the new fields once (the table is emptied, so this does not repeat). Changing the
+     * settings restarts the instance.
+     *
+     * @returns true when the settings were changed
+     */
+    private async movePvRows(): Promise<boolean> {
+        const rows: unknown = this.config.pvSources;
+        if (!Array.isArray(rows) || !rows.length) {
+            return false;
+        }
+        const fields = pvRowsToFields(rows);
+        try {
+            await this.extendForeignObjectAsync(`system.adapter.${this.namespace}`, {
+                native: { ...fields, pvSources: [] },
+            });
+            this.log.info(
+                `The PV sources moved from the table to the fixed fields of the settings page (${Object.keys(fields).filter(key => key.endsWith('StateId')).length} registers); the adapter restarts once`,
+            );
+            return true;
+        } catch (error) {
+            // the old rows stay and keep working (readPvSettings reads them as long as the fields are empty)
+            this.log.warn(`The PV sources could not be moved to the new fields: ${(error as Error).message}`);
+            return false;
+        }
     }
 
     /**

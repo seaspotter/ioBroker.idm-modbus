@@ -79,14 +79,14 @@ describe('PvRunner', () => {
         expect(host.published.last_write).to.equal(NOW);
     });
 
-    it('writes 0 for an old surplus, with one warning, and nothing for the battery level', async () => {
+    it('writes 0 for an old surplus and -1 for an old battery level, with one warning each', async () => {
         const host = new Fake();
         const runner = await make(host);
         host.time = NOW + 600000;
         await runner.tick();
         await runner.tick();
         expect(host.writes[0]).to.deep.equal({ address: 74, words: [0, 0] });
-        expect(host.writes.some(w => w.address === 86)).to.equal(false);
+        expect(host.writes.find(w => w.address === 86)?.words).to.deep.equal([0xffff]); // -1: not available
         expect(host.logs.filter(l => l.startsWith('warn') && l.includes('too old'))).to.have.length(2); // surplus and battery, once each
     });
 

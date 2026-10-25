@@ -2,7 +2,10 @@ import { expect } from 'chai';
 import {
     readDiagramSettings,
     readGltSettings,
+    readDecimal,
     readPlantSettings,
+    pvRowsToFields,
+    readPvSettings,
     readRoomSettings,
     readStatsSettings,
     readWebSettings,
@@ -218,6 +221,148 @@ describe('readRoomSettings', () => {
             ],
         });
         expect(settings.sources[0].registerId).to.equal('hc_c_ext_room_temp');
+    });
+});
+
+describe('decimal fields', () => {
+    it('reads a number as typed: point or comma, empty is not set, nonsense is not a number', () => {
+        expect(readDecimal(0.2)).to.equal(0.2);
+        expect(readDecimal('0.001')).to.equal(0.001);
+        expect(readDecimal(' 0,25 ')).to.equal(0.25);
+        expect(readDecimal('-1,5')).to.equal(-1.5);
+        expect(readDecimal('')).to.equal(null);
+        expect(readDecimal('  ')).to.equal(null);
+        expect(readDecimal(null)).to.equal(null);
+        expect(readDecimal('abc')).to.equal(null);
+        expect(readDecimal('1,2,3')).to.equal(null);
+        expect(readDecimal(Number.NaN)).to.equal(null);
+    });
+
+    it('takes the PV scaling from text fields and clears a limit that was emptied', () => {
+        const settings = readPvSettings({
+            pvEnabled: true,
+            pvSources: [
+                { register: 'pv_surplus', stateId: 'a.b', factor: '0,001', invert: false, min: '', max: '12,5' },
+                { register: 'battery_discharge', stateId: 'a.c', factor: 1, invert: true, min: null, max: 'x' },
+            ],
+        });
+        expect(settings.sources.map(s => [s.register, s.factor, s.min, s.max])).to.deep.equal([
+            ['pv_surplus', 0.001, null, 12.5],
+            ['battery_discharge', 1, null, null],
+        ]);
+        // a limit that is neither empty nor a number is said, not dropped silently
+        expect(settings.warnings.join(' ')).to.include('battery_discharge').and.include('max "x" is not a number');
+    });
+
+    it('takes room and building automation scaling from text fields', () => {
+        const rooms = readRoomSettings({
+            roomsEnabled: true,
+            roomSources: [
+                {
+                    circuit: 'A',
+                    stateId: 'a.b',
+                    factor: '1,0',
+                    offset: '-0,5',
+                    heartbeatS: 300,
+                    toleranceC: '0,3',
+                    min: '16',
+                    max: '28,5',
+                    maxAgeS: 900,
+                    onStale: 'fixed',
+                    fixedValue: '21,5',
+                },
+            ],
+        }).sources[0];
+        expect([rooms.factor, rooms.offset, rooms.toleranceC, rooms.min, rooms.max]).to.deep.equal([
+            1, -0.5, 0.3, 16, 28.5,
+        ]);
+        expect([rooms.onStale, rooms.fixedValue]).to.deep.equal(['fixed', 21.5]);
+    });
+
+    it('reads price and CO2 factor typed with a comma', () => {
+        const settings = readStatsSettings({ pricePerKwh: '0,32', co2GramsPerKwh: '380,5' });
+        expect(settings.pricePerKwh).to.equal(0.32);
+        expect(settings.co2GramsPerKwh).to.equal(380.5);
+        // a cleared price field is "no price", without a complaint
+        expect(readStatsSettings({ pricePerKwh: '' }).warnings).to.deep.equal([]);
+    });
+});
+
+describe('PV fields of the settings page', () => {
+    it('sends only the blocks that have a source state, with the scaling of the block', () => {
+        const settings = readPvSettings({
+            pvEnabled: true,
+            pvSurplusStateId: 'a.surplus',
+            pvSurplusFactor: '0,001',
+            pvSurplusInvert: true,
+            pvSurplusMin: '0',
+            pvSurplusMax: '',
+            pvProductionStateId: '',
+            pvProductionFactor: '1',
+            pvSocStateId: 'a.soc',
+            pvSocFactor: '1',
+        });
+        expect(settings.sources.map(s => [s.register, s.stateId, s.factor, s.invert, s.min, s.max])).to.deep.equal([
+            ['pv_surplus', 'a.surplus', 0.001, true, 0, null],
+            ['battery_soc', 'a.soc', 1, false, null, null],
+        ]);
+    });
+
+    it('still reads the table of an older version until it is moved, and the fields win once they are set', () => {
+        const oldRows = [{ register: 'pv_surplus', stateId: 'old.s', factor: 1, invert: false, min: null, max: null }];
+        expect(readPvSettings({ pvEnabled: true, pvSources: oldRows }).sources.map(s => s.stateId)).to.deep.equal([
+            'old.s',
+        ]);
+        expect(
+            readPvSettings({
+                pvEnabled: true,
+                pvSources: oldRows,
+                pvSurplusStateId: 'new.s',
+                pvSurplusFactor: 1,
+            }).sources.map(s => s.stateId),
+        ).to.deep.equal(['new.s']);
+    });
+
+    it('moves the rows of the table into the fields: first row of a register, no heating rod, no empty values lost', () => {
+        const fields = pvRowsToFields([
+            { register: 'pv_surplus', stateId: 'a.s', factor: 0.001, invert: true, min: 0, max: null },
+            { register: 'pv_surplus', stateId: 'a.second', factor: 1, invert: false },
+            { register: 'electric_heater_power', stateId: 'a.rod', factor: 1 },
+            { register: 'battery_soc', stateId: 'a.soc', factor: 1 },
+            { register: 'nonsense', stateId: 'a.x', factor: 1 },
+        ]);
+        expect(fields).to.deep.equal({
+            pvSurplusStateId: 'a.s',
+            pvSurplusFactor: '0.001',
+            pvSurplusInvert: true,
+            pvSurplusMin: '0',
+            pvSurplusMax: '',
+            pvSocStateId: 'a.soc',
+            pvSocFactor: '1',
+        });
+        // and the fields read back as the same source
+        expect(
+            readPvSettings({ pvEnabled: true, ...fields }).sources.map(s => [s.register, s.factor, s.invert, s.min]),
+        ).to.deep.equal([
+            ['pv_surplus', 0.001, true, 0],
+            ['battery_soc', 1, false, null],
+        ]);
+    });
+
+    it('says what is not set up, once the PV values are switched on', () => {
+        const warn = (config: Record<string, unknown>): string =>
+            readPvSettings({ pvEnabled: true, ...config }).warnings.join(' | ');
+        expect(warn({})).to.include('no source row');
+        expect(warn({ pvProductionStateId: 'a.p', pvProductionFactor: 1 })).to.include('no surplus');
+        expect(warn({ pvSurplusMode: 'calculated', pvProductionStateId: 'a.p', pvProductionFactor: 1 })).to.include(
+            'needs rows for PV production (78) and house consumption (82)',
+        );
+        expect(warn({ pvSurplusStateId: 'a.s', pvSurplusFactor: 1, pvSocStateId: 'a.c', pvSocFactor: 1 })).to.include(
+            'Battery level (86) without battery power (84)',
+        );
+        expect(warn({ pvSurplusStateId: 'a.s', pvSurplusFactor: 1 })).to.equal('');
+        // switched off: nothing to complain about
+        expect(readPvSettings({ pvEnabled: false }).warnings).to.deep.equal([]);
     });
 });
 
