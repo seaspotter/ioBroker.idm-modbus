@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "idm-modbus",
-        "version": "0.1.15",
+        "version": "0.1.16",
         "news": {
+            "0.1.16": {
+                "en": "photovoltaics: a fixed block per register instead of a table (a block without a source state sends nothing), a source that is missing or too old is written as 0 (battery level -1) so that the Navigator keeps receiving every value, warnings for what is not set up, existing rows move automatically; decimals with point or comma now work in all factor, offset and limit fields (a limit can be cleared)",
+                "de": "Photovoltaik: ein fester Block je Register statt einer Tabelle (ein Block ohne Quell-Datenpunkt sendet nichts), eine fehlende oder zu alte Quelle wird als 0 geschrieben (Batteriefüllstand -1), damit der Navigator weiter jeden Wert erhält, Warnungen für Nicht-Eingerichtetes, bestehende Zeilen werden automatisch übernommen; Dezimalzahlen mit Punkt oder Komma funktionieren jetzt in allen Faktor-, Offset- und Grenzfeldern (eine Grenze lässt sich löschen)",
+                "ru": "фотовольтаика: фиксированный блок на регистр вместо таблицы (блок без исходного состояния ничего не отправляет), отсутствующий или устаревший источник записывается как 0 (уровень батареи -1), чтобы Navigator получал каждое значение, предупреждения о ненастроенном, существующие строки переносятся автоматически; десятичные числа с точкой или запятой теперь работают во всех полях коэффициента, смещения и границ (границу можно очистить)",
+                "pt": "fotovoltaica: um bloco fixo por registo em vez de uma tabela (um bloco sem estado de origem não envia nada), uma fonte em falta ou demasiado antiga é escrita como 0 (nível da bateria -1) para que o Navigator continue a receber cada valor, avisos sobre o que não está configurado, as linhas existentes são transferidas automaticamente; decimais com ponto ou vírgula funcionam agora em todos os campos de fator, deslocamento e limite (um limite pode ser apagado)",
+                "nl": "fotovoltaïsche installatie: een vast blok per register in plaats van een tabel (een blok zonder bronstatus verstuurt niets), een ontbrekende of te oude bron wordt als 0 geschreven (batterijniveau -1) zodat de Navigator elke waarde blijft ontvangen, waarschuwingen voor wat niet is ingesteld, bestaande rijen worden automatisch overgenomen; decimalen met punt of komma werken nu in alle velden voor factor, offset en grenzen (een grens kan worden gewist)",
+                "fr": "photovoltaïque : un bloc fixe par registre au lieu d'un tableau (un bloc sans état source n'envoie rien), une source manquante ou trop ancienne est écrite à 0 (niveau de batterie -1) pour que le Navigator continue à recevoir chaque valeur, avertissements pour ce qui n'est pas configuré, les lignes existantes sont reprises automatiquement ; les décimales avec point ou virgule fonctionnent désormais dans tous les champs de facteur, de décalage et de limite (une limite peut être effacée)",
+                "it": "fotovoltaico: un blocco fisso per registro al posto di una tabella (un blocco senza stato di origine non invia nulla), una fonte mancante o troppo vecchia viene scritta come 0 (livello batteria -1) così il Navigator continua a ricevere ogni valore, avvisi per ciò che non è configurato, le righe esistenti vengono trasferite automaticamente; i decimali con punto o virgola funzionano ora in tutti i campi di fattore, offset e limite (un limite può essere cancellato)",
+                "es": "fotovoltaica: un bloque fijo por registro en lugar de una tabla (un bloque sin estado de origen no envía nada), una fuente ausente o demasiado antigua se escribe como 0 (nivel de batería -1) para que el Navigator siga recibiendo cada valor, avisos de lo que no está configurado, las filas existentes se trasladan automáticamente; los decimales con punto o coma funcionan ahora en todos los campos de factor, desplazamiento y límite (un límite se puede borrar)",
+                "pl": "fotowoltaika: stały blok na rejestr zamiast tabeli (blok bez stanu źródłowego niczego nie wysyła), brakujące lub zbyt stare źródło jest zapisywane jako 0 (poziom baterii -1), aby Navigator nadal otrzymywał każdą wartość, ostrzeżenia o tym, co nie jest skonfigurowane, istniejące wiersze są przenoszone automatycznie; liczby dziesiętne z kropką lub przecinkiem działają teraz we wszystkich polach współczynnika, przesunięcia i granic (granicę można wyczyścić)",
+                "uk": "фотовольтаїка: фіксований блок на регістр замість таблиці (блок без вихідного стану нічого не надсилає), відсутнє або застаріле джерело записується як 0 (рівень батареї -1), щоб Navigator отримував кожне значення, попередження про ненастроєне, наявні рядки переносяться автоматично; десяткові числа з крапкою або комою тепер працюють в усіх полях коефіцієнта, зсуву та меж (межу можна очистити)",
+                "zh-cn": "光伏：每个寄存器一个固定区块，取代表格（没有来源状态的区块不发送任何内容），缺失或过旧的来源写为 0（电池电量为 -1），使 Navigator 持续收到每个值，对未设置的内容给出警告，现有行自动迁移；系数、偏移和限值字段现在都可使用小数点或逗号输入小数（限值可清空）"
+            },
             "0.1.15": {
                 "en": "the objects of the web interface (inputs and outputs, rooms) follow the current wording after an update: a renamed part such as the station pump M22 (Pump hot water station) now also changes on installations that created it earlier",
                 "de": "die Objekte der Weboberfläche (Ein- und Ausgänge, Räume) folgen nach einem Update dem aktuellen Wortlaut: ein umbenanntes Teil wie die Stationspumpe M22 (Pumpe Warmwasserstation) ändert sich jetzt auch bei Installationen, die es früher angelegt haben",
@@ -54,19 +67,6 @@
                 "pl": "schemat: rura i etykieta na niej są kolorowe tylko wtedy, gdy naprawdę płynie przez nią woda; rura, której pompa jest wyłączona lub której nie używa bieżący tryb pracy, pozostaje szara",
                 "uk": "схема: труба та позначка на ній забарвлюються лише поки по ній справді тече вода; труба, насос якої вимкнений або яку не використовує поточний режим, залишається сірою",
                 "zh-cn": "示意图：只有管道里真的有水流动时，管道及其上的标签才会着色；水泵关闭或当前运行模式不使用的管道保持灰色"
-            },
-            "0.1.11": {
-                "en": "diagram: the flow in a heating circuit follows its pump (M31, M32, ...) instead of its operating mode, and the white flow dashes show only while a pipe actually flows",
-                "de": "Diagramm: der Fluss in einem Heizkreis folgt seiner Pumpe (M31, M32, ...) statt seiner Betriebsart, und die weißen Strömungsstriche erscheinen nur, solange eine Leitung wirklich fließt",
-                "ru": "схема: поток в контуре отопления определяется его насосом (M31, M32, ...), а не режимом работы, а белые штрихи потока видны только пока в трубе действительно течёт вода",
-                "pt": "diagrama: o fluxo num circuito de aquecimento segue a sua bomba (M31, M32, ...) em vez do modo de funcionamento, e os traços brancos de fluxo só aparecem enquanto um tubo realmente tem fluxo",
-                "nl": "diagram: de stroming in een verwarmingskring volgt zijn pomp (M31, M32, ...) in plaats van zijn bedrijfsmodus, en de witte stromingsstreepjes verschijnen alleen zolang een leiding echt stroomt",
-                "fr": "schéma : le débit dans un circuit de chauffage suit sa pompe (M31, M32, ...) et non son mode de fonctionnement, et les tirets blancs d'écoulement n'apparaissent que lorsqu'une conduite coule réellement",
-                "it": "schema: il flusso in un circuito di riscaldamento segue la sua pompa (M31, M32, ...) invece della modalità di funzionamento, e i trattini bianchi del flusso compaiono solo mentre un tubo scorre davvero",
-                "es": "diagrama: el flujo en un circuito de calefacción sigue a su bomba (M31, M32, ...) en lugar de su modo de funcionamiento, y los guiones blancos de flujo solo aparecen mientras una tubería realmente fluye",
-                "pl": "schemat: przepływ w obiegu grzewczym zależy od jego pompy (M31, M32, ...), a nie od trybu pracy, a białe kreski przepływu pojawiają się tylko wtedy, gdy rura naprawdę przepływa",
-                "uk": "схема: потік у контурі опалення визначається його насосом (M31, M32, ...), а не режимом роботи, а білі штрихи потоку видно лише поки в трубі справді тече вода",
-                "zh-cn": "示意图：采暖回路的水流取决于其水泵（M31、M32 等），而不是运行模式；白色流动短线只在管道真正有水流时显示"
             }
         },
         "titleLang": {
@@ -218,6 +218,28 @@
         "pvIntervalS": 30,
         "pvMaxAgeS": 120,
         "pvSurplusMode": "direct",
+        "pvSurplusStateId": "",
+        "pvSurplusFactor": "1",
+        "pvSurplusInvert": false,
+        "pvSurplusMin": "",
+        "pvSurplusMax": "",
+        "pvProductionStateId": "",
+        "pvProductionFactor": "1",
+        "pvProductionInvert": false,
+        "pvProductionMin": "",
+        "pvProductionMax": "",
+        "pvHouseStateId": "",
+        "pvHouseFactor": "1",
+        "pvHouseInvert": false,
+        "pvHouseMin": "",
+        "pvHouseMax": "",
+        "pvBatteryStateId": "",
+        "pvBatteryFactor": "1",
+        "pvBatteryInvert": false,
+        "pvBatteryMin": "",
+        "pvBatteryMax": "",
+        "pvSocStateId": "",
+        "pvSocFactor": "1",
         "pvSources": [],
         "roomsEnabled": false,
         "roomSources": [],

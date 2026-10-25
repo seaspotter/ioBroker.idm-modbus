@@ -69,6 +69,12 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.16 (2026-10-25)
+
+- (SeaSpotter) photovoltaics: a fixed block per register instead of a table (a block without a source state sends nothing; the electric heating rod 76 is not offered, the Navigator delivers it itself); existing rows move into the blocks at the first start
+- (SeaSpotter) photovoltaics: a source that is missing or too old is written as 0 (battery level -1, not available) so that the Navigator keeps receiving every configured value; warnings at the start for what is not set up
+- (SeaSpotter) decimals typed with a point or a comma work in all factor, offset, tolerance, limit and price fields (the number field removed the point while typing); a limit can be cleared by emptying the field
+
 ### 0.1.15 (2026-10-20)
 
 - (SeaSpotter) the objects of the web interface (inputs and outputs, rooms) follow the current wording after an update: a renamed part such as the station pump M22 ("Pump hot water station") now also changes on installations that created it earlier (before, only new installations got the name)
