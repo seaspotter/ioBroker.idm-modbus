@@ -1321,7 +1321,7 @@
                 "pvHeadSurplus": {
                     "type": "header",
                     "text": "pvRegSurplus",
-                    "size": 5,
+                    "size": 3,
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -1379,7 +1379,7 @@
                 "pvHeadProduction": {
                     "type": "header",
                     "text": "pvRegProduction",
-                    "size": 5,
+                    "size": 3,
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -1437,7 +1437,7 @@
                 "pvHeadHouse": {
                     "type": "header",
                     "text": "pvRegHouse",
-                    "size": 5,
+                    "size": 3,
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -1495,7 +1495,7 @@
                 "pvHeadBattery": {
                     "type": "header",
                     "text": "pvRegBatteryPower",
-                    "size": 5,
+                    "size": 3,
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -1553,7 +1553,7 @@
                 "pvHeadSoc": {
                     "type": "header",
                     "text": "pvRegBatterySoc",
-                    "size": 5,
+                    "size": 3,
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -1568,18 +1568,18 @@
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
-                    "md": 8,
-                    "lg": 8,
-                    "xl": 8
+                    "md": 5,
+                    "lg": 5,
+                    "xl": 5
                 },
                 "pvSocFactor": {
                     "type": "text",
                     "label": "colFactor",
                     "xs": 12,
                     "sm": 6,
-                    "md": 4,
-                    "lg": 4,
-                    "xl": 4
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
                 }
             }
         },

@@ -7,6 +7,14 @@
     /* an id that sorts after every id with the prefix (the way ioBroker lists the ids of a range) */
     var RANGE_END = '香';
     var OBJECT_REFRESH_MS = 5000;
+    /* a request without an answer after this long failed (a connection that is half dead never answers, and never says so) */
+    var ASK_TIMEOUT_MS = 15000;
+    /* all states are compared with the server this often, so that a missed update cannot stay missed */
+    var RESYNC_MS = 60000;
+    /* after this many failed re-syncs in a row the connection is opened again */
+    var RESYNC_FAILURES = 2;
+    /* a failed load after a connect is tried again after this long */
+    var RETRY_MS = 5000;
 
     function loadScript(url) {
         return new Promise(function (resolve, reject) {
@@ -39,7 +47,11 @@
     function ask(socket, command) {
         var args = Array.prototype.slice.call(arguments, 2);
         return new Promise(function (resolve, reject) {
+            var timer = setTimeout(function () {
+                reject(new Error(`No answer to ${command}`));
+            }, ASK_TIMEOUT_MS);
             args.push(function (error, result) {
+                clearTimeout(timer);
                 if (error) {
                     reject(new Error(String(error)));
                 } else {
@@ -69,6 +81,9 @@
         var settings = {};
         var language = (navigator.language || 'en').slice(0, 2);
         var refreshAt = 0;
+        var failures = 0;
+        var retryTimer = null;
+        var resyncTimer = null;
 
         function loadObjects() {
             var range = { startkey: prefix, endkey: prefix + RANGE_END };
@@ -134,25 +149,71 @@
                 });
         }
 
-        var start = loadScript(`${origin}/socket.io/socket.io.js`).then(function () {
-            socket = openSocket(origin);
-            socket.on('connect', function () {
-                loadAll()
-                    .then(function () {
-                        socket.emit('subscribe', `${prefix}*`);
+        /* load everything; a load that fails (no answer, an error) is tried again while the socket stays up, otherwise nothing would
+           ever fill the page again: the socket itself never reconnects as long as it believes it is connected */
+        function load(sock) {
+            clearTimeout(retryTimer);
+            loadAll()
+                .then(function () {
+                    handlers.onConnection(true);
+                })
+                .catch(function (error) {
+                    handlers.onConnection(false, error.message);
+                    if (sock === socket) {
+                        retryTimer = setTimeout(function () {
+                            load(sock);
+                        }, RETRY_MS);
+                    }
+                });
+        }
+        /* compare every state with the server: whatever differs is reported like a change (a missed update is corrected, the objects
+           are not loaded again); a connection that does not answer is opened again */
+        function resync() {
+            if (!socket || socket.connected === false) {
+                return; // the socket is reconnecting by itself and loads everything when it is back
+            }
+            var sock = socket;
+            ask(sock, 'getStates', `${prefix}*`)
+                .then(function (all) {
+                    if (sock !== socket) {
+                        return;
+                    }
+                    if (failures) {
+                        failures = 0;
                         handlers.onConnection(true);
-                    })
-                    .catch(function (error) {
-                        handlers.onConnection(false, error.message);
+                    }
+                    Object.keys(all || {}).forEach(function (id) {
+                        var rel = relative(id);
+                        var value = all[id] ? all[id].val : null;
+                        if (rel !== null && rel !== 'diagram.settings' && states[rel] !== value) {
+                            var before = states[rel];
+                            states[rel] = value;
+                            handlers.onState(rel, value, before);
+                        }
                     });
+                })
+                .catch(function (error) {
+                    failures++;
+                    handlers.onConnection(false, error.message);
+                    if (failures >= RESYNC_FAILURES && sock === socket) {
+                        open();
+                    }
+                });
+        }
+        function bind(sock) {
+            sock.on('connect', function () {
+                failures = 0;
+                // subscribe first: what changes while everything is loaded is not lost
+                sock.emit('subscribe', `${prefix}*`);
+                load(sock);
             });
-            socket.on('disconnect', function () {
+            sock.on('disconnect', function () {
                 handlers.onConnection(false);
             });
-            socket.on('connect_error', function (error) {
+            sock.on('connect_error', function (error) {
                 handlers.onConnection(false, error && error.message);
             });
-            socket.on('stateChange', function (id, state) {
+            sock.on('stateChange', function (id, state) {
                 var rel = relative(id);
                 if (rel === null) {
                     return;
@@ -169,12 +230,39 @@
                 }
                 handlers.onState(rel, states[rel], before);
             });
+        }
+        /* open a socket (the old one is closed) */
+        function open() {
+            failures = 0;
+            clearTimeout(retryTimer);
+            if (socket) {
+                try {
+                    socket.close();
+                } catch {
+                    /* it is going away anyway */
+                }
+            }
+            socket = openSocket(origin);
+            bind(socket);
+        }
+
+        var start = loadScript(`${origin}/socket.io/socket.io.js`).then(function () {
+            open();
+            resyncTimer = setInterval(resync, RESYNC_MS);
+            // a tab that was in the background wakes up with a connection nobody looked after: look at once
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible') {
+                    resync();
+                }
+            });
         });
         start.catch(function (error) {
             handlers.onConnection(false, error.message);
         });
         return {
             close: function () {
+                clearInterval(resyncTimer);
+                clearTimeout(retryTimer);
                 if (socket) {
                     socket.close();
                 }

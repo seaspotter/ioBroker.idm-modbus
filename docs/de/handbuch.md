@@ -177,6 +177,8 @@ _Eine Kaskade aus zwei Wärmepumpen: Die Karte (links unten) zeigt, wie viele de
 
 **Nur mit Modbus.** Ist die Weboberfläche aus oder nicht erreichbar, wird alles gezeichnet, was von Modbus kommt. Es fehlt, was nur die Weboberfläche liefert: die Pumpen- und Mischerzeilen der Heizkreise, die Stationspumpe M22 und der Durchflussschalter B1, die Lüfterspannung M13, der Durchfluss B2, der Heißgasmischer M71, die Solarpumpen, die Heizstabstufen, Kessel und Kachelofen sowie die Raum- und Heizkreisnamen. Das Diagramm zeichnet dann nach der besten verbleibenden Information und behauptet nie mehr, als es weiß: Ein Heizkreis ohne Pumpenwert zeigt seine Betriebsart im Punkt, seine Leitungen sind nach der Betriebsart gefärbt, aber nicht bewegt; die Frischwasserstation ist gefärbt, aber nicht bewegt (nichts sagt, ob Warmwasser gezapft wird); der Lüfter dreht sich, solange der Verdichter läuft; die Solarschleife folgt den Fühlern B74 und B75.
 
+**Aktuell bleiben.** Die Seite vergleicht alle Werte jede Minute mit dem Server, zeigt nach einer Unterbrechung der Verbindung zum Web-Adapter die aktuellen Werte, versucht ein fehlgeschlagenes Laden erneut, öffnet die Verbindung neu, wenn sie nicht mehr antwortet, und aktualisiert sich, wenn ein Tab aus dem Hintergrund wieder sichtbar wird. Eine Statuszeile oben zeigt die Zeit der letzten Aktualisierung.
+
 **Gut zu wissen.** Die Räume werden den Heizkreisen nach der Nummer des Zonenmoduls zugeordnet (Zone 1 zu Heizkreis A, Zone 2 zu Heizkreis B usw.); das ist eine Annahme. Die Fühler der Heizkreise A bis G heißen B51 bis B57 (Vorlauf) und B61 bis B67 (Raum). Die Variante für Erdreich und Grundwasser und der Solarblock wurden noch nicht an einer echten Anlage gesehen.
 
 ## 9. Support

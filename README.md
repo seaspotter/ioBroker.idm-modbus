@@ -69,6 +69,11 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.17 (2026-10-26)
+
+- (SeaSpotter) diagram: the page no longer stays stale after the connection to the web adapter was interrupted: it shows the current values again after a reconnect (before, only values that changed again were updated), compares all values with the server every minute, tries a failed load again, reopens a connection that stops answering and refreshes when a tab in the background becomes visible
+- (SeaSpotter) PV settings: larger block headings, the battery level block lines up with the others
+
 ### 0.1.16 (2026-10-25)
 
 - (SeaSpotter) photovoltaics: a fixed block per register instead of a table (a block without a source state sends nothing; the electric heating rod 76 is not offered, the Navigator delivers it itself); existing rows move into the blocks at the first start
