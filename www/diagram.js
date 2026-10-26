@@ -1842,7 +1842,8 @@
             model = m;
             render(m);
         } else {
-            updateStatus();
+            // the plant is the same, but a snapshot (a reconnect, an object that was added) brings the values of that moment: show them
+            applyAll();
         }
     }
     function scheduleRebuild() {
