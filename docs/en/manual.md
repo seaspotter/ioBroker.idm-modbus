@@ -179,6 +179,8 @@ _A cascade of two heat pumps: the card (bottom left) shows how many stages run o
 
 **With Modbus only.** If the web interface is off or not available, everything that comes from Modbus is drawn as usual. What only the web interface delivers is missing: the pump and mixer rows of the circuits, the station pump M22 and the flow switch B1, the fan voltage M13, the flow rate B2, the hot gas mixer M71, the solar pumps, the heating rod stages, the boiler and the stove, and the room and circuit names. The diagram then draws from the best information left and never claims more than it knows: a circuit without a pump state shows its operating mode in its dot, and its pipes are coloured by the operating mode but not animated; the fresh water station is coloured but not animated (nothing tells whether hot water is drawn); the fan turns while the compressor runs; the solar loop follows the sensors B74 and B75.
 
+**Staying current.** The page compares all values with the server every minute, shows the current values after the connection to the web adapter was interrupted, tries a load again that failed, opens the connection again when it stops answering, and refreshes when a tab that was in the background becomes visible again. A status line at the top shows the time of the last update.
+
 **Good to know.** Rooms are assigned to circuits by zone module number (zone 1 to circuit A, zone 2 to circuit B and so on); this is an assumption. Heating circuits are numbered B51 to B57 (flow) and B61 to B67 (room) for circuits A to G. The ground and groundwater variant and the solar block have not been seen on a real plant yet.
 
 ## 9. Support
