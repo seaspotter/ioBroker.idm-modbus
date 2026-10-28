@@ -8,9 +8,10 @@ function hostWith(object: ioBroker.Object | null): { host: PvMoveHost; written: 
     return {
         written,
         host: {
-            getForeignObjectAsync: async () => object,
-            setForeignObjectAsync: async (_id, obj) => {
+            getForeignObjectAsync: () => Promise.resolve(object),
+            setForeignObjectAsync: (_id, obj) => {
                 written.push(obj);
+                return Promise.resolve();
             },
         },
     };
