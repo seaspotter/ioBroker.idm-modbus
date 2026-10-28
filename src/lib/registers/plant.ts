@@ -74,7 +74,7 @@ function conditionHolds(condition: string, plant: PlantConfig): boolean {
  * @param reg a register
  * @param plant the configured installation
  */
-export function isActive(reg: RegisterEntry, plant: PlantConfig): boolean {
+function isActive(reg: RegisterEntry, plant: PlantConfig): boolean {
     if (reg.access === 'W') {
         return false;
     }

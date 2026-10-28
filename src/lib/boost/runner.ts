@@ -1,7 +1,5 @@
 import type { Result } from '../modbus/result';
-
-/** Hard limits of a boost, whatever the configuration says. */
-export const BOOST_LIMITS = { minTargetC: 40, maxTargetC: 65, minMinutes: 5, maxMinutes: 240 } as const;
+import { type IntervalTimers, type Logger, Ticker } from '../runner-kit';
 
 /** The heartbeat of the demand while a boost runs: the register is meant to be written cyclically (spec Modul E). */
 const HEARTBEAT_MS = 30000;
@@ -26,9 +24,9 @@ export interface BoostHost {
     /** clock in ms */
     now(): number;
     /** log lines */
-    log: { debug(message: string): void; info(message: string): void; warn(message: string): void };
+    log: Logger;
     /** managed timers */
-    timers: { setInterval: (cb: () => void, ms: number) => unknown; clearInterval: (handle: unknown) => void };
+    timers: IntervalTimers;
     /** the Navigator connection is up */
     connected(): boolean;
     /** latest hot water temperature at the top of the heater in °C, `null` when unknown or too old */
@@ -58,7 +56,7 @@ export interface BoostOptions {
  * is the only thing that ends a boost.
  */
 export class BoostRunner {
-    private timer: unknown;
+    private readonly ticker: Ticker;
     private busy = false;
     private deadline = 0;
     private failures = 0;
@@ -71,7 +69,9 @@ export class BoostRunner {
     public constructor(
         private readonly host: BoostHost,
         private readonly options: BoostOptions,
-    ) {}
+    ) {
+        this.ticker = new Ticker(host.timers);
+    }
 
     /** Whether a boost is running. */
     public get running(): boolean {
@@ -137,7 +137,7 @@ export class BoostRunner {
             this.host.publish('active', true);
             this.host.publish('remaining', this.options.maxMinutes);
             this.host.publish('status', 'running');
-            this.timer = this.host.timers.setInterval(() => void this.tick(), HEARTBEAT_MS);
+            this.ticker.start(() => void this.tick(), HEARTBEAT_MS);
             this.host.log.info(
                 `Hot water boost started: target ${this.options.targetC} °C, at most ${this.options.maxMinutes} min`,
             );
@@ -162,10 +162,7 @@ export class BoostRunner {
         } catch {
             // the adapter is stopping anyway
         }
-        if (this.timer !== undefined) {
-            this.host.timers.clearInterval(this.timer);
-            this.timer = undefined;
-        }
+        this.ticker.stop();
     }
 
     /** Heartbeat: check target and time, refresh the demand. Never throws. */
@@ -207,10 +204,7 @@ export class BoostRunner {
 
     private async end(status: BoostStatus): Promise<void> {
         this.active = false;
-        if (this.timer !== undefined) {
-            this.host.timers.clearInterval(this.timer);
-            this.timer = undefined;
-        }
+        this.ticker.stop();
         let result = await this.host.setDemand(false);
         if (!result.ok) {
             result = await this.host.setDemand(false); // one more try: leaving the demand on would keep charging

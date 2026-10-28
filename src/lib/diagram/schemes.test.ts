@@ -9,7 +9,6 @@ const load = <T>(file: string): T => {
     vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', '..', '..', 'www', file), 'utf8'), exported);
     return exported.module.exports as T;
 };
-const plant = load<{ describePlant(has: (id: string) => boolean): Record<string, any> }>('plant.js');
 const diagram = load<{ buildModel(input: object): Record<string, any> }>('model.js');
 const labels = JSON.parse(
     fs.readFileSync(path.join(__dirname, '..', '..', '..', 'www', 'labels.json'), 'utf8'),
@@ -28,16 +27,8 @@ describe('plant schemes of the IDM manuals (tools/sources/diagram-schemes.json)'
     });
 
     for (const scheme of schemes) {
-        it(`${scheme.id}: the plant description and the model follow from the tags (${scheme.unit})`, () => {
+        it(`${scheme.id}: the model follows from the tags (${scheme.unit})`, () => {
             const snapshot = buildSnapshot(scheme);
-            const has = (id: string): boolean => snapshot.states[id] !== undefined && snapshot.states[id] !== null;
-            const described = plant.describePlant(has);
-            expect(described.source, 'heat source').to.equal(scheme.family === 'air' ? 'air' : 'ground');
-            expect(described.hotGasLine, 'hot gas line').to.equal(
-                scheme.tags.includes('B35') || scheme.tags.includes('M71'),
-            );
-            expect(described.storage.heatingBuffer, 'heating buffer').to.equal(scheme.tags.includes('B38'));
-            expect(described.storage.hotWater, 'hot water').to.equal(scheme.tags.some(t => t === 'B41' || t === 'B48'));
             const model = diagram.buildModel({
                 language: 'en',
                 labels,

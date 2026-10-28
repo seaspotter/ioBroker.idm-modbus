@@ -1,5 +1,5 @@
 import type { PlannedObject } from '../object-tree';
-import { localized } from '../translations';
+import { channelObject, stateObject } from './objects';
 import { copOf, WEB_STATISTICS, type WebCategory, type WebStatistics, type WebStatisticsKind } from './parse';
 
 /** Categories in the order of the states; `all` is the sum of the others. */
@@ -54,19 +54,8 @@ const round = (value: number | undefined): number | null => (value === undefined
 export function buildStatisticsStates(tables: Partial<Record<WebStatisticsKind, WebStatistics>>): StatisticsStates {
     const objects: PlannedObject[] = [];
     const values = new Map<string, number | string | null>();
-    const channel = (id: string, name: string): void => {
-        objects.push({ id, object: { type: 'channel', common: { name: localized(name) }, native: {} } });
-    };
-    const state = (id: string, name: string, type: 'number' | 'string', role: string, unit?: string): void => {
-        objects.push({
-            id,
-            object: {
-                type: 'state',
-                common: { name: localized(name), type, role, read: true, write: false, ...(unit ? { unit } : {}) },
-                native: {},
-            },
-        });
-    };
+    const channel = (id: string, name: string): number => objects.push(channelObject(id, name));
+    const state = (...args: Parameters<typeof stateObject>): number => objects.push(stateObject(...args));
     channel('web.statistics', 'Statistics');
     const byKind = new Map<
         WebStatisticsKind,

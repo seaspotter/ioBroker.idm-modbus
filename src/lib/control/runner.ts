@@ -1,23 +1,26 @@
 import type { ControlSettings } from '../config';
 import type { FloatWordOrder } from '../constants';
 import type { RegisterEntry } from '../registers/types';
+import type { Logger } from '../runner-kit';
 import { stateIdFor, toStateValue } from '../state-model';
-import { isWritable } from './groups';
+import { ACKNOWLEDGE_ID, isWritable } from './groups';
 import { toNumber } from './rules';
-import { type WriteCounters, type WriteExecutor, type WriteOutcome, WriteScheduler } from './scheduler';
+import {
+    type WriteCounters,
+    type WriteExecutor,
+    type SchedulerOptions,
+    type WriteOutcome,
+    WriteScheduler,
+} from './scheduler';
 
 /** What the runner needs from the adapter; a fake in the tests. */
 export interface ControlHost {
     /** clock in ms */
     now(): number;
     /** log lines */
-    log: { debug(message: string): void; info(message: string): void; warn(message: string): void };
+    log: Logger;
     /** managed timers */
-    timers: {
-        setTimeout: (cb: () => void, ms: number) => unknown;
-        clearTimeout: (handle: unknown) => void;
-        delay: (ms: number) => Promise<void>;
-    };
+    timers: SchedulerOptions['timers'];
     /** connection to the Navigator */
     executor: WriteExecutor;
     /** latest value the poller read for a register (to restore a state after a refused write) */
@@ -127,7 +130,7 @@ export class ControlRunner {
         switch (outcome.kind) {
             case 'written':
             case 'unchanged': {
-                const value = reg.id === 'error_acknowledge' ? false : toStateValue(reg, outcome.value);
+                const value = reg.id === ACKNOWLEDGE_ID ? false : toStateValue(reg, outcome.value);
                 this.host.acknowledge(stateId, value);
                 if (outcome.kind === 'written') {
                     this.host.log.info(`${reg.id} set to ${String(toNumber(requested))}`);
@@ -179,7 +182,7 @@ export class ControlRunner {
      * @param stateId its state id
      */
     private restore(reg: RegisterEntry, stateId: string): void {
-        if (reg.id === 'error_acknowledge') {
+        if (reg.id === ACKNOWLEDGE_ID) {
             this.host.acknowledge(stateId, false);
             return;
         }

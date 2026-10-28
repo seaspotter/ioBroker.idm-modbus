@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vm from 'node:vm';
+import { TAG_STATES } from '../../../tools/diagram-tags';
 import { buildDiagramLabels } from '../../../tools/build-diagram-labels';
 import { loadRegisters } from '../registers/plant';
 import type { RegisterEntry } from '../registers/types';
@@ -236,13 +237,7 @@ describe('diagram model', () => {
         expect(model.hpModes).to.deep.equal({ 0: 'Off', 1: 'Heating' });
     });
 
-    it('reads the add-on parts from the same states as the plant detection', () => {
-        const exported: { module: { exports: unknown } } = { module: { exports: {} } };
-        vm.runInNewContext(
-            fs.readFileSync(path.join(__dirname, '..', '..', '..', 'www', 'plant.js'), 'utf8'),
-            exported,
-        );
-        const tagStates = (exported.module.exports as { TAG_STATES: Record<string, string[]> }).TAG_STATES;
+    it('reads the add-on parts from the same states as the tag table of the gallery', () => {
         const pairs: [string, string][] = [
             ['solarPump1', 'M75'],
             ['solarPump2', 'M76'],
@@ -251,7 +246,7 @@ describe('diagram model', () => {
             ['stoveTemp', 'B84'],
         ];
         for (const [name, tag] of pairs) {
-            expect(diagram.STATE_IDS[name], `${name} / ${tag}`).to.deep.equal(tagStates[tag]);
+            expect(diagram.STATE_IDS[name], `${name} / ${tag}`).to.deep.equal(TAG_STATES[tag]);
         }
     });
 

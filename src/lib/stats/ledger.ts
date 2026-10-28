@@ -77,6 +77,17 @@ export class Ledger {
     }
 
     /**
+     * Apply a change to the bucket of the day and to the totals.
+     *
+     * @param date local date key
+     * @param change the change
+     */
+    private add(date: string, change: (bucket: Bucket) => void): void {
+        change(this.bucketFor(date));
+        change(this.totals);
+    }
+
+    /**
      * Add thermal energy from the Navigator's counters.
      *
      * @param date local date key
@@ -84,8 +95,7 @@ export class Ledger {
      * @param kwh energy in kWh
      */
     public addThermal(date: string, mode: ThermalMode, kwh: number): void {
-        this.bucketFor(date).thermal[mode] += kwh;
-        this.totals.thermal[mode] += kwh;
+        this.add(date, bucket => (bucket.thermal[mode] += kwh));
     }
 
     /**
@@ -95,8 +105,7 @@ export class Ledger {
      * @param kwh energy in kWh
      */
     public addThermalExternal(date: string, kwh: number): void {
-        this.bucketFor(date).thermalExternal += kwh;
-        this.totals.thermalExternal += kwh;
+        this.add(date, bucket => (bucket.thermalExternal += kwh));
     }
 
     /**
@@ -106,8 +115,7 @@ export class Ledger {
      * @param kwh energy in kWh
      */
     public addThermalIntegrated(date: string, kwh: number): void {
-        this.bucketFor(date).thermalIntegrated += kwh;
-        this.totals.thermalIntegrated += kwh;
+        this.add(date, bucket => (bucket.thermalIntegrated += kwh));
     }
 
     /**
@@ -120,8 +128,7 @@ export class Ledger {
      */
     public addElectrical(date: string, source: ElectricalSource, mode: Mode, kwh: number): void {
         const key = source === 'internal' ? 'elecInternal' : 'elecExternal';
-        this.bucketFor(date)[key][mode] += kwh;
-        this.totals[key][mode] += kwh;
+        this.add(date, bucket => (bucket[key][mode] += kwh));
     }
 
     /**
@@ -131,8 +138,7 @@ export class Ledger {
      * @param amount cost in the configured currency
      */
     public addCost(date: string, amount: number): void {
-        this.bucketFor(date).cost += amount;
-        this.totals.cost += amount;
+        this.add(date, bucket => (bucket.cost += amount));
     }
 
     /**
@@ -142,8 +148,7 @@ export class Ledger {
      * @param kg emissions in kg
      */
     public addCo2(date: string, kg: number): void {
-        this.bucketFor(date).co2 += kg;
-        this.totals.co2 += kg;
+        this.add(date, bucket => (bucket.co2 += kg));
     }
 
     /**
@@ -154,7 +159,7 @@ export class Ledger {
      */
     public sum(period: Period, today: string): Bucket {
         if (period === 'total') {
-            return JSON.parse(JSON.stringify(this.totals)) as Bucket;
+            return structuredClone(this.totals);
         }
         const result = emptyBucket();
         for (const day of this.days) {
@@ -176,8 +181,8 @@ export class Ledger {
     /** The state to persist. */
     public serialize(): LedgerData {
         return {
-            days: JSON.parse(JSON.stringify(this.days)) as DayBucket[],
-            totals: JSON.parse(JSON.stringify(this.totals)) as Bucket,
+            days: structuredClone(this.days),
+            totals: structuredClone(this.totals),
         };
     }
 

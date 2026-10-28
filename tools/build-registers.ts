@@ -23,7 +23,7 @@ import {
     missingLanguages,
 } from '../src/lib/translations';
 
-export type { PollGroup, RegisterEntry, RegisterType };
+export type { RegisterEntry };
 
 /** One axis of a repeated block: `address = base + stride * index`. */
 export interface SourceAxis {

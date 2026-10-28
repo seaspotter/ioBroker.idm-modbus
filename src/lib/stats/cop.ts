@@ -8,6 +8,17 @@ export const COP_MAX_PLAUSIBLE = 15;
 export const COP_MIN_PERIOD_KWH = 0.1;
 
 /**
+ * A ratio as COP with two decimals, or no value above the plausible maximum.
+ *
+ * @param thermal heat
+ * @param electrical electricity
+ */
+function ratio(thermal: number, electrical: number): number | null {
+    const cop = thermal / electrical;
+    return cop > COP_MAX_PLAUSIBLE ? null : Math.round(cop * 100) / 100;
+}
+
+/**
  * Momentary coefficient of performance: thermal power divided by electrical power. No value (never an estimate) unless both
  * are present, positive and plausible.
  *
@@ -21,8 +32,7 @@ export function instantCop(thermalKw: number | null, electricalKw: number | null
     if (thermalKw <= 0 || electricalKw < COP_MIN_ELECTRICAL_KW) {
         return null;
     }
-    const cop = thermalKw / electricalKw;
-    return cop > COP_MAX_PLAUSIBLE ? null : Math.round(cop * 100) / 100;
+    return ratio(thermalKw, electricalKw);
 }
 
 /**
@@ -35,8 +45,7 @@ export function periodCop(heatKwh: number, electricalKwh: number): number | null
     if (electricalKwh < COP_MIN_PERIOD_KWH || heatKwh <= 0) {
         return null;
     }
-    const cop = heatKwh / electricalKwh;
-    return cop > COP_MAX_PLAUSIBLE ? null : Math.round(cop * 100) / 100;
+    return ratio(heatKwh, electricalKwh);
 }
 
 /** Which heat meter is authoritative. */

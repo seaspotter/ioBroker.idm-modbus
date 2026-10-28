@@ -1,6 +1,6 @@
 import type { FloatWordOrder } from './constants';
 import type { RegisterReader } from './poller';
-import type { PlantConfig } from './registers/plant';
+import { HEATING_CIRCUITS, type PlantConfig } from './registers/plant';
 import type { RegisterEntry } from './registers/types';
 import { interpretWords } from './value';
 
@@ -183,9 +183,7 @@ function classify(reg: RegisterEntry, reads: ScanEntry['reads'], order: FloatWor
 export function suggestPlant(scan: ScanResult): PlantConfig {
     const present = new Set(scan.entries.filter(e => e.status === 'present').map(e => e.id));
     const has = (id: string): boolean => present.has(id);
-    const heatingCircuits = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].filter(letter =>
-        has(`hc_${letter.toLowerCase()}_flow_temp`),
-    );
+    const heatingCircuits = HEATING_CIRCUITS.filter(letter => has(`hc_${letter.toLowerCase()}_flow_temp`));
     let zoneModules = 0;
     let roomsPerZone = 0;
     for (let z = 1; z <= 10; z++) {
@@ -229,7 +227,7 @@ export function plantToNative(plant: PlantConfig): Record<string, boolean | numb
         blockPv: plant.blocks.pv,
         blockBooster: plant.blocks.booster,
     };
-    for (const letter of ['A', 'B', 'C', 'D', 'E', 'F', 'G']) {
+    for (const letter of HEATING_CIRCUITS) {
         native[`hc${letter}`] = plant.heatingCircuits.includes(letter);
     }
     return native;

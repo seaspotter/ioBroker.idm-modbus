@@ -136,6 +136,6 @@ export function toStateValue(reg: RegisterEntry, value: number | null): number |
  *
  * @param unit unit of the register
  */
-export function decimalsFor(unit: string | null): number {
+function decimalsFor(unit: string | null): number {
     return unit !== null && ['°C', 'K', 'kWh', 'MWh', 'h'].includes(unit) ? 1 : 3;
 }

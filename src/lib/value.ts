@@ -53,10 +53,10 @@ function checkRange(reg: RegisterEntry, value: number): DecodedValue {
 }
 
 /** FLOAT values closer than this to the last written value do not trigger a state update (spec Modul A, step 6). */
-export const FLOAT_DEADBAND = 0.01;
+const FLOAT_DEADBAND = 0.01;
 
 /** A state is refreshed at least this many cycles after its last write so the timestamp stays current. */
-export const REFRESH_EVERY_CYCLES = 10;
+const REFRESH_EVERY_CYCLES = 10;
 
 /**
  * Decide whether a freshly read value must be written to the state.
