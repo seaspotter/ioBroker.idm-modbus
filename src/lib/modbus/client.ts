@@ -1,6 +1,6 @@
 import TransportController from 'modbus-connect/transport';
 import { MODBUS_MAX_READ_WORDS, MODBUS_MAX_WRITE_WORDS } from '../constants';
-import { fail, ok, type Failure, type ModbusError, type Result } from './result';
+import { fail, notConnected, ok, type Failure, type ModbusError, type Result } from './result';
 
 /** The adapter's managed timers (CLAUDE.md rule 17) - passed in, the client never uses bare globals for its own waits. */
 export interface ClientTimers {
@@ -253,7 +253,7 @@ export class ModbusTcpClient {
             await this.waitPause();
             const client = this.client;
             if (!client) {
-                return fail('offline', 'Not connected');
+                return notConnected();
             }
             try {
                 const result = await task(client);

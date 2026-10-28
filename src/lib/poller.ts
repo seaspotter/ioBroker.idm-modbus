@@ -1,7 +1,7 @@
 import { type FloatWordOrder, KEEPALIVE_AFTER_MS, KEEPALIVE_CHECK_MS } from './constants';
 import { buildReadBlocks, type ReadBlock } from './modbus/batching';
 import { nextReconnectDelayMs } from './modbus/backoff';
-import { fail, type ModbusError, type Result } from './modbus/result';
+import { notConnected, type ModbusError, type Result } from './modbus/result';
 import type { PollGroup, RegisterEntry } from './registers/types';
 import { interpretWords, shouldWrite } from './value';
 
@@ -151,7 +151,7 @@ export class Poller {
     }
 
     private whenConnected<T>(call: (client: RegisterReader) => Promise<Result<T>>): Promise<Result<T>> {
-        return this.client && this.connected ? call(this.client) : Promise.resolve(fail('offline', 'Not connected'));
+        return this.client && this.connected ? call(this.client) : Promise.resolve(notConnected());
     }
 
     /** Request statistics since the last call: number of requests and their average duration. */

@@ -26,7 +26,7 @@ import {
 } from './lib/constants';
 import { readFunctionCode } from './lib/modbus/batching';
 import { ModbusTcpClient } from './lib/modbus/client';
-import { fail } from './lib/modbus/result';
+import { notConnected } from './lib/modbus/result';
 import { BoostRunner } from './lib/boost/runner';
 import { detectFamily } from './lib/detect';
 import { faultText } from './lib/faults';
@@ -85,7 +85,7 @@ function scanMinutes(count: number, pauseMs: number): number {
 const FAULT_REGISTER_IDS = ['internal_message', 'error_number'];
 
 /** Result of a raw Modbus call while the adapter has no poller. */
-const OFFLINE = fail('offline', 'Not connected');
+const OFFLINE = notConnected();
 
 /** The parts of `diag.scan` the admin commands read. */
 interface StoredScan {
