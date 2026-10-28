@@ -69,6 +69,10 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.18 (2026-10-28)
+
+- (SeaSpotter) photovoltaics: fixed an endless restart loop at the first start after updating from version 0.1.15 or older (the old PV table was not emptied, so it moved again and again)
+
 ### 0.1.17 (2026-10-26)
 
 - (SeaSpotter) diagram: the page no longer stays stale after the connection to the web adapter was interrupted: it shows the current values again after a reconnect (before, only values that changed again were updated), compares all values with the server every minute, tries a failed load again, reopens a connection that stops answering and refreshes when a tab in the background becomes visible

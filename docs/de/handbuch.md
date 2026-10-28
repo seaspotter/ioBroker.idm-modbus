@@ -26,6 +26,8 @@ Alles Weitere ist optional und bleibt aus, bis Sie es einschalten.
 
 ### Verbindung
 
+![Reiter Verbindung](../images/de/settings-connection.png)
+
 | Einstellung              | Bedeutung                                                                                                                                                                                                                                                                                                             |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Navigator Host / IP      | Adresse des Navigators. Eine feste Adresse verwenden.                                                                                                                                                                                                                                                                 |
@@ -98,6 +100,8 @@ Jeder Schreibvorgang durchläuft diese Prüfungen: erlaubte Gruppe, gültiger We
 ## 7. Werte an den Navigator senden
 
 Alle drei Module sind **standardmäßig aus**, schreiben nur, wenn etwas konfiguriert ist, und lesen das Geschriebene zurück, um einen zweiten Schreiber zu erkennen (`*.writer_conflict`).
+
+![Reiter Photovoltaik](../images/de/settings-pv.png)
 
 - **Photovoltaik** (Register 74–86): je ein Block für PV-Überschuss (74), Produktion (78), Hausverbrauch (82, einschließlich Wärmepumpe), Batterieentladung (84, positiv = Entladen, negativ = Laden) und Batteriefüllstand (86). Ein Block mit Quell-Datenpunkt wird gesendet; **ein Block ohne Datenpunkt sendet nichts**. Der E-Heizstab (76) wird nicht angeboten, der Navigator liefert ihn selbst. Ein Faktor rechnet auf kW um (1 bei kW, 0,001 bei W, Punkt oder Komma; es gibt bewusst keinen Standardwert), dazu Umkehren und Grenzen (eine Grenze löscht man, indem man das Feld leert). Der Überschuss kommt direkt aus einem Datenpunkt oder wird als Produktion minus Hausverbrauch berechnet. Jeder konfigurierte Wert wird in jedem Zyklus geschrieben (standardmäßig 30 s), geändert oder nicht, weil der Navigator fehlende Daten meldet, wenn keine Werte mehr ankommen. Fehlt eine Quelle oder ist sie zu alt, wird **0** geschrieben (Batteriefüllstand: **-1**, „nicht verfügbar“), damit der Navigator weiter jeden Wert erhält und die Wärmepumpe nicht auf einem alten Überschuss weiterläuft. Beim Start warnt der Adapter vor dem, was nicht eingerichtet ist (kein Überschuss-Block, berechneter Überschuss ohne Produktion oder Hausverbrauch, Batteriefüllstand ohne Batterieleistung). Das PV-Menü des Navigators muss eingerichtet sein. Jedes andere Programm, das diese Register beschreibt, abschalten. Ältere Konfigurationen mit der Tabelle werden beim ersten Start in die Blöcke übernommen.
 - **Raumsensoren** (Register 1650 ff.): Die Temperatur eines Datenpunkts als externe Raumtemperatur eines Heizkreises; geschrieben bei einer Änderung ab 0,2 °C oder im Heartbeat (300 s), nur im Bereich 15–30 °C und nicht aus Quellen, die älter als 15 Minuten sind (oder mit festem Ersatzwert). Im Navigator muss beim Heizkreis die Raumtemperaturerfassung auf „GLT Raumsensor“ stehen.
