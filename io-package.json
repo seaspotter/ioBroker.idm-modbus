@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "idm-modbus",
-        "version": "0.1.17",
+        "version": "0.1.18",
         "news": {
+            "0.1.18": {
+                "en": "photovoltaics: fixed an endless restart loop at the first start after updating from version 0.1.15 or older (the old PV table was not emptied, so it moved again and again)",
+                "de": "Photovoltaik: Endlos-Neustartschleife beim ersten Start nach dem Update von Version 0.1.15 oder älter behoben (die alte PV-Tabelle wurde nicht geleert und deshalb immer wieder verschoben)",
+                "ru": "фотовольтаика: исправлен бесконечный цикл перезапуска при первом запуске после обновления с версии 0.1.15 или старше (старая таблица PV не очищалась, поэтому перемещалась снова и снова)",
+                "pt": "energia fotovoltaica: corrigido um loop de reinicialização interminável na primeira inicialização após a atualização da versão 0.1.15 ou anterior (a tabela fotovoltaica antiga não foi esvaziada, então ela foi movida repetidamente)",
+                "nl": "fotovoltaïsche zonne-energie: een eindeloze herstartlus opgelost bij de eerste start na het updaten vanaf versie 0.1.15 of ouder (de oude PV-tabel werd niet geleegd, dus deze werd steeds opnieuw verplaatst)",
+                "fr": "photovoltaïque : correction d'une boucle de redémarrage sans fin au premier démarrage après mise à jour depuis la version 0.1.15 ou antérieure (l'ancienne table PV n'était pas vidée, donc elle bougeait encore et encore)",
+                "it": "fotovoltaico: risolto un ciclo di riavvio infinito al primo avvio dopo l'aggiornamento dalla versione 0.1.15 o precedente (la vecchia tabella PV non veniva svuotata, quindi si spostava ancora e ancora)",
+                "es": "Fotovoltaica: se corrigió un bucle de reinicio sin fin en el primer inicio después de actualizar desde la versión 0.1.15 o anterior (la tabla fotovoltaica anterior no se vació, por lo que se movió una y otra vez)",
+                "pl": "fotowoltaika: naprawiono niekończącą się pętlę restartu przy pierwszym uruchomieniu po aktualizacji z wersji 0.1.15 lub starszej (stara tabela PV nie została opróżniona, więc przesuwała się raz po raz)",
+                "uk": "фотоелектричні пристрої: виправлено нескінченний цикл перезапуску під час першого запуску після оновлення з версії 0.1.15 або старішої (стара таблиця PV не була порожня, тому вона переміщувалася знову і знову)",
+                "zh-cn": "光伏：修复了从0.1.15或更早版本更新后第一次启动时的无限重启循环（旧的PV表没有清空，所以它一次又一次地移动）"
+            },
             "0.1.17": {
                 "en": "diagram: the page no longer stays stale after the connection to the web adapter was interrupted (it shows the current values again, compares itself with the server every minute, tries a failed load again, reopens a connection that stops answering and refreshes when the tab becomes visible); PV settings: larger block headings, the battery level block lines up with the others",
                 "de": "Diagramm: die Seite bleibt nach einer Unterbrechung der Verbindung zum Web-Adapter nicht mehr veraltet (sie zeigt wieder die aktuellen Werte, vergleicht sich jede Minute mit dem Server, versucht ein fehlgeschlagenes Laden erneut, öffnet eine nicht mehr antwortende Verbindung neu und aktualisiert sich, wenn der Tab wieder sichtbar wird); PV-Einstellungen: größere Blocküberschriften, der Block Batteriefüllstand fluchtet mit den anderen",
@@ -95,8 +108,16 @@
             "uk": "Підключає теплові насоси IDM із керуванням Navigator до ioBroker локально через Modbus TCP: зчитування, керування та подача значень кімнати, PV та автоматизації будівель",
             "zh-cn": "通过 Modbus TCP 将带有 Navigator 控制的 IDM 热泵本地连接到 ioBroker：读取、控制和馈送室、PV 和楼宇自动化值"
         },
-        "authors": ["SeaSpotter <seatowage@gmail.com>"],
-        "keywords": ["idm", "heatpump", "modbus", "navigator", "pv"],
+        "authors": [
+            "SeaSpotter <seatowage@gmail.com>"
+        ],
+        "keywords": [
+            "idm",
+            "heatpump",
+            "modbus",
+            "navigator",
+            "pv"
+        ],
         "licenseInformation": {
             "type": "free",
             "license": "MIT"
@@ -264,8 +285,12 @@
         "dailyWriteWarn": 24,
         "writeZones": false
     },
-    "encryptedNative": ["webPin"],
-    "protectedNative": ["webPin"],
+    "encryptedNative": [
+        "webPin"
+    ],
+    "protectedNative": [
+        "webPin"
+    ],
     "objects": [],
     "instanceObjects": [
         {

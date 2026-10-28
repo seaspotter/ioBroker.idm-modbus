@@ -6,7 +6,6 @@ import {
     readGltSettings,
     readWebSettings,
     readPlantSettings,
-    pvRowsToFields,
     readPvSettings,
     readRoomSettings,
     readStatsSettings,
@@ -38,6 +37,7 @@ import { plantToNative, runScan, type ScanResult, scanToCsv, summarizeScan, sugg
 import { activeRegisters, loadRegisters } from './lib/registers/plant';
 import type { RegisterEntry } from './lib/registers/types';
 import { stateIdFor, toStateValue } from './lib/state-model';
+import { movePvRowsToFields } from './lib/pv/migrate';
 import { PvRunner } from './lib/pv/runner';
 import { RoomRunner } from './lib/rooms/runner';
 import { WebClient } from './lib/web/client';
@@ -597,13 +597,13 @@ class IdmModbus extends utils.Adapter {
         if (!Array.isArray(rows) || !rows.length) {
             return false;
         }
-        const fields = pvRowsToFields(rows);
         try {
-            await this.extendForeignObjectAsync(`system.adapter.${this.namespace}`, {
-                native: { ...fields, pvSources: [] },
-            });
+            const moved = await movePvRowsToFields(this, `system.adapter.${this.namespace}`, rows);
+            if (moved === null) {
+                return false;
+            }
             this.log.info(
-                `The PV sources moved from the table to the fixed fields of the settings page (${Object.keys(fields).filter(key => key.endsWith('StateId')).length} registers); the adapter restarts once`,
+                `The PV sources moved from the table to the fixed fields of the settings page (${moved} registers); the adapter restarts once`,
             );
             return true;
         } catch (error) {

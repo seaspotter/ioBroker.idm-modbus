@@ -26,6 +26,8 @@ Everything else is optional and off until you switch it on.
 
 ### Connection
 
+![Connection tab](../images/en/settings-connection.png)
+
 | Setting                  | Meaning                                                                                                                                                                                                                                                                                                 |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Navigator host / IP      | Address of the Navigator. Use a fixed address.                                                                                                                                                                                                                                                          |
@@ -98,6 +100,8 @@ Every write passes these checks: allowed group, valid value (documented range an
 ## 7. Feeding values to the Navigator
 
 All three modules are **off by default**, write only when something is configured, and read back what they wrote to detect a second writer (`*.writer_conflict`).
+
+![Photovoltaics tab](../images/en/settings-pv.png)
 
 - **Photovoltaics** (registers 74–86): one block each for PV surplus (74), production (78), house consumption (82, including the heat pump), battery discharge (84, positive = discharging, negative = charging) and battery level (86). Give a block a source state to send it; **a block without a state sends nothing**. The electric heating rod (76) is not offered, the Navigator delivers it itself. A factor converts to kW (1 for kW, 0.001 for W, point or comma; there is deliberately no default), plus invert and limits (clear a limit by emptying the field). Surplus is taken directly from a state or calculated as production minus house consumption. Every configured value is written every cycle (30 s by default), changed or not, because the Navigator reports missing data when values stop arriving. If a source is missing or too old, **0** is written (battery level: **-1**, "not available") so that the Navigator keeps receiving every value and the heat pump does not keep running on an old surplus. At the start the adapter warns about what is not set up (no surplus block, calculated surplus without production or house consumption, battery level without battery power). The Navigator's PV menu must be set up. Switch off any other program that writes these registers. Older configurations with the table of rows are moved into the blocks at the first start.
 - **Room sensors** (registers 1650+): the temperature of a state as external room temperature of a heating circuit; written on a change of 0.2 °C or at the heartbeat (300 s), only within 15–30 °C, and not from sources older than 15 minutes (or a fixed fallback value). In the Navigator the room must use the Modbus/GLT sensor as its temperature source.
