@@ -69,6 +69,10 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+- (SeaSpotter) Navigator 10: the changeover valve of the heating circuit (M61, register 1110) shows Heating / Cooling instead of 0 / 1
+
 ### 0.1.18 (2026-10-28)
 
 - (SeaSpotter) photovoltaics: fixed an endless restart loop at the first start after updating from version 0.1.15 or older (the old PV table was not emptied, so it moved again and again)
