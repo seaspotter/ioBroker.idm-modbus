@@ -2761,7 +2761,34 @@
             "ownRange": false,
             "cyclicSec": null,
             "sentinel": [],
-            "enum": null,
+            "enum": {
+                "0": {
+                    "en": "Heating",
+                    "de": "Heizen",
+                    "ru": "Отопление",
+                    "pt": "Aquecimento",
+                    "nl": "Verwarmen",
+                    "fr": "Chauffage",
+                    "it": "Riscaldamento",
+                    "es": "Calefacción",
+                    "pl": "Ogrzewanie",
+                    "uk": "Опалення",
+                    "zh-cn": "供暖"
+                },
+                "1": {
+                    "en": "Cooling",
+                    "de": "Kühlen",
+                    "ru": "Охлаждение",
+                    "pt": "Arrefecimento",
+                    "nl": "Koelen",
+                    "fr": "Refroidissement",
+                    "it": "Raffrescamento",
+                    "es": "Refrigeración",
+                    "pl": "Chłodzenie",
+                    "uk": "Охолодження",
+                    "zh-cn": "制冷"
+                }
+            },
             "requires": [],
             "overlaps": [],
             "verified": "doc",

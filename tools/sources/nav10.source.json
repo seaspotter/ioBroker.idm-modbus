@@ -9,6 +9,19 @@
     "removeIds": ["zm{z}_room9_relay", "thermal_power_flow_sensor", "total_heat_energy"],
     "overrides": [
         {
+            "id": "valve_hc_heat_cool",
+            "enum": {
+                "0": {
+                    "de": "Heizen",
+                    "en": "Heating"
+                },
+                "1": {
+                    "de": "Kühlen",
+                    "en": "Cooling"
+                }
+            }
+        },
+        {
             "id": "variable_input",
             "max": 3,
             "default": 0,
