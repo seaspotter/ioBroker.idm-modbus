@@ -1336,9 +1336,9 @@
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
-                    "md": 5,
-                    "lg": 5,
-                    "xl": 5
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
                 },
                 "pvSurplusFactor": {
                     "type": "text",
@@ -1354,9 +1354,9 @@
                     "label": "colInvert",
                     "xs": 12,
                     "sm": 6,
-                    "md": 1,
-                    "lg": 1,
-                    "xl": 1
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
                 },
                 "pvSurplusMin": {
                     "type": "text",
@@ -1394,9 +1394,9 @@
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
-                    "md": 5,
-                    "lg": 5,
-                    "xl": 5
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
                 },
                 "pvProductionFactor": {
                     "type": "text",
@@ -1412,9 +1412,9 @@
                     "label": "colInvert",
                     "xs": 12,
                     "sm": 6,
-                    "md": 1,
-                    "lg": 1,
-                    "xl": 1
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
                 },
                 "pvProductionMin": {
                     "type": "text",
@@ -1452,9 +1452,9 @@
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
-                    "md": 5,
-                    "lg": 5,
-                    "xl": 5
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
                 },
                 "pvHouseFactor": {
                     "type": "text",
@@ -1470,9 +1470,9 @@
                     "label": "colInvert",
                     "xs": 12,
                     "sm": 6,
-                    "md": 1,
-                    "lg": 1,
-                    "xl": 1
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
                 },
                 "pvHouseMin": {
                     "type": "text",
@@ -1510,9 +1510,9 @@
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
-                    "md": 5,
-                    "lg": 5,
-                    "xl": 5
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
                 },
                 "pvBatteryFactor": {
                     "type": "text",
@@ -1528,9 +1528,9 @@
                     "label": "colInvert",
                     "xs": 12,
                     "sm": 6,
-                    "md": 1,
-                    "lg": 1,
-                    "xl": 1
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
                 },
                 "pvBatteryMin": {
                     "type": "text",
@@ -1568,9 +1568,9 @@
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
-                    "md": 5,
-                    "lg": 5,
-                    "xl": 5
+                    "md": 4,
+                    "lg": 4,
+                    "xl": 4
                 },
                 "pvSocFactor": {
                     "type": "text",

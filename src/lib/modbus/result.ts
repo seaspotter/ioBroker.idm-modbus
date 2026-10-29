@@ -49,3 +49,8 @@ export function ok<T>(value: T): Result<T> {
 export function fail(kind: ModbusErrorKind, message: string, exceptionCode?: number): Failure {
     return { ok: false, error: exceptionCode === undefined ? { kind, message } : { kind, message, exceptionCode } };
 }
+
+/** The failure for a call while no connection is open. */
+export function notConnected(): Failure {
+    return fail('offline', 'Not connected');
+}

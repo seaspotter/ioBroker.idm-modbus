@@ -1,3 +1,4 @@
+import { FailureLog, type IntervalTimers, type Logger, Ticker } from '../runner-kit';
 import { IoPublisher, type IoHost } from './io-publisher';
 import { parseInfoTable, type IoGroup, type IoItem } from './io';
 import type { Nav10Client } from './nav10-client';
@@ -17,9 +18,9 @@ const REQUEST_PAUSE_MS = 50;
 /** What the runner needs from the adapter; a fake in the tests. */
 export interface Nav10Host extends IoHost {
     /** log lines, never containing the host or the PIN */
-    log: { debug(message: string): void; info(message: string): void; warn(message: string): void };
+    log: Logger;
     /** managed timers */
-    timers: { setInterval: (cb: () => void, ms: number) => unknown; clearInterval: (handle: unknown) => void };
+    timers: IntervalTimers;
     /** wait (managed timer), to pace the requests */
     sleep(ms: number): Promise<void>;
 }
@@ -29,9 +30,9 @@ export interface Nav10Host extends IoHost {
  * Read-only. The other web data of the Navigator 2.0 (rooms, circuit names, statistics) has no counterpart here yet.
  */
 export class Nav10Runner {
-    private timer: unknown;
+    private readonly ticker: Ticker;
+    private readonly failures: FailureLog;
     private busy = false;
-    private failing = false;
     private readonly io: IoPublisher;
 
     /**
@@ -45,6 +46,8 @@ export class Nav10Runner {
         private readonly intervalMs: number,
     ) {
         this.io = new IoPublisher(host);
+        this.ticker = new Ticker(host.timers);
+        this.failures = new FailureLog(host.log);
     }
 
     /** Create the base objects, read once and start the cycle. */
@@ -54,16 +57,13 @@ export class Nav10Runner {
             stateObject('web.connected', 'Web interface reachable', 'boolean', 'indicator.reachable'),
         ]);
         await this.tick();
-        this.timer = this.host.timers.setInterval(() => void this.tick(), this.intervalMs);
+        this.ticker.start(() => void this.tick(), this.intervalMs);
         this.host.log.info(`Navigator 10 web interface module started, every ${this.intervalMs / 1000} s`);
     }
 
     /** Stop the cycle and close the connection. */
     public stop(): void {
-        if (this.timer !== undefined) {
-            this.host.timers.clearInterval(this.timer);
-            this.timer = undefined;
-        }
+        this.ticker.stop();
         this.client.close();
     }
 
@@ -94,7 +94,7 @@ export class Nav10Runner {
             }
             this.host.publish('web.connected', reached);
             if (reached) {
-                this.failing = false;
+                this.failures.clear();
                 if (complete) {
                     await this.io.update(tables); // a partial read would remove the states of the tables it missed
                 }
@@ -110,11 +110,6 @@ export class Nav10Runner {
 
     private report(message: string): void {
         this.host.publish('web.connected', false);
-        if (!this.failing) {
-            this.failing = true;
-            this.host.log.warn(`Navigator 10 web interface: ${message}`);
-        } else {
-            this.host.log.debug(`Navigator 10 web interface: ${message}`);
-        }
+        this.failures.report(`Navigator 10 web interface: ${message}`);
     }
 }

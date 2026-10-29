@@ -3,6 +3,7 @@ import { KEEPALIVE_AFTER_MS, STATS_MIN_GAP_MS, STATS_PERSIST_INTERVAL_MS } from 
 import type { PlannedObject } from '../object-tree';
 import type { PollGroup } from '../registers/types';
 import { type EngineConfig, StatsEngine, type TickInputs } from './engine';
+import { type IntervalTimers, type Logger, type ForeignState, Ticker } from '../runner-kit';
 import { planStatsObjects } from './plan';
 import type { ThermalMode } from './types';
 
@@ -21,9 +22,9 @@ export interface StatsHost {
     /** clock in ms */
     now(): number;
     /** log lines, never containing host names */
-    log: { debug(message: string): void; info(message: string): void; warn(message: string): void };
+    log: Logger;
     /** managed timers */
-    timers: { setInterval: (callback: () => void, ms: number) => unknown; clearInterval: (handle: unknown) => void };
+    timers: IntervalTimers;
     /** latest reading of a register of the Navigator */
     sample(registerId: string): Sample | undefined;
     /** create channels and states */
@@ -39,7 +40,7 @@ export interface StatsHost {
     /** subscribe to a foreign state */
     subscribe(id: string): void;
     /** current value of a foreign state */
-    foreignState(id: string): Promise<{ val: unknown; ts: number } | null>;
+    foreignState(id: string): Promise<ForeignState | null>;
 }
 
 /** Plant and timing the runner needs. */
@@ -75,8 +76,8 @@ type ExternalKind = 'electricalCounter' | 'electricalPower' | 'heatCounter' | 'h
 /** Connects the statistics engine to the adapter: samples in, states out, persistence, external states. */
 export class StatsRunner {
     private engine: StatsEngine;
-    private timer: unknown = null;
-    private persistTimer: unknown = null;
+    private readonly ticker: Ticker;
+    private readonly persistTicker: Ticker;
     private readonly factors = new Map<ExternalKind, number>();
     private readonly ids = new Map<string, ExternalKind>();
     private readonly published = new Map<string, number | null>();
@@ -92,6 +93,8 @@ export class StatsRunner {
         private readonly options: RunnerOptions,
     ) {
         this.engine = this.createEngine();
+        this.ticker = new Ticker(host.timers);
+        this.persistTicker = new Ticker(host.timers);
     }
 
     private createEngine(): StatsEngine {
@@ -132,20 +135,14 @@ export class StatsRunner {
             planStatsObjects(Object.keys(this.engine.outputs(this.host.now())), this.options.settings.currency),
         );
         await this.connectExternalSources();
-        this.timer = this.host.timers.setInterval(() => this.tick(), this.options.tickMs);
-        this.persistTimer = this.host.timers.setInterval(() => this.persist(), STATS_PERSIST_INTERVAL_MS);
+        this.ticker.start(() => this.tick(), this.options.tickMs);
+        this.persistTicker.start(() => this.persist(), STATS_PERSIST_INTERVAL_MS);
     }
 
     /** Stop calculating and save the statistics. */
     public stop(): void {
-        if (this.timer !== null) {
-            this.host.timers.clearInterval(this.timer);
-            this.timer = null;
-        }
-        if (this.persistTimer !== null) {
-            this.host.timers.clearInterval(this.persistTimer);
-            this.persistTimer = null;
-        }
+        this.ticker.stop();
+        this.persistTicker.stop();
         this.persist();
     }
 
@@ -210,7 +207,7 @@ export class StatsRunner {
      * @param id state id
      * @param state its new state
      */
-    public onForeignState(id: string, state: { val: unknown; ts: number } | null | undefined): void {
+    public onForeignState(id: string, state: ForeignState | null | undefined): void {
         const kind = this.ids.get(id);
         if (kind && state) {
             this.apply(kind, state.val, state.ts);

@@ -64,6 +64,21 @@ export function readDecimal(value: unknown): number | null {
     return Number.isFinite(parsed) ? parsed : null;
 }
 
+/**
+ * A text field trimmed, empty for anything that is not text.
+ *
+ * @param value the configured value
+ */
+const trimmed = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
+/**
+ * {@link readDecimal} with a default for an empty or unreadable value.
+ *
+ * @param value a number or the text of a field
+ * @param fallback value for an empty field
+ */
+const decimalOr = (value: unknown, fallback: number): number => readDecimal(value) ?? fallback;
+
 /** The part of the adapter configuration that describes the installation and the polling. */
 export interface PlantSettings {
     /** selected Navigator generation */
@@ -148,9 +163,9 @@ export function readPlantSettings(config: Partial<ioBroker.AdapterConfig>): Plan
     const heatingCircuits = HEATING_CIRCUITS.filter(letter => flags[`hc${letter}`] === true) as string[];
     const heatingCircuitNames: Record<string, string> = {};
     for (const letter of HEATING_CIRCUITS) {
-        const name = flags[`hcName${letter}`];
-        if (typeof name === 'string' && name.trim()) {
-            heatingCircuitNames[letter] = name.trim();
+        const name = trimmed(flags[`hcName${letter}`]);
+        if (name) {
+            heatingCircuitNames[letter] = name;
         }
     }
 
@@ -433,7 +448,7 @@ export const PV_REGISTERS = [
  * The fields of the settings page by register: one block per register (the electric heating rod, register 76, is not offered: the
  * Navigator delivers it itself). A block without a source state sends nothing.
  */
-export const PV_FIELDS = {
+const PV_FIELDS = {
     pv_surplus: 'pvSurplus',
     pv_production: 'pvProduction',
     house_consumption: 'pvHouse',
@@ -540,7 +555,7 @@ export function readPvSettings(config: Partial<ioBroker.AdapterConfig>): PvSetti
     const rows = fieldRows.length ? fieldRows : Array.isArray(config.pvSources) ? config.pvSources : [];
     for (const row of rows) {
         const register = PV_REGISTERS.find(id => id === row?.register);
-        const stateId = typeof row?.stateId === 'string' ? row.stateId.trim() : '';
+        const stateId = trimmed(row?.stateId);
         if (!register || !stateId) {
             warnings.push(`PV row ignored: register or state missing (${String(row?.register)})`);
             continue;
@@ -649,10 +664,9 @@ export function readRoomSettings(config: Partial<ioBroker.AdapterConfig>): RoomS
     const warnings: string[] = [];
     const sources: RoomSource[] = [];
     const seen = new Set<string>();
-    const num = (value: unknown, fallback: number): number => readDecimal(value) ?? fallback;
     for (const row of Array.isArray(config.roomSources) ? config.roomSources : []) {
         const circuit = HEATING_CIRCUITS.find(letter => letter === row?.circuit);
-        const stateId = typeof row?.stateId === 'string' ? row.stateId.trim() : '';
+        const stateId = trimmed(row?.stateId);
         if (!circuit || !stateId) {
             warnings.push(`Room row ignored: heating circuit or state missing (${String(row?.circuit)})`);
             continue;
@@ -661,9 +675,9 @@ export function readRoomSettings(config: Partial<ioBroker.AdapterConfig>): RoomS
             warnings.push(`Room row for heating circuit ${circuit} ignored: configured twice`);
             continue;
         }
-        const factor = num(row.factor, 1);
-        const min = num(row.min, DEFAULT_ROOM_MIN_C);
-        const max = num(row.max, DEFAULT_ROOM_MAX_C);
+        const factor = decimalOr(row.factor, 1);
+        const min = decimalOr(row.min, DEFAULT_ROOM_MIN_C);
+        const max = decimalOr(row.max, DEFAULT_ROOM_MAX_C);
         if (!factor || min >= max) {
             warnings.push(`Room row for heating circuit ${circuit} ignored: factor is 0 or the range is empty`);
             continue;
@@ -674,12 +688,12 @@ export function readRoomSettings(config: Partial<ioBroker.AdapterConfig>): RoomS
             registerId: `hc_${circuit.toLowerCase()}_ext_room_temp`,
             stateId,
             factor,
-            offset: num(row.offset, 0),
-            heartbeatMs: Math.max(30, num(row.heartbeatS, DEFAULT_ROOM_HEARTBEAT_S)) * 1000,
-            toleranceC: Math.max(0.1, num(row.toleranceC, DEFAULT_ROOM_TOLERANCE_C)),
+            offset: decimalOr(row.offset, 0),
+            heartbeatMs: Math.max(30, decimalOr(row.heartbeatS, DEFAULT_ROOM_HEARTBEAT_S)) * 1000,
+            toleranceC: Math.max(0.1, decimalOr(row.toleranceC, DEFAULT_ROOM_TOLERANCE_C)),
             min,
             max,
-            maxAgeMs: Math.max(60, num(row.maxAgeS, DEFAULT_ROOM_MAX_AGE_S)) * 1000,
+            maxAgeMs: Math.max(60, decimalOr(row.maxAgeS, DEFAULT_ROOM_MAX_AGE_S)) * 1000,
             onStale: row.onStale === 'fixed' && readDecimal(row.fixedValue) !== null ? 'fixed' : 'stop',
             fixedValue: readDecimal(row.fixedValue),
         });
@@ -691,7 +705,7 @@ export function readRoomSettings(config: Partial<ioBroker.AdapterConfig>): RoomS
 }
 
 /** GLT values of the Navigator that are written cyclically (spec Modul E) with the defaults of the spec. */
-export const GLT_FUNCTIONS = {
+const GLT_FUNCTIONS = {
     outdoor_temp: { register: 'ext_outdoor_temp', heartbeatS: 60, min: -50, max: 60, tolerance: 0.2 },
     humidity: { register: 'ext_humidity', heartbeatS: 60, min: 0, max: 100, tolerance: 1 },
     temp_demand_heating: { register: 'glt_temp_demand_heating', heartbeatS: 600, min: 10, max: 90, tolerance: 0.5 },
@@ -725,11 +739,10 @@ export function readGltSettings(config: Partial<ioBroker.AdapterConfig>): GltSet
     const warnings: string[] = [];
     const sources: RoomSource[] = [];
     const seen = new Set<string>();
-    const num = (value: unknown, fallback: number): number => readDecimal(value) ?? fallback;
     for (const row of Array.isArray(config.gltSources) ? config.gltSources : []) {
         const name = String(row?.function) as keyof typeof GLT_FUNCTIONS;
         const def = GLT_FUNCTIONS[name];
-        const stateId = typeof row?.stateId === 'string' ? row.stateId.trim() : '';
+        const stateId = trimmed(row?.stateId);
         if (!def || !stateId) {
             warnings.push(`GLT row ignored: function or state missing (${String(row?.function)})`);
             continue;
@@ -738,9 +751,9 @@ export function readGltSettings(config: Partial<ioBroker.AdapterConfig>): GltSet
             warnings.push(`GLT row for ${name} ignored: configured twice`);
             continue;
         }
-        const factor = num(row.factor, 1);
-        const min = num(row.min, def.min);
-        const max = num(row.max, def.max);
+        const factor = decimalOr(row.factor, 1);
+        const min = decimalOr(row.min, def.min);
+        const max = decimalOr(row.max, def.max);
         if (!factor || min >= max) {
             warnings.push(`GLT row for ${name} ignored: factor is 0 or the range is empty`);
             continue;
@@ -751,12 +764,12 @@ export function readGltSettings(config: Partial<ioBroker.AdapterConfig>): GltSet
             registerId: def.register,
             stateId,
             factor,
-            offset: num(row.offset, 0),
-            heartbeatMs: Math.max(30, num(row.heartbeatS, def.heartbeatS)) * 1000,
+            offset: decimalOr(row.offset, 0),
+            heartbeatMs: Math.max(30, decimalOr(row.heartbeatS, def.heartbeatS)) * 1000,
             toleranceC: def.tolerance,
             min,
             max,
-            maxAgeMs: Math.max(60, num(row.maxAgeS, DEFAULT_ROOM_MAX_AGE_S)) * 1000,
+            maxAgeMs: Math.max(60, decimalOr(row.maxAgeS, DEFAULT_ROOM_MAX_AGE_S)) * 1000,
             onStale: 'stop',
             fixedValue: null,
         });
@@ -791,7 +804,7 @@ export interface WebSettings {
  */
 export function readWebSettings(config: Partial<ioBroker.AdapterConfig>, family: NavigatorFamily): WebSettings {
     const warnings: string[] = [];
-    const pin = typeof config.webPin === 'string' ? config.webPin.trim() : '';
+    const pin = trimmed(config.webPin);
     const enabled = config.webEnabled === true;
     const statisticsSeconds =
         config.webStatisticsIntervalS === 0 ? 0 : (config.webStatisticsIntervalS ?? DEFAULT_WEB_STATISTICS_INTERVAL_S);

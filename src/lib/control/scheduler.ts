@@ -1,5 +1,6 @@
 import type { Result } from '../modbus/result';
 import type { RegisterEntry } from '../registers/types';
+import type { Logger } from '../runner-kit';
 import { checkWrite, type WriteContext, type WriteRefusal } from './rules';
 
 /** What the scheduler needs from the connection to the Navigator. */
@@ -48,7 +49,7 @@ export interface SchedulerOptions {
     /** clock in ms */
     now(): number;
     /** log lines */
-    log: { debug(message: string): void; info(message: string): void; warn(message: string): void };
+    log: Logger;
     /** values of related registers and the FLOAT word order */
     context: WriteContext;
     /** local date key `YYYY-MM-DD` */
@@ -80,6 +81,9 @@ export const LOCK_AFTER_FAILURES = 3;
 /** How long a locked register stays locked. */
 export const LOCK_MS = 10 * 60 * 1000;
 
+const sameWords = (a: readonly number[], b: readonly number[]): boolean =>
+    a.length === b.length && a.every((word, i) => word === b[i]);
+
 interface Pending {
     value: number;
     words: number[];
@@ -108,8 +112,8 @@ export class WriteScheduler {
     /** @param options services and settings */
     public constructor(private readonly options: SchedulerOptions) {}
 
-    private state(reg: RegisterEntry): RegisterState {
-        let state = this.registers.get(reg.id);
+    private state(id: string): RegisterState {
+        let state = this.registers.get(id);
         if (!state) {
             state = {
                 pending: null,
@@ -120,7 +124,7 @@ export class WriteScheduler {
                 counters: { total: 0, day: 0, date: '' },
                 warnedDate: '',
             };
-            this.registers.set(reg.id, state);
+            this.registers.set(id, state);
         }
         return state;
     }
@@ -137,7 +141,7 @@ export class WriteScheduler {
         if (!check.ok) {
             return Promise.resolve({ kind: 'refused', reason: check.reason, message: check.message });
         }
-        const state = this.state(reg);
+        const state = this.state(reg.id);
         const now = this.options.now();
         if (state.lockedUntil > now) {
             const minutes = Math.ceil((state.lockedUntil - now) / 60000);
@@ -172,7 +176,7 @@ export class WriteScheduler {
     }
 
     private async attempt(reg: RegisterEntry): Promise<void> {
-        const state = this.state(reg);
+        const state = this.state(reg.id);
         state.timer = null;
         const pending = state.pending;
         if (!pending) {
@@ -205,11 +209,7 @@ export class WriteScheduler {
             const readable = reg.access !== 'W';
             if (isLimited(reg) && readable) {
                 const current = await executor.read(reg);
-                if (
-                    current.ok &&
-                    current.value.length === pending.words.length &&
-                    current.value.every((w, i) => w === pending.words[i])
-                ) {
+                if (current.ok && sameWords(current.value, pending.words)) {
                     return { kind: 'unchanged', value: pending.value };
                 }
             }
@@ -235,7 +235,7 @@ export class WriteScheduler {
             if (!back.ok) {
                 return this.failure(reg, state, `the value could not be read back (${back.error.kind})`);
             }
-            if (back.value.length !== pending.words.length || back.value.some((w, i) => w !== pending.words[i])) {
+            if (!sameWords(back.value, pending.words)) {
                 return this.failure(
                     reg,
                     state,
@@ -304,20 +304,7 @@ export class WriteScheduler {
             if (typeof saved?.total !== 'number' || !Number.isFinite(saved.total)) {
                 continue;
             }
-            let state = this.registers.get(id);
-            if (!state) {
-                state = {
-                    pending: null,
-                    timer: null,
-                    lastWriteAt: 0,
-                    failures: 0,
-                    lockedUntil: 0,
-                    counters: { total: 0, day: 0, date: '' },
-                    warnedDate: '',
-                };
-                this.registers.set(id, state);
-            }
-            state.counters = {
+            this.state(id).counters = {
                 total: saved.total,
                 day: typeof saved.day === 'number' ? saved.day : 0,
                 date: typeof saved.date === 'string' ? saved.date : '',

@@ -6,7 +6,6 @@ import { CompressorTracker, type CompressorData } from './runtime';
 import {
     type Bucket,
     type ElectricalSource,
-    MODES,
     type Mode,
     THERMAL_MODES,
     type ThermalMode,
@@ -16,8 +15,6 @@ import {
 
 /** Periods with their own states. */
 export const PERIODS = ['day', 'month', 'year', 'total'] as const;
-/** Groups of electrical energy: everything, or only the heating / hot water modes. */
-export const ELECTRICAL_GROUPS = ['all', 'heating', 'dhw'] as const;
 
 /** What the statistics module is set up to do. */
 export interface EngineConfig {
@@ -97,6 +94,19 @@ const round = (value: number, decimals: number): number => {
     return Math.round(value * factor) / factor;
 };
 
+/**
+ * A usable measurement: finite and not negative, else `null`.
+ *
+ * @param value the reading
+ */
+const nonNegative = (value: number | null): number | null =>
+    value !== null && Number.isFinite(value) && value >= 0 ? value : null;
+
+const stamp = (at: number, value: number | null): Stamped | null => {
+    const usable = nonNegative(value);
+    return usable === null ? null : { at, value: usable };
+};
+
 /** Derived values and statistics of the heat pump (spec Modul G). Pure logic; the adapter feeds it and publishes its outputs. */
 export class StatsEngine {
     private readonly ledger = new Ledger();
@@ -159,7 +169,7 @@ export class StatsEngine {
      * @param price price, or `null` when unknown
      */
     public setPrice(price: number | null): void {
-        this.price = price !== null && Number.isFinite(price) && price >= 0 ? price : null;
+        this.price = nonNegative(price);
     }
 
     /**
@@ -169,8 +179,7 @@ export class StatsEngine {
      * @param gramsPerKwh intensity, or `null` when unknown
      */
     public setCo2Intensity(gramsPerKwh: number | null): void {
-        this.co2Intensity =
-            gramsPerKwh !== null && Number.isFinite(gramsPerKwh) && gramsPerKwh >= 0 ? gramsPerKwh : null;
+        this.co2Intensity = nonNegative(gramsPerKwh);
     }
 
     /**
@@ -229,7 +238,7 @@ export class StatsEngine {
      * @param kw power in kW, or `null` when invalid
      */
     public onExternalElectricalPower(at: number, kw: number | null): void {
-        this.externalElectricalPower = kw !== null && Number.isFinite(kw) && kw >= 0 ? { at, value: kw } : null;
+        this.externalElectricalPower = stamp(at, kw);
         if (!this.config.externalElectricalCounter) {
             const kwh = this.externalPowerIntegrator.add(at, kw);
             if (kwh !== null) {
@@ -259,7 +268,7 @@ export class StatsEngine {
      * @param kw power in kW, or `null` when invalid
      */
     public onExternalHeatPower(at: number, kw: number | null): void {
-        this.externalHeatPower = kw !== null && Number.isFinite(kw) && kw >= 0 ? { at, value: kw } : null;
+        this.externalHeatPower = stamp(at, kw);
     }
 
     private addExternalElectrical(at: number, kwh: number): void {
@@ -403,6 +412,3 @@ export class StatsEngine {
         this.defrostTracker.restore(data.defrost);
     }
 }
-
-/** All operating modes, exported for the state plan. */
-export { MODES };

@@ -22,6 +22,18 @@
     // the solar loop counts as running when the charge pipe is at least this much (K) warmer than the return
     var SOLAR_MIN_DIFF = 2;
 
+    // the colours of a vessel from top to bottom: warm to cold, and the all-cold one of the cold storage
+    var TANK_STOPS = [
+        ['0%', '#f28a3a'],
+        ['50%', '#f3b266'],
+        ['78%', '#9cc3e8'],
+        ['100%', '#3f8fdc'],
+    ];
+    var COLD_TANK_STOPS = [
+        ['0%', '#8cc0f0'],
+        ['100%', '#3f8fdc'],
+    ];
+
     /* IDM measuring points shown next to their values, as in the plant diagram of the Navigator */
     var TAG = {
         outdoor: 'B32',
@@ -72,7 +84,6 @@
             gapBelow: 80,
             hungGap: 70,
             stackGap: 80,
-            rodGap: 40,
             dhwH: 190,
             feedX: 22,
             returnX: 36,
@@ -136,6 +147,13 @@
     }
     function num(v) {
         return typeof v === 'number' && isFinite(v) ? v : null;
+    }
+    function unique(list) {
+        return Array.from(new Set(list));
+    }
+    /* green while on, grey while off: the colour of a part that shows a state (set on an element's style) */
+    function lit(on) {
+        return on ? 'var(--good)' : 'var(--muted)';
     }
     /* running: a switch that is on, or a speed above zero (a pump at -1 % is not driven) */
     function isRunning(v) {
@@ -234,19 +252,18 @@
     }
     /* the pipes whose colour changes with cooling: the heat pump flow and return and the flow of the circuits (while the heat pump
        cools, cold water runs in all of them) */
+    function circuitFlows(m) {
+        return m.circuits.map(function (c) {
+            return c.flow;
+        });
+    }
     function coolRoles(m) {
         var roles = {};
-        [m.ids.hpFlow, m.ids.hpReturn]
-            .concat(
-                m.circuits.map(function (c) {
-                    return c.flow;
-                }),
-            )
-            .forEach(function (id) {
-                if (id) {
-                    roles[id] = true;
-                }
-            });
+        [m.ids.hpFlow, m.ids.hpReturn].concat(circuitFlows(m)).forEach(function (id) {
+            if (id) {
+                roles[id] = true;
+            }
+        });
         return roles;
     }
     /* Which way the water goes depends on the operating mode: heating charges the heating buffer and the circuits take their heat from
@@ -348,26 +365,34 @@
             c.setAttribute('fill', running ? 'var(--good)' : IDLE_COLOR);
         });
     }
-    /* a pump from the web interface or Modbus: a small pump symbol (green = running, grey = off) with the IDM tag; analog pumps
-       show their speed */
-    function badge(parent, x, y, tag, id, showPercent) {
-        var r = 7;
-        var cy = y - 4;
-        var body = el('circle', { cx: x + r, cy: cy, r: r, class: 'pumpbody smallpump' }, parent);
+    /* the pump symbol (a circle with a triangle, the radius `r` of the circle is 26 units of the triangle's design); `show(on)` lights it */
+    function pumpGlyph(parent, cx, cy, r, bodyClass) {
         var k = r / 26;
+        var body = el('circle', { cx: cx, cy: cy, r: r, class: bodyClass }, parent);
         var arrow = el(
             'path',
             {
-                d: `M${x + r - 10 * k} ${cy - 15 * k} L${x + r + 15 * k} ${cy} L${x + r - 10 * k} ${cy + 15 * k} Z`,
+                d: `M${cx - 10 * k} ${cy - 15 * k} L${cx + 15 * k} ${cy} L${cx - 10 * k} ${cy + 15 * k} Z`,
                 class: 'pumparrow',
             },
             parent,
         );
+        return {
+            show: function (on) {
+                arrow.style.fill = lit(on);
+                body.style.stroke = lit(on);
+            },
+        };
+    }
+    /* a pump from the web interface or Modbus: a small pump symbol (green = running, grey = off) with the IDM tag; analog pumps
+       show their speed */
+    function badge(parent, x, y, tag, id, showPercent) {
+        var r = 7;
+        var glyph = pumpGlyph(parent, x + r, y - 4, r, 'pumpbody smallpump');
         var label = text(parent, x + 2 * r + 6, y, `${tag} ${view.m.labels.off}`, 'small');
         bind(id, function (v) {
             var on = isRunning(v);
-            arrow.style.fill = on ? 'var(--good)' : 'var(--muted)';
-            body.style.stroke = on ? 'var(--good)' : 'var(--muted)';
+            glyph.show(on);
             label.textContent = `${tag} ${on ? (showPercent ? `${Math.round(v)} %` : view.m.labels.on) : view.m.labels.off}`;
         });
     }
@@ -388,7 +413,7 @@
         var label = text(parent, x + 2 * s + 8, y, tag, 'small');
         bind(id, function (v) {
             var info = describe(v);
-            valve.style.fill = info.active ? 'var(--good)' : 'var(--muted)';
+            valve.style.fill = lit(info.active);
             label.textContent = `${tag} ${info.text}`;
         });
     }
@@ -531,7 +556,6 @@
         );
         var t = text(g, cx, cy + 5, tag, 'chiptext', 'middle');
         var activity = activityOf(activeIds);
-        // grey while the pipe it sits on rests
         var refresh = function () {
             var on = inUse(uses) && (!activity.ids.length || activity.fn());
             r.setAttribute('fill', on ? colorOf(id, state[id]) : IDLE_COLOR);
@@ -556,7 +580,6 @@
         iconBox(parent, cx, cy, size);
         var g = el('g', { transform: `translate(${cx} ${cy})` }, parent);
         var blades = el('g', { class: 'fan' }, g);
-        // five blades, the shape of the adapter logo
         for (var i = 0; i < FAN_BLADES; i++) {
             el(
                 'path',
@@ -591,18 +614,9 @@
             { d: `M${cx - 40 * k} ${cy} H${cx - 26 * k} M${cx + 26 * k} ${cy} H${cx + 40 * k}`, class: 'pumpstub' },
             parent,
         );
-        var body = el('circle', { cx: cx, cy: cy, r: 26 * k, class: 'pumpbody' }, parent);
-        var arrow = el(
-            'path',
-            {
-                d: `M${cx - 10 * k} ${cy - 15 * k} L${cx + 15 * k} ${cy} L${cx - 10 * k} ${cy + 15 * k} Z`,
-                class: 'pumparrow',
-            },
-            parent,
-        );
+        var glyph = pumpGlyph(parent, cx, cy, 26 * k, 'pumpbody');
         whenRunning(pumpIds, function (running) {
-            arrow.style.fill = running ? 'var(--good)' : 'var(--muted)';
-            body.style.stroke = running ? 'var(--good)' : 'var(--muted)';
+            glyph.show(running);
             stubs.classList.toggle('flowing', running);
         });
     }
@@ -610,18 +624,7 @@
     function tank(parent, x, y, w, h, levels, title, reserveBottom, titleBelow, cold) {
         var gradientId = `tank-gradient-${tankCount++}`;
         var grad = el('linearGradient', { id: gradientId, x1: 0, y1: 0, x2: 0, y2: 1 }, el('defs', {}, parent));
-        (cold
-            ? [
-                  ['0%', '#8cc0f0'],
-                  ['100%', '#3f8fdc'],
-              ]
-            : [
-                  ['0%', '#f28a3a'],
-                  ['50%', '#f3b266'],
-                  ['78%', '#9cc3e8'],
-                  ['100%', '#3f8fdc'],
-              ]
-        ).forEach(function (stop) {
+        (cold ? COLD_TANK_STOPS : TANK_STOPS).forEach(function (stop) {
             el('stop', { offset: stop[0], 'stop-color': stop[1] }, grad);
         });
         el(
@@ -676,12 +679,7 @@
         var charge = sensorByTag(m, TAG.solarCharge);
         var back = sensorByTag(m, TAG.solarReturn);
         assign([ids.hgl, ids.hpFlow, ids.dhwTop, ids.solarCollector, ids.dhwTap, charge && charge.id], FLOW_COLOR);
-        assign(
-            m.circuits.map(function (c) {
-                return c.flow;
-            }),
-            FLOW_COLOR,
-        );
+        assign(circuitFlows(m), FLOW_COLOR);
         assign([ids.hpReturn, ids.dhwBottom || ids.buffer, back && back.id], RETURN_COLOR);
         return roles;
     }
@@ -730,22 +728,27 @@
             var dhwH = L.split.dhwH + (!m.centralTank && m.parts.solar ? L.solar.reserve : 0);
             hung.push({ kind: 'dhw', top: cursor, h: dhwH, bottom: cursor + dhwH });
         }
-        var dhw = hungOf(hung, 'dhw');
         if (!m.centralTank && hung.length) {
             // the solar coil sits in the hot water vessel
-            tankBottom = (dhw || hung[0]).bottom;
+            tankBottom = (hungOf(hung, 'dhw') || hung[0]).bottom;
         }
-        return {
+        var g = {
             tankH: tankH,
             tankBottom: tankBottom,
             yHgl: yFlow - L.pipeGap,
             yFlow: yFlow,
             yRet: yFlow + L.pipeGap,
             hung: hung,
-            dhwTop: dhw ? dhw.top : 0,
-            dhwBottom: dhw ? dhw.bottom : 0,
-            hungBottom: hung.length ? hung[hung.length - 1].bottom : tankBottom,
         };
+        return measureHung(g);
+    }
+    /* the extent of the hung vessels in the grid: the hot water vessel (0 without) and the lowest edge */
+    function measureHung(g) {
+        var dhw = hungOf(g.hung, 'dhw');
+        g.dhwTop = dhw ? dhw.top : 0;
+        g.dhwBottom = dhw ? dhw.bottom : 0;
+        g.hungBottom = g.hung.length ? g.hung[g.hung.length - 1].bottom : g.tankBottom;
+        return g;
     }
     /* a solar coil needs room for its flow and return pipe between the solar box (below the heat pump) and the bottom of the vessel it
        sits in; the vessel grows downwards when the box is too low, everything that hangs below moves with it */
@@ -775,10 +778,7 @@
                 }
             });
         }
-        g.hungBottom = g.hung.length ? g.hung[g.hung.length - 1].bottom : g.tankBottom;
-        var dhw = hungOf(g.hung, 'dhw');
-        g.dhwTop = dhw ? dhw.top : 0;
-        g.dhwBottom = dhw ? dhw.bottom : 0;
+        measureHung(g);
     }
 
     function heatPumpRows(m) {
@@ -849,7 +849,7 @@
             labeled(
                 parts,
                 textX,
-                y + 70 + i * L.hp.rowGap,
+                y + L.hp.topPad + i * L.hp.rowGap,
                 row.label,
                 row.id,
                 row.decimals,
@@ -870,7 +870,6 @@
             }
         });
         if (ids.fanM13 && m.heatSource !== 'ground') {
-            // under the fan it belongs to
             var fanLabel = text(
                 parts,
                 x + L.hp.iconX,
@@ -984,15 +983,13 @@
                 continue;
             }
             // the piece serves the vessels beyond it (the lanes from the k-th on) and the end of the row
-            var uses = Array.from(
-                new Set(
-                    [].concat.apply(
-                        st.endUses,
-                        far.slice(k).map(function (lane) {
-                            // a vessel on the hot gas line takes nothing from the flow pipe
-                            return lane.byHgl && !backward ? [] : lane.uses;
-                        }),
-                    ),
+            var uses = unique(
+                [].concat.apply(
+                    st.endUses,
+                    far.slice(k).map(function (lane) {
+                        // a vessel on the hot gas line takes nothing from the flow pipe
+                        return lane.byHgl && !backward ? [] : lane.uses;
+                    }),
                 ),
             );
             var from = xs[k];
@@ -1110,7 +1107,7 @@
             returnX: central ? st.wall : lanes.length ? lanes[0].returnX : st.hpRight,
             cold: hungOf(g.hung, 'cold'),
             // a heating buffer keeps feeding the circuits while the heat pump charges the hot water vessel
-            trunkUses: central ? Array.from(new Set(st.endUses.concat(['dhw', 'rest']))) : st.endUses,
+            trunkUses: central ? unique(st.endUses.concat(['dhw', 'rest'])) : st.endUses,
         };
         return { central: central, any: hasPipes };
     }

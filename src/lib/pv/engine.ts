@@ -1,13 +1,9 @@
 import type { PvSettings, PvSource } from '../config';
 import { PV_NEUTRAL_VALUES } from '../constants';
+import type { ForeignState } from '../runner-kit';
 
-/** The latest value of a foreign state. */
-export interface PvInput {
-    /** the value as the state holds it */
-    val: unknown;
-    /** time of the last update in ms */
-    ts: number;
-}
+/** The latest value of a source state. */
+export type PvInput = ForeignState;
 
 /** One value to write to the Navigator. */
 export interface PvWrite {
@@ -44,7 +40,7 @@ export function convertSource(
     if (!input || input.val === null || input.val === undefined || input.val === '') {
         return { missing: 'invalid' };
     }
-    const raw = typeof input.val === 'boolean' ? Number(input.val) : Number(input.val);
+    const raw = Number(input.val);
     if (!Number.isFinite(raw)) {
         return { missing: 'invalid' };
     }

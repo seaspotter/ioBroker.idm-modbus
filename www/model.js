@@ -59,7 +59,7 @@
         coldBuffer: ['dhw.cold_storage_temp'],
         // the solar pumps (web outputs), the priority valve M111 of an oil / gas boiler, the tiled stove pump M88 and its sensor B84
         // (the manuals name them; the state keys follow the web module's rule and are not confirmed on a device)
-        // (plant.js TAG_STATES lists the same ids by tag; a unit test keeps the two equal)
+        // (tools/diagram-tags.ts lists the same ids by tag; a unit test keeps the two equal)
         solarPump1: ['web.io.digital_out.m75'],
         solarPump2: ['web.io.digital_out.m76'],
         boilerValve: ['web.io.digital_out.m111'],
@@ -167,6 +167,14 @@
         return index < 0 ? null : { flow: `B${51 + index}`, room: `B${61 + index}` };
     }
 
+    /* the IDM tag of a state and its name without the tag: web states carry it at the start of the name, Modbus registers at the end
+       (`tail`: only at the very end) */
+    function splitTag(isWeb, english, local, tail) {
+        var pattern = isWeb ? /^([BME]\d+v?)\s+/ : tail ? /\s*\(([BME]\d+v?)\)\s*$/ : /\s*\(([BME]\d+v?)\)/;
+        var match = pattern.exec(english);
+        return { tag: match ? match[1] : undefined, name: local.replace(pattern, '') };
+    }
+
     /* The sensors with an IDM tag: Modbus registers carry it at the end of their label ("Heat storage temperature (B38)"), the
        states of the web interface at the start of their name ("B2 Heating flow sensor"). */
     function findSensors(objects, states, language) {
@@ -182,18 +190,10 @@
             }
             var english = textOf(common.name, 'en');
             var name = textOf(common.name, language);
-            var tag;
-            if (id.indexOf('web.io.sensors.') === 0) {
-                var web = /^([BME]\d+v?)\s+/.exec(english);
-                tag = web && WEB_SENSOR_TAGS[web[1]] ? web[1] : undefined;
-                name = name.replace(/^[BME]\d+v?\s+/, '');
-            } else {
-                var modbus = /\s*\(([BME]\d+v?)\)/.exec(english);
-                tag = modbus ? modbus[1] : undefined;
-                name = name.replace(/\s*\([BME]\d+v?\)/, '');
-            }
-            if (tag) {
-                sensors.push({ id: id, tag: tag, name: name, unit: common.unit });
+            var isWeb = id.indexOf('web.io.sensors.') === 0;
+            var split = splitTag(isWeb, english, name, false);
+            if (split.tag && (!isWeb || WEB_SENSOR_TAGS[split.tag])) {
+                sensors.push({ id: id, tag: split.tag, name: split.name, unit: common.unit });
             }
         });
         return sensors;
@@ -213,20 +213,9 @@
                 return;
             }
             var english = textOf(common.name, 'en');
-            var local = textOf(common.name, language);
-            var tag;
-            var name;
-            if (id.indexOf('web.io.') === 0) {
-                var web = /^([BME]\d+v?)\s+/.exec(english);
-                tag = web && web[1];
-                name = local.replace(/^[BME]\d+v?\s+/, '');
-            } else {
-                var modbus = /\s*\(([BME]\d+v?)\)\s*$/.exec(english);
-                tag = modbus && modbus[1];
-                name = local.replace(/\s*\([BME]\d+v?\)\s*$/, '');
-            }
-            if (tag && name && !names[tag]) {
-                names[tag] = name;
+            var split = splitTag(id.indexOf('web.io.') === 0, english, textOf(common.name, language), true);
+            if (split.tag && split.name && !names[split.tag]) {
+                names[split.tag] = split.name;
             }
         });
         return names;

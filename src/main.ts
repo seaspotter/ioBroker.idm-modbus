@@ -21,10 +21,12 @@ import {
     INVALID_LOG_INTERVAL_MS,
     MIN_REQUEST_PAUSE_MS,
     NAVIGATOR_FAMILIES,
+    type FloatWordOrder,
     type NavigatorFamily,
 } from './lib/constants';
 import { readFunctionCode } from './lib/modbus/batching';
 import { ModbusTcpClient } from './lib/modbus/client';
+import { notConnected } from './lib/modbus/result';
 import { BoostRunner } from './lib/boost/runner';
 import { detectFamily } from './lib/detect';
 import { faultText } from './lib/faults';
@@ -34,7 +36,7 @@ import { planCleanup, planObjects, type PlannedObject } from './lib/object-tree'
 import { Poller, type PollSink } from './lib/poller';
 import type { PlantConfig } from './lib/registers/plant';
 import { plantToNative, runScan, type ScanResult, scanToCsv, summarizeScan, suggestPlant } from './lib/scan';
-import { activeRegisters, loadRegisters } from './lib/registers/plant';
+import { activeRegisters, HEATING_CIRCUITS, loadRegisters } from './lib/registers/plant';
 import type { RegisterEntry } from './lib/registers/types';
 import { stateIdFor, toStateValue } from './lib/state-model';
 import { movePvRowsToFields } from './lib/pv/migrate';
@@ -47,7 +49,7 @@ import { WebRunner } from './lib/web/runner';
 import { localDateKey, StatsRunner, type Sample } from './lib/stats/runner';
 import { clampTimerMs } from './lib/timers';
 import { modbusTagRegisters } from './lib/web/tags';
-import { localized, textIn } from './lib/translations';
+import { localized, textIn, type LocalizedText } from './lib/translations';
 
 /** ioBroker quality code "sensor reports error" for invalid values (sentinel / out of range). */
 const QUALITY_INVALID = 0x44;
@@ -81,6 +83,81 @@ function scanMinutes(count: number, pauseMs: number): number {
 
 /** Registers that carry a fault number; each gets a state with the text next to it (`<state>_text`). */
 const FAULT_REGISTER_IDS = ['internal_message', 'error_number'];
+
+/** Result of a raw Modbus call while the adapter has no poller. */
+const OFFLINE = notConnected();
+
+/** The parts of `diag.scan` the admin commands read. */
+interface StoredScan {
+    finishedAt: string;
+    summary: ScanSummaryNumbers;
+    suggestion: {
+        heatingCircuits: string[];
+        zoneModules: number;
+        roomsPerZone: number;
+        blocks: Record<string, boolean>;
+    };
+}
+
+/**
+ * Names of the switched-on blocks of a suggested layout.
+ *
+ * @param blocks block name -> on
+ */
+function blockNames(blocks: Record<string, boolean>): string[] {
+    return Object.entries(blocks)
+        .filter(([, on]) => on)
+        .map(([name]) => name);
+}
+
+/**
+ * Compact timestamp for file names (`20261010-123456`).
+ *
+ * @param iso ISO date string
+ */
+function fileStamp(iso: string): string {
+    return iso.replace(/[-:]/g, '').replace(/\..*$/, '').replace('T', '-');
+}
+
+/** Timers the Modbus client and the scan use (the adapter's managed ones). */
+interface ManagedTimers {
+    setTimeout: (cb: () => void, ms: number) => unknown;
+    clearTimeout: (handle: unknown) => void;
+    delay: (ms: number) => Promise<void>;
+}
+
+/**
+ * The connection values of a `sendTo` form as a Modbus client configuration.
+ *
+ * @param host trimmed host
+ * @param config the values currently entered in the admin form
+ * @param pauseMs pause between requests
+ * @param timers the adapter's timers
+ */
+function clientOptions(
+    host: string,
+    config: Record<string, unknown> | undefined,
+    pauseMs: number,
+    timers: ManagedTimers,
+): ConstructorParameters<typeof ModbusTcpClient>[0] {
+    return {
+        host,
+        port: Number(config?.port) || DEFAULT_PORT,
+        unitId: Number.isFinite(Number(config?.unitId)) ? Number(config?.unitId) : DEFAULT_UNIT_ID,
+        timeoutMs: clampTimerMs(Number(config?.requestTimeoutMs), DEFAULT_REQUEST_TIMEOUT_MS, 500),
+        pauseMs,
+        timers,
+    };
+}
+
+/**
+ * The host of a `sendTo` form, trimmed (empty when missing).
+ *
+ * @param config the values currently entered in the admin form
+ */
+function formHost(config: Record<string, unknown> | undefined): string {
+    return typeof config?.host === 'string' ? config.host.trim() : '';
+}
 
 /** Names of the Navigator generations in the test message. */
 const FAMILY_NAMES: Record<NavigatorFamily, string> = {
@@ -145,25 +222,9 @@ class IdmModbus extends utils.Adapter {
      */
     private async onReady(): Promise<void> {
         await this.setState('info.connection', false, true);
-        await this.extendObject('diag.scanStatus', {
-            type: 'state',
-            common: { name: localized('Scan status'), type: 'string', role: 'text', read: true, write: false },
-            native: {},
-        });
+        await this.defineState('diag.scanStatus', 'Scan status', 'string', 'text');
         await this.initScanStatus();
-        await this.extendObject('diag.scanProgress', {
-            type: 'state',
-            common: {
-                name: localized('Scan progress'),
-                type: 'number',
-                role: 'value',
-                unit: '%',
-                read: true,
-                write: false,
-                def: 0,
-            },
-            native: {},
-        });
+        await this.defineState('diag.scanProgress', 'Scan progress', 'number', 'value', { unit: '%', def: 0 });
 
         if (await this.movePvRows()) {
             return; // the instance restarts with the new settings
@@ -172,7 +233,7 @@ class IdmModbus extends utils.Adapter {
         await this.publishDiagramSettings();
 
         const settings = readPlantSettings(this.config);
-        settings.warnings.forEach(warning => this.log.warn(warning));
+        this.warnAll(settings.warnings);
         await this.setState('info.family', settings.family, true);
 
         if (!this.config.host) {
@@ -192,7 +253,7 @@ class IdmModbus extends utils.Adapter {
         );
 
         const controlSettings = readControlSettings(this.config);
-        controlSettings.warnings.forEach(warning => this.log.warn(warning));
+        this.warnAll(controlSettings.warnings);
         // the fault acknowledgement is write-only, so it is not polled; it gets a state only when control is switched on
         const writeOnly = registers.filter(reg => reg.access === 'W' && isWritable(reg, controlSettings));
         this.objectContext = {
@@ -221,7 +282,7 @@ class IdmModbus extends utils.Adapter {
         this.createPoller = () =>
             new Poller({
                 registers: active,
-                floatWordOrder: this.config.floatWordOrder === 'highFirst' ? 'highFirst' : 'lowFirst',
+                floatWordOrder: this.floatWordOrder,
                 intervalsMs: settings.intervalsMs,
                 createClient: onDisconnect =>
                     new ModbusTcpClient({
@@ -255,23 +316,13 @@ class IdmModbus extends utils.Adapter {
      */
     private async publishDiagramSettings(): Promise<void> {
         const { settings, warnings } = readDiagramSettings(this.config);
-        warnings.forEach(warning => this.log.warn(warning));
+        this.warnAll(warnings);
         await this.extendObject('diagram', {
             type: 'channel',
             common: { name: localized('Heat pump diagram') },
             native: {},
         });
-        await this.extendObject('diagram.settings', {
-            type: 'state',
-            common: {
-                name: localized('Diagram settings'),
-                type: 'string',
-                role: 'json',
-                read: true,
-                write: false,
-            },
-            native: {},
-        });
+        await this.defineState('diagram.settings', 'Diagram settings', 'string', 'json');
         await this.setState('diagram.settings', JSON.stringify(settings), true);
     }
 
@@ -283,7 +334,7 @@ class IdmModbus extends utils.Adapter {
      */
     private async startBoost(registers: readonly RegisterEntry[], mediumIntervalMs: number): Promise<void> {
         const settings = readBoostSettings(this.config);
-        settings.warnings.forEach(warning => this.log.warn(warning));
+        this.warnAll(settings.warnings);
         const demand = registers.find(reg => reg.id === 'demand_dhw_charging');
         if (!settings.enabled) {
             return;
@@ -306,87 +357,30 @@ class IdmModbus extends utils.Adapter {
             refused_at_target: 'Refused: hot water already at the target temperature',
             error: 'Error - check the hot water demand of the Navigator',
         };
-        await this.extendObject('dhw.boost_start', {
-            type: 'state',
-            common: {
-                name: localized('Start hot water boost'),
-                type: 'boolean',
-                role: 'button',
-                read: false,
-                write: true,
-            },
-            native: {},
+        await this.defineState('dhw.boost_start', 'Start hot water boost', 'boolean', 'button', {
+            read: false,
+            write: true,
         });
-        await this.extendObject('dhw.boost_stop', {
-            type: 'state',
-            common: {
-                name: localized('Stop hot water boost'),
-                type: 'boolean',
-                role: 'button',
-                read: false,
-                write: true,
-            },
-            native: {},
+        await this.defineState('dhw.boost_stop', 'Stop hot water boost', 'boolean', 'button', {
+            read: false,
+            write: true,
         });
-        await this.extendObject('dhw.boost_active', {
-            type: 'state',
-            common: {
-                name: localized('Hot water boost active'),
-                type: 'boolean',
-                role: 'indicator.working',
-                read: true,
-                write: false,
-            },
-            native: {},
+        await this.defineState('dhw.boost_active', 'Hot water boost active', 'boolean', 'indicator.working');
+        await this.defineState('dhw.boost_remaining', 'Boost time remaining', 'number', 'value', { unit: 'min' });
+        await this.defineState('dhw.boost_status', 'Hot water boost status', 'string', 'text', {
+            // plain strings in the system language: translated objects are not allowed in `common.states`
+            states: Object.fromEntries(
+                Object.entries(statuses).map(([key, text]) => [key, textIn(localized(text), this.language)]),
+            ),
         });
-        await this.extendObject('dhw.boost_remaining', {
-            type: 'state',
-            common: {
-                name: localized('Boost time remaining'),
-                type: 'number',
-                role: 'value',
-                unit: 'min',
-                read: true,
-                write: false,
-            },
-            native: {},
-        });
-        await this.extendObject('dhw.boost_status', {
-            type: 'state',
-            common: {
-                name: localized('Hot water boost status'),
-                type: 'string',
-                role: 'text',
-                read: true,
-                write: false,
-                // plain strings in the system language: translated objects are not allowed in `common.states`
-                states: Object.fromEntries(
-                    Object.entries(statuses).map(([key, text]) => [key, textIn(localized(text), this.language)]),
-                ),
-            },
-            native: {},
-        });
-        await this.extendObject('dhw.boost_data', {
-            type: 'state',
-            common: {
-                name: localized('Hot water boost data (internal)'),
-                type: 'string',
-                role: 'json',
-                read: true,
-                write: false,
-            },
-            native: {},
-        });
+        await this.defineState('dhw.boost_data', 'Hot water boost data (internal)', 'string', 'json');
         this.subscribeStates('dhw.boost_start');
         this.subscribeStates('dhw.boost_stop');
         this.boost = new BoostRunner(
             {
                 now: () => Date.now(),
                 log: this.log,
-                timers: {
-                    setInterval: (cb, ms) => this.setInterval(cb, ms),
-                    clearInterval: handle => this.clearInterval(handle as ioBroker.Interval | undefined),
-                },
+                timers: this.intervalTimers(),
                 connected: () => this.poller?.isConnected === true,
                 temperature: () => {
                     const sample = this.samples.get('dhw_temp_top');
@@ -394,11 +388,7 @@ class IdmModbus extends utils.Adapter {
                         ? sample.value
                         : null;
                 },
-                setDemand: async on =>
-                    (await this.poller?.writeRaw(demand.address, [on ? 1 : 0])) ?? {
-                        ok: false,
-                        error: { kind: 'offline', message: 'Not connected' },
-                    },
+                setDemand: async on => (await this.poller?.writeRaw(demand.address, [on ? 1 : 0])) ?? OFFLINE,
                 publish: (id, value) => this.put(`dhw.boost_${id}`, { val: value, ack: true }),
                 load: async () => {
                     const state = await this.getStateAsync('dhw.boost_data');
@@ -426,7 +416,7 @@ class IdmModbus extends utils.Adapter {
         registers: readonly RegisterEntry[],
     ): Promise<void> {
         const settings = readWebSettings(this.config, family);
-        settings.warnings.forEach(warning => this.log.warn(warning));
+        this.warnAll(settings.warnings);
         if (!settings.enabled) {
             return;
         }
@@ -440,16 +430,9 @@ class IdmModbus extends utils.Adapter {
         const timeoutMs = clampTimerMs(this.config.requestTimeoutMs, DEFAULT_REQUEST_TIMEOUT_MS, 500) * 3;
         const common = {
             log: this.log,
-            timers: {
-                setInterval: (cb: () => void, ms: number) => this.setInterval(cb, ms),
-                clearInterval: (handle: unknown) => this.clearInterval(handle as ioBroker.Interval | undefined),
-            },
+            timers: this.intervalTimers(),
             sleep: (ms: number) => this.delay(ms),
-            createObjects: async (planned: PlannedObject[]) => {
-                for (const { id, object } of planned) {
-                    await this.extendObject(id, object);
-                }
-            },
+            createObjects: (planned: PlannedObject[]) => this.createPlanned(planned),
             existingIds: async (prefix: string) => {
                 const start = `${this.namespace}.${prefix}.`;
                 const list = await this.getObjectListAsync({ startkey: start, endkey: `${start}\u9999` });
@@ -512,7 +495,7 @@ class IdmModbus extends utils.Adapter {
      */
     private async startFeeds(registers: readonly RegisterEntry[]): Promise<void> {
         const rooms = readRoomSettings(this.config);
-        rooms.warnings.forEach(warning => this.log.warn(warning));
+        this.warnAll(rooms.warnings);
         if (rooms.enabled && rooms.sources.length) {
             this.rooms = await this.startFeed('rooms', rooms, registers, {
                 conflict: 'Room temperature writer conflict',
@@ -520,7 +503,7 @@ class IdmModbus extends utils.Adapter {
             });
         }
         const glt = readGltSettings(this.config);
-        glt.warnings.forEach(warning => this.log.warn(warning));
+        this.warnAll(glt.warnings);
         if (glt.enabled && glt.sources.length) {
             this.glt = await this.startFeed('glt', glt, registers, {
                 conflict: 'GLT writer conflict',
@@ -546,41 +529,12 @@ class IdmModbus extends utils.Adapter {
         registers: readonly RegisterEntry[],
         names: { conflict: string; last: string },
     ): Promise<RoomRunner> {
-        for (const [id, name, type, role] of [
-            ['writer_conflict', names.conflict, 'boolean', 'indicator.alarm'],
-            ['last_write', names.last, 'number', 'date'],
-        ] as const) {
-            await this.extendObject(`${channel}.${id}`, {
-                type: 'state',
-                common: { name: localized(name), type, role, read: true, write: false },
-                native: {},
-            });
-        }
-        const offline = { ok: false, error: { kind: 'offline', message: 'Not connected' } } as const;
-        const runner = new RoomRunner(
-            {
-                now: () => Date.now(),
-                log: this.log,
-                timers: {
-                    setInterval: (cb, ms) => this.setInterval(cb, ms),
-                    clearInterval: handle => this.clearInterval(handle as ioBroker.Interval | undefined),
-                },
-                connected: () => this.poller?.isConnected === true,
-                read: async (address, count) => (await this.poller?.readRaw(3, address, count)) ?? offline,
-                write: async (address, words) => (await this.poller?.writeRaw(address, words)) ?? offline,
-                subscribe: id => this.subscribeForeignStates(id),
-                foreignState: async id => {
-                    const state = await this.getForeignStateAsync(id);
-                    return state ? { val: state.val, ts: state.ts } : null;
-                },
-                publish: (id, value) => this.put(`${channel}.${id}`, { val: value, ack: true }),
-            },
-            {
-                settings,
-                registers,
-                floatWordOrder: this.config.floatWordOrder === 'highFirst' ? 'highFirst' : 'lowFirst',
-            },
-        );
+        await this.defineWriterStates(channel, names.conflict, names.last);
+        const runner = new RoomRunner(this.writerHost(channel), {
+            settings,
+            registers,
+            floatWordOrder: this.floatWordOrder,
+        });
         await runner.start();
         return runner;
     }
@@ -614,13 +568,54 @@ class IdmModbus extends utils.Adapter {
     }
 
     /**
+     * Create the two states every writing module has: the conflict flag and the time of the last write.
+     *
+     * @param channel channel of the module
+     * @param conflict name of the conflict state
+     * @param last name of the last-write state
+     */
+    private async defineWriterStates(channel: string, conflict: string, last: string): Promise<void> {
+        await this.defineState(`${channel}.writer_conflict`, conflict, 'boolean', 'indicator.alarm');
+        await this.defineState(`${channel}.last_write`, last, 'number', 'date');
+    }
+
+    /**
+     * What the PV and the feeding runners need from the adapter: raw Modbus access through the poller, foreign states, publishing.
+     *
+     * @param channel channel of the module's states
+     */
+    private writerHost(channel: string): ConstructorParameters<typeof RoomRunner>[0] {
+        return {
+            now: () => Date.now(),
+            log: this.log,
+            timers: this.intervalTimers(),
+            connected: () => this.poller?.isConnected === true,
+            read: async (address, count) => (await this.poller?.readRaw(3, address, count)) ?? OFFLINE,
+            write: async (address, words) => (await this.poller?.writeRaw(address, words)) ?? OFFLINE,
+            subscribe: id => this.subscribeForeignStates(id),
+            foreignState: id => this.foreignState(id),
+            publish: (id, value) => this.put(`${channel}.${id}`, { val: value, ack: true }),
+        };
+    }
+
+    /**
+     * A foreign state as the runners want it.
+     *
+     * @param id foreign state id
+     */
+    private async foreignState(id: string): Promise<{ val: ioBroker.StateValue; ts: number } | null> {
+        const state = await this.getForeignStateAsync(id);
+        return state ? { val: state.val, ts: state.ts } : null;
+    }
+
+    /**
      * Start the PV module (spec Modul D): writes PV values from foreign states to the Navigator in a fixed interval.
      *
      * @param registers all registers of the family
      */
     private async startPv(registers: readonly RegisterEntry[]): Promise<void> {
         const settings = readPvSettings(this.config);
-        settings.warnings.forEach(warning => this.log.warn(warning));
+        this.warnAll(settings.warnings);
         if (!settings.enabled) {
             return;
         }
@@ -628,48 +623,8 @@ class IdmModbus extends utils.Adapter {
             this.log.warn('The PV module is on, but no source is configured - nothing is written');
             return;
         }
-        for (const [id, name, type, role] of [
-            ['writer_conflict', 'PV writer conflict', 'boolean', 'indicator.alarm'],
-            ['last_write', 'Last PV write', 'number', 'date'],
-        ] as const) {
-            await this.extendObject(`pv.${id}`, {
-                type: 'state',
-                common: { name: localized(name), type, role, read: true, write: false },
-                native: {},
-            });
-        }
-        this.pv = new PvRunner(
-            {
-                now: () => Date.now(),
-                log: this.log,
-                timers: {
-                    setInterval: (cb, ms) => this.setInterval(cb, ms),
-                    clearInterval: handle => this.clearInterval(handle as ioBroker.Interval | undefined),
-                },
-                connected: () => this.poller?.isConnected === true,
-                read: async (address, count) =>
-                    (await this.poller?.readRaw(3, address, count)) ?? {
-                        ok: false,
-                        error: { kind: 'offline', message: 'Not connected' },
-                    },
-                write: async (address, words) =>
-                    (await this.poller?.writeRaw(address, words)) ?? {
-                        ok: false,
-                        error: { kind: 'offline', message: 'Not connected' },
-                    },
-                subscribe: id => this.subscribeForeignStates(id),
-                foreignState: async id => {
-                    const state = await this.getForeignStateAsync(id);
-                    return state ? { val: state.val, ts: state.ts } : null;
-                },
-                publish: (id, value) => this.put(`pv.${id}`, { val: value, ack: true }),
-            },
-            {
-                settings,
-                registers,
-                floatWordOrder: this.config.floatWordOrder === 'highFirst' ? 'highFirst' : 'lowFirst',
-            },
-        );
+        await this.defineWriterStates('pv', 'PV writer conflict', 'Last PV write');
+        this.pv = new PvRunner(this.writerHost('pv'), { settings, registers, floatWordOrder: this.floatWordOrder });
         await this.pv.start();
     }
 
@@ -686,7 +641,7 @@ class IdmModbus extends utils.Adapter {
         registers: readonly RegisterEntry[],
     ): Promise<void> {
         const settings = readStatsSettings(this.config);
-        settings.warnings.forEach(warning => this.log.warn(warning));
+        this.warnAll(settings.warnings);
         if (!settings.enabled) {
             if (this.config.removeInactiveStates) {
                 for (const id of ['calc', 'stats']) {
@@ -710,16 +665,9 @@ class IdmModbus extends utils.Adapter {
             {
                 now: () => Date.now(),
                 log: this.log,
-                timers: {
-                    setInterval: (cb, ms) => this.setInterval(cb, ms),
-                    clearInterval: handle => this.clearInterval(handle as ioBroker.Interval | undefined),
-                },
+                timers: this.intervalTimers(),
                 sample: id => this.samples.get(id),
-                createObjects: async planned => {
-                    for (const { id, object } of planned) {
-                        await this.extendObject(id, object);
-                    }
-                },
+                createObjects: planned => this.createPlanned(planned),
                 publish: (id, value) => this.put(id, { val: value, ack: true }),
                 loadData: async () => {
                     const state = await this.getStateAsync('stats.data');
@@ -732,10 +680,7 @@ class IdmModbus extends utils.Adapter {
                     return typeof unit === 'string' ? unit : undefined;
                 },
                 subscribe: id => this.subscribeForeignStates(id),
-                foreignState: async id => {
-                    const state = await this.getForeignStateAsync(id);
-                    return state ? { val: state.val, ts: state.ts } : null;
-                },
+                foreignState: id => this.foreignState(id),
             },
             { settings, circuits, intervalsMs, tickMs: intervalsMs.fast },
         );
@@ -767,12 +712,9 @@ class IdmModbus extends utils.Adapter {
                         const fc = readFunctionCode(reg);
                         const result =
                             fc && this.poller ? await this.poller.readRaw(fc, reg.address, reg.words) : undefined;
-                        return result ?? { ok: false, error: { kind: 'offline', message: 'Not connected' } };
+                        return result ?? OFFLINE;
                     },
-                    write: async (reg, words) =>
-                        this.poller
-                            ? this.poller.writeRaw(reg.address, words)
-                            : { ok: false, error: { kind: 'offline', message: 'Not connected' } },
+                    write: async (reg, words) => (await this.poller?.writeRaw(reg.address, words)) ?? OFFLINE,
                 },
                 lastKnown: id => this.samples.get(id)?.value ?? undefined,
                 subscribe: stateId => this.subscribeStates(stateId),
@@ -791,7 +733,7 @@ class IdmModbus extends utils.Adapter {
             {
                 registers,
                 control,
-                floatWordOrder: this.config.floatWordOrder === 'highFirst' ? 'highFirst' : 'lowFirst',
+                floatWordOrder: this.floatWordOrder,
                 dateKey: localDateKey,
             },
         );
@@ -806,27 +748,78 @@ class IdmModbus extends utils.Adapter {
      */
     private async publishWriteCounter(registerId: string, total: number): Promise<void> {
         const id = `diag.writes.${registerId}`;
-        await this.extendObject(id, {
-            type: 'state',
-            common: {
-                name: localized('Writes of {id}', { id: registerId }),
-                type: 'number',
-                role: 'value',
-                read: true,
-                write: false,
-                def: 0,
-            },
-            native: {},
-        });
+        await this.defineState(id, localized('Writes of {id}', { id: registerId }), 'number', 'value', { def: 0 });
         await this.setState(id, total, true);
     }
 
-    /** The adapter's managed timers, handed to helper classes (CLAUDE.md rule 17). */
-    private managedTimers(): {
-        setTimeout: (cb: () => void, ms: number) => unknown;
-        clearTimeout: (handle: unknown) => void;
-        delay: (ms: number) => Promise<void>;
+    /** FLOAT word order from the configuration. */
+    private get floatWordOrder(): FloatWordOrder {
+        return this.config.floatWordOrder === 'highFirst' ? 'highFirst' : 'lowFirst';
+    }
+
+    /**
+     * Log every problem the config readers found.
+     *
+     * @param warnings the warnings of a settings reader
+     */
+    private warnAll(warnings: readonly string[]): void {
+        warnings.forEach(warning => this.log.warn(warning));
+    }
+
+    /**
+     * Create or update a read-only state (writable ones through `extra`).
+     *
+     * @param id state id
+     * @param name English name from the dictionary, or an already localized one
+     * @param type value type
+     * @param role ioBroker role
+     * @param extra further `common` fields, also overriding `read`/`write`
+     */
+    private async defineState(
+        id: string,
+        name: string | LocalizedText,
+        type: ioBroker.CommonType,
+        role: string,
+        extra: Partial<ioBroker.StateCommon> = {},
+    ): Promise<void> {
+        await this.extendObject(id, {
+            type: 'state',
+            common: {
+                name: typeof name === 'string' ? localized(name) : name,
+                type,
+                role,
+                read: true,
+                write: false,
+                ...extra,
+            },
+            native: {},
+        });
+    }
+
+    /**
+     * Create the objects a module planned.
+     *
+     * @param planned ids with their objects
+     */
+    private async createPlanned(planned: readonly PlannedObject[]): Promise<void> {
+        for (const { id, object } of planned) {
+            await this.extendObject(id, object);
+        }
+    }
+
+    /** The adapter's managed interval timers, handed to the runners (CLAUDE.md rule 17). */
+    private intervalTimers(): {
+        setInterval: (cb: () => void, ms: number) => unknown;
+        clearInterval: (handle: unknown) => void;
     } {
+        return {
+            setInterval: (cb, ms) => this.setInterval(cb, ms),
+            clearInterval: handle => this.clearInterval(handle as ioBroker.Interval | undefined),
+        };
+    }
+
+    /** The adapter's managed timers, handed to helper classes (CLAUDE.md rule 17). */
+    private managedTimers(): ManagedTimers {
         return {
             setTimeout: (cb, ms) => this.setTimeout(cb, ms),
             clearTimeout: handle => this.clearTimeout(handle as ioBroker.Timeout | undefined),
@@ -855,11 +848,7 @@ class IdmModbus extends utils.Adapter {
         for (const reg of active.filter(r => FAULT_REGISTER_IDS.includes(r.id))) {
             const id = `${stateIdFor(reg)}_text`;
             if (!this.createdStates.has(id)) {
-                await this.extendObject(id, {
-                    type: 'state',
-                    common: { name: localized('Fault text'), type: 'string', role: 'text', read: true, write: false },
-                    native: {},
-                });
+                await this.defineState(id, 'Fault text', 'string', 'text');
                 this.createdStates.add(id);
             }
         }
@@ -990,17 +979,8 @@ class IdmModbus extends utils.Adapter {
             }
             this.invalidFlushed.set(id, count);
             const stateId = `diag.invalid.${id}`;
-            await this.extendObject(stateId, {
-                type: 'state',
-                common: {
-                    name: localized('Invalid readings of {id}', { id }),
-                    type: 'number',
-                    role: 'value',
-                    read: true,
-                    write: false,
-                    def: 0,
-                },
-                native: {},
+            await this.defineState(stateId, localized('Invalid readings of {id}', { id }), 'number', 'value', {
+                def: 0,
             });
             await this.setState(stateId, count, true);
         }
@@ -1043,19 +1023,12 @@ class IdmModbus extends utils.Adapter {
             return;
         }
         const config = (obj.message as { config?: Record<string, unknown> } | undefined)?.config;
-        const host = typeof config?.host === 'string' ? config.host.trim() : '';
+        const host = formHost(config);
         if (!host) {
             this.sendTo(obj.from, obj.command, { error: 'testNoHost' }, obj.callback);
             return;
         }
-        const client = new ModbusTcpClient({
-            host,
-            port: Number(config?.port) || DEFAULT_PORT,
-            unitId: Number.isFinite(Number(config?.unitId)) ? Number(config?.unitId) : DEFAULT_UNIT_ID,
-            timeoutMs: clampTimerMs(Number(config?.requestTimeoutMs), DEFAULT_REQUEST_TIMEOUT_MS, 500),
-            pauseMs: MIN_REQUEST_PAUSE_MS,
-            timers: this.managedTimers(),
-        });
+        const client = new ModbusTcpClient(clientOptions(host, config, MIN_REQUEST_PAUSE_MS, this.managedTimers()));
         try {
             const connected = await client.connect();
             if (!connected.ok) {
@@ -1101,7 +1074,7 @@ class IdmModbus extends utils.Adapter {
     private async createSupportFile(obj: ioBroker.Message): Promise<void> {
         try {
             const report = buildSupportReport(await this.collectSupport(), new Date());
-            const name = `support-${report.generatedAt.replace(/[-:]/g, '').replace(/\..*$/, '').replace('T', '-')}.json`;
+            const name = `support-${fileStamp(report.generatedAt)}.json`;
             await this.writeFileAsync(`${this.namespace}.support`, name, JSON.stringify(report, null, 2));
             // keep the last five files only
             const files = (await this.readDirAsync(`${this.namespace}.support`, '')).map(f => f.file).sort();
@@ -1138,13 +1111,7 @@ class IdmModbus extends utils.Adapter {
             'intervalMediumS',
             'intervalSlowS',
             'intervalConfigS',
-            'hcA',
-            'hcB',
-            'hcC',
-            'hcD',
-            'hcE',
-            'hcF',
-            'hcG',
+            ...HEATING_CIRCUITS.map(letter => `hc${letter}`),
             'zoneModules',
             'roomsPerZone',
             'blockSolar',
@@ -1180,10 +1147,10 @@ class IdmModbus extends utils.Adapter {
             'webStatisticsIntervalS',
         ];
         const settings: Record<string, unknown> = Object.fromEntries(keep.map(key => [key, config[key]]));
-        settings.heatingCircuitNamesSet = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].filter(l => config[`hcName${l}`]).length;
-        settings.pvSources = Array.isArray(config.pvSources) ? config.pvSources.length : 0;
-        settings.roomSources = Array.isArray(config.roomSources) ? config.roomSources.length : 0;
-        settings.gltSources = Array.isArray(config.gltSources) ? config.gltSources.length : 0;
+        settings.heatingCircuitNamesSet = HEATING_CIRCUITS.filter(l => config[`hcName${l}`]).length;
+        for (const key of ['pvSources', 'roomSources', 'gltSources']) {
+            settings[key] = Array.isArray(config[key]) ? config[key].length : 0;
+        }
         settings.externalMeters = ['extElecCounterId', 'extElecPowerId', 'extHeatCounterId', 'extHeatPowerId'].filter(
             k => config[k],
         ).length;
@@ -1198,29 +1165,21 @@ class IdmModbus extends utils.Adapter {
         } catch {
             controllerVersion = null;
         }
-        let scan: unknown = null;
-        try {
-            const raw = JSON.parse(String(await value('diag.scan'))) as {
-                finishedAt: string;
-                aborted: unknown;
-                summary: unknown;
-                suggestion: unknown;
-            };
-            scan = {
-                finishedAt: raw.finishedAt,
-                aborted: raw.aborted,
-                summary: raw.summary,
-                suggestion: raw.suggestion,
-            };
-        } catch {
-            scan = null;
-        }
-        let writes: unknown = null;
-        try {
-            writes = JSON.parse(String(await value('diag.writesData')));
-        } catch {
-            writes = null;
-        }
+        const json = async (id: string): Promise<Record<string, unknown> | null> => {
+            try {
+                return JSON.parse(String(await value(id))) as Record<string, unknown>;
+            } catch {
+                return null;
+            }
+        };
+        const stored = await json('diag.scan');
+        const scan = stored && {
+            finishedAt: stored.finishedAt,
+            aborted: stored.aborted,
+            summary: stored.summary,
+            suggestion: stored.suggestion,
+        };
+        const writes = await json('diag.writesData');
         return {
             adapterVersion: this.version ?? 'unknown',
             nodeVersion: process.version,
@@ -1271,13 +1230,19 @@ class IdmModbus extends utils.Adapter {
     private async initScanStatus(): Promise<void> {
         const state = await this.getStateAsync('diag.scan');
         try {
-            const scan = JSON.parse(String(state?.val)) as { finishedAt: string; summary: ScanSummaryNumbers };
+            const scan = JSON.parse(String(state?.val)) as StoredScan;
             this.setScanStatus(SCAN_FINISHED_TEXT, this.scanStatusVars(scan.finishedAt, scan.summary));
         } catch {
             this.setScanStatus('Scan not started yet');
         }
     }
 
+    /**
+     * Placeholder values of the "scan finished" status line.
+     *
+     * @param finishedAt ISO time the scan ended
+     * @param summary numbers of the scan summary
+     */
     private scanStatusVars(finishedAt: string, summary: ScanSummaryNumbers): Record<string, string> {
         return {
             time: new Date(finishedAt).toLocaleString(this.language ?? 'en'),
@@ -1288,46 +1253,36 @@ class IdmModbus extends utils.Adapter {
     }
 
     /**
+     * Answer an admin command from the last scan stored in `diag.scan`.
+     *
+     * @param obj the message
+     * @param answer builds the answer from the stored scan
+     */
+    private sendFromScan(obj: ioBroker.Message, answer: (scan: StoredScan) => Record<string, unknown>): void {
+        void this.getStateAsync('diag.scan').then(state => {
+            let reply: Record<string, unknown>;
+            try {
+                reply = answer(JSON.parse(String(state?.val)) as StoredScan);
+            } catch {
+                reply = { error: 'scanNone' };
+            }
+            this.sendTo(obj.from, obj.command, reply, obj.callback);
+        });
+    }
+
+    /**
      * Handles the `scanApply` command: the suggested installation layout of the last scan as configuration values. The admin
      * page puts them into the form (the user still saves).
      *
      * @param obj the message
      */
     private sendScanApply(obj: ioBroker.Message): void {
-        void this.getStateAsync('diag.scan').then(state => {
-            try {
-                const scan = JSON.parse(String(state?.val)) as {
-                    suggestion: {
-                        heatingCircuits: string[];
-                        zoneModules: number;
-                        roomsPerZone: number;
-                        blocks: PlantConfig['blocks'];
-                    };
-                };
-                const s = scan.suggestion;
-                const native = plantToNative(s);
-                this.sendTo(
-                    obj.from,
-                    obj.command,
-                    {
-                        result: 'scanApplied',
-                        native,
-                        saveConfig: false,
-                        args: [
-                            s.heatingCircuits.join(', ') || '-',
-                            String(s.zoneModules),
-                            Object.entries(s.blocks)
-                                .filter(([, on]) => on)
-                                .map(([name]) => name)
-                                .join(', ') || '-',
-                        ],
-                    },
-                    obj.callback,
-                );
-            } catch {
-                this.sendTo(obj.from, obj.command, { error: 'scanNone' }, obj.callback);
-            }
-        });
+        this.sendFromScan(obj, ({ suggestion: s }) => ({
+            result: 'scanApplied',
+            native: plantToNative({ ...s, blocks: s.blocks as PlantConfig['blocks'] }),
+            saveConfig: false,
+            args: [s.heatingCircuits.join(', ') || '-', String(s.zoneModules), blockNames(s.blocks).join(', ') || '-'],
+        }));
     }
 
     /**
@@ -1336,44 +1291,19 @@ class IdmModbus extends utils.Adapter {
      * @param obj the message
      */
     private sendScanResult(obj: ioBroker.Message): void {
-        void this.getStateAsync('diag.scan').then(state => {
-            try {
-                const scan = JSON.parse(String(state?.val)) as {
-                    finishedAt: string;
-                    summary: { present: number; unavailable: number; absent: number };
-                    suggestion: {
-                        heatingCircuits: string[];
-                        zoneModules: number;
-                        roomsPerZone: number;
-                        blocks: Record<string, boolean>;
-                    };
-                };
-                const blocks = Object.entries(scan.suggestion.blocks)
-                    .filter(([, on]) => on)
-                    .map(([name]) => name)
-                    .join(', ');
-                this.sendTo(
-                    obj.from,
-                    obj.command,
-                    {
-                        result: 'scanResult',
-                        args: [
-                            new Date(scan.finishedAt).toLocaleString(this.language ?? 'en'),
-                            String(scan.summary.present),
-                            String(scan.summary.unavailable),
-                            String(scan.summary.absent),
-                            scan.suggestion.heatingCircuits.join(', ') || '-',
-                            String(scan.suggestion.zoneModules),
-                            String(scan.suggestion.roomsPerZone),
-                            blocks || '-',
-                        ],
-                    },
-                    obj.callback,
-                );
-            } catch {
-                this.sendTo(obj.from, obj.command, { error: 'scanNone' }, obj.callback);
-            }
-        });
+        this.sendFromScan(obj, ({ finishedAt, summary, suggestion }) => ({
+            result: 'scanResult',
+            args: [
+                new Date(finishedAt).toLocaleString(this.language ?? 'en'),
+                String(summary.present),
+                String(summary.unavailable),
+                String(summary.absent),
+                suggestion.heatingCircuits.join(', ') || '-',
+                String(suggestion.zoneModules),
+                String(suggestion.roomsPerZone),
+                blockNames(suggestion.blocks).join(', ') || '-',
+            ],
+        }));
     }
 
     /**
@@ -1384,9 +1314,8 @@ class IdmModbus extends utils.Adapter {
      */
     private startScan(obj: ioBroker.Message): void {
         const config = (obj.message as { config?: Record<string, unknown> } | undefined)?.config;
-        const host = typeof config?.host === 'string' ? config.host.trim() : '';
         const family = config?.family as string | undefined;
-        if (!host) {
+        if (!formHost(config)) {
             this.sendTo(obj.from, obj.command, { error: 'scanNoHost' }, obj.callback);
             return;
         }
@@ -1407,12 +1336,7 @@ class IdmModbus extends utils.Adapter {
             {
                 result: 'scanStarted',
                 args: [
-                    String(
-                        scanMinutes(
-                            registers.filter(r => r.access !== 'W').length,
-                            Number((config as { requestPauseMs?: unknown } | undefined)?.requestPauseMs),
-                        ),
-                    ),
+                    String(scanMinutes(registers.filter(r => r.access !== 'W').length, Number(config?.requestPauseMs))),
                 ],
             },
             obj.callback,
@@ -1439,14 +1363,8 @@ class IdmModbus extends utils.Adapter {
         const resumePolling = this.poller !== null;
         this.poller?.stop();
         this.poller = null;
-        const client = new ModbusTcpClient({
-            host: String(config.host).trim(),
-            port: Number(config.port) || DEFAULT_PORT,
-            unitId: Number.isFinite(Number(config.unitId)) ? Number(config.unitId) : DEFAULT_UNIT_ID,
-            timeoutMs: clampTimerMs(Number(config.requestTimeoutMs), DEFAULT_REQUEST_TIMEOUT_MS, 500),
-            pauseMs: clampTimerMs(Number(config.requestPauseMs), DEFAULT_REQUEST_PAUSE_MS, MIN_REQUEST_PAUSE_MS),
-            timers: this.managedTimers(),
-        });
+        const pauseMs = clampTimerMs(Number(config.requestPauseMs), DEFAULT_REQUEST_PAUSE_MS, MIN_REQUEST_PAUSE_MS);
+        const client = new ModbusTcpClient(clientOptions(formHost(config), config, pauseMs, this.managedTimers()));
         try {
             const connected = await client.connect();
             if (!connected.ok) {
@@ -1515,17 +1433,14 @@ class IdmModbus extends utils.Adapter {
     private async publishScan(scan: ScanResult): Promise<void> {
         const summary = summarizeScan(scan);
         const suggestion = suggestPlant(scan);
-        const stamp = scan.finishedAt.replace(/[-:]/g, '').replace(/\..*$/, '').replace('T', '-');
-        const base = `scan-${scan.family}-${stamp}`;
+        const base = `scan-${scan.family}-${fileStamp(scan.finishedAt)}`;
         try {
             await this.writeFileAsync(`${this.namespace}.scans`, `${base}.json`, JSON.stringify(scan));
             await this.writeFileAsync(`${this.namespace}.scans`, `${base}.csv`, scanToCsv(scan));
         } catch (error) {
             this.log.warn(`Could not write the scan files: ${(error as Error).message}`);
         }
-        const blocks = Object.entries(suggestion.blocks)
-            .filter(([, on]) => on)
-            .map(([name]) => name);
+        const blocks = blockNames(suggestion.blocks);
         const layout = `heating circuits ${suggestion.heatingCircuits.join(', ') || 'none'}; zone modules ${suggestion.zoneModules}${suggestion.zoneModules ? ` (up to ${suggestion.roomsPerZone} rooms)` : ''}; blocks ${blocks.join(', ') || 'none'}`;
         await this.setState(
             'diag.scan',
@@ -1556,22 +1471,10 @@ class IdmModbus extends utils.Adapter {
     private onUnload(callback: () => void): void {
         const finish = (): void => {
             try {
-                this.web?.stop();
-                this.web = null;
-                this.nav10?.stop();
-                this.nav10 = null;
-                this.glt?.stop();
-                this.glt = null;
-                this.rooms?.stop();
-                this.rooms = null;
-                this.pv?.stop();
-                this.pv = null;
-                this.control?.stop();
-                this.control = null;
-                this.stats?.stop();
-                this.stats = null;
-                this.poller?.stop();
-                this.poller = null;
+                for (const key of ['web', 'nav10', 'glt', 'rooms', 'pv', 'control', 'stats', 'poller'] as const) {
+                    this[key]?.stop();
+                    this[key] = null;
+                }
                 if (this.diagTimer) {
                     this.clearInterval(this.diagTimer);
                     this.diagTimer = undefined;

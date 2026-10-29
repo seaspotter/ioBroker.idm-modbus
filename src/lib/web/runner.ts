@@ -1,4 +1,5 @@
 import type { PlannedObject } from '../object-tree';
+import { FailureLog, type IntervalTimers, type Logger, Ticker } from '../runner-kit';
 import { IoPublisher, type IoHost } from './io-publisher';
 import { channelObject, stateObject } from './objects';
 import { ManagedObjects } from './managed';
@@ -23,9 +24,9 @@ export interface WebHost extends IoHost {
     /** clock in ms */
     now(): number;
     /** log lines, never containing the host or the PIN */
-    log: { debug(message: string): void; info(message: string): void; warn(message: string): void };
+    log: Logger;
     /** managed timers */
-    timers: { setInterval: (cb: () => void, ms: number) => unknown; clearInterval: (handle: unknown) => void };
+    timers: IntervalTimers;
     /** read a data page of the web interface */
     getData(name: string): Promise<Result<unknown>>;
     /** wait (managed timer), to pace the requests */
@@ -50,8 +51,9 @@ export interface WebOptions {
  * Reads the room data and the names from the Navigator's web interface in a fixed interval (spec Modul H). Read-only.
  */
 export class WebRunner {
-    private timer: unknown;
-    private statisticsTimer: unknown;
+    private readonly ticker: Ticker;
+    private readonly statisticsTicker: Ticker;
+    private readonly failures: FailureLog;
     private statisticsBusy = false;
     private statisticsObjects = new Set<string>();
     private readonly io: IoPublisher;
@@ -59,7 +61,6 @@ export class WebRunner {
     private readonly roomNameStates = new Set<string>();
     private busy = false;
     private namesAt = Number.NEGATIVE_INFINITY;
-    private failing = false;
 
     /**
      * @param host adapter services
@@ -70,6 +71,9 @@ export class WebRunner {
         private readonly options: WebOptions,
     ) {
         this.io = new IoPublisher(host);
+        this.ticker = new Ticker(host.timers);
+        this.statisticsTicker = new Ticker(host.timers);
+        this.failures = new FailureLog(host.log);
         this.roomObjects = new ManagedObjects(host, 'web.rooms');
     }
 
@@ -81,27 +85,18 @@ export class WebRunner {
             stateObject('web.connected', 'Web interface reachable', 'boolean', 'indicator.reachable'),
         ]);
         await this.tick();
-        this.timer = this.host.timers.setInterval(() => void this.tick(), this.options.intervalMs);
+        this.ticker.start(() => void this.tick(), this.options.intervalMs);
         if (this.options.statisticsIntervalMs > 0) {
             await this.statisticsTick();
-            this.statisticsTimer = this.host.timers.setInterval(
-                () => void this.statisticsTick(),
-                this.options.statisticsIntervalMs,
-            );
+            this.statisticsTicker.start(() => void this.statisticsTick(), this.options.statisticsIntervalMs);
         }
         this.host.log.info(`Web interface module started, every ${this.options.intervalMs / 1000} s`);
     }
 
     /** Stop the cycle. */
     public stop(): void {
-        if (this.timer !== undefined) {
-            this.host.timers.clearInterval(this.timer);
-            this.timer = undefined;
-        }
-        if (this.statisticsTimer !== undefined) {
-            this.host.timers.clearInterval(this.statisticsTimer);
-            this.statisticsTimer = undefined;
-        }
+        this.ticker.stop();
+        this.statisticsTicker.stop();
     }
 
     /** Read the three statistics pages one after the other and publish them. Never throws. */
@@ -148,7 +143,7 @@ export class WebRunner {
                 this.fail(rooms.error.message);
                 return;
             }
-            this.failing = false;
+            this.failures.clear();
             this.host.publish('web.connected', true);
             await this.publishRooms(parseRooms(rooms.value));
             await this.publishIo();
@@ -180,12 +175,7 @@ export class WebRunner {
 
     private fail(message: string): void {
         this.host.publish('web.connected', false);
-        if (!this.failing) {
-            this.failing = true;
-            this.host.log.warn(`Web interface: ${message}`);
-        } else {
-            this.host.log.debug(`Web interface: ${message}`);
-        }
+        this.failures.report(`Web interface: ${message}`);
     }
 
     /**

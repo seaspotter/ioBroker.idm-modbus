@@ -1,12 +1,12 @@
 import { type FloatWordOrder, KEEPALIVE_AFTER_MS, KEEPALIVE_CHECK_MS } from './constants';
 import { buildReadBlocks, type ReadBlock } from './modbus/batching';
 import { nextReconnectDelayMs } from './modbus/backoff';
-import { fail, type ModbusError, type Result } from './modbus/result';
+import { notConnected, type ModbusError, type Result } from './modbus/result';
 import type { PollGroup, RegisterEntry } from './registers/types';
 import { interpretWords, shouldWrite } from './value';
 
 /** Failed reads (Modbus exception) before a register is treated as not present (spec "Fehlerbehandlung"). */
-export const ABSENT_AFTER_FAILURES = 3;
+const ABSENT_AFTER_FAILURES = 3;
 
 /** The part of the Modbus client the poller needs - a fake in the tests. */
 export interface RegisterReader {
@@ -115,17 +115,11 @@ export class Poller {
     public stop(): void {
         this.stopped = true;
         this.epoch++;
-        if (this.reconnectTimer !== null) {
-            this.options.timers.clearTimeout(this.reconnectTimer);
-            this.reconnectTimer = null;
-        }
+        this.reconnectTimer = this.cancel(this.reconnectTimer);
         this.clearGroupTimers();
         this.client?.close();
         this.client = null;
-        if (this.connected) {
-            this.connected = false;
-            this.options.sink.connection(false);
-        }
+        this.markDisconnected();
     }
 
     /** True while the connection to the Navigator is open. */
@@ -142,9 +136,7 @@ export class Poller {
      * @param count number of registers
      */
     public readRaw(fc: 3 | 4, address: number, count: number): Promise<Result<number[]>> {
-        return this.client && this.connected
-            ? this.client.readRegisters(fc, address, count)
-            : Promise.resolve(fail('offline', 'Not connected'));
+        return this.whenConnected(client => client.readRegisters(fc, address, count));
     }
 
     /**
@@ -155,9 +147,11 @@ export class Poller {
      * @param words values
      */
     public writeRaw(address: number, words: readonly number[]): Promise<Result<void>> {
-        return this.client && this.connected
-            ? this.client.writeMultipleRegisters(address, words)
-            : Promise.resolve(fail('offline', 'Not connected'));
+        return this.whenConnected(client => client.writeMultipleRegisters(address, words));
+    }
+
+    private whenConnected<T>(call: (client: RegisterReader) => Promise<Result<T>>): Promise<Result<T>> {
+        return this.client && this.connected ? call(this.client) : Promise.resolve(notConnected());
     }
 
     /** Request statistics since the last call: number of requests and their average duration. */
@@ -200,10 +194,7 @@ export class Poller {
         }
         this.epoch++;
         this.clearGroupTimers();
-        if (this.connected) {
-            this.connected = false;
-            this.options.sink.connection(false);
-        }
+        this.markDisconnected();
         this.options.sink.error(reason.message);
         this.options.sink.log.warn(`Connection lost (${reason.kind}), reconnecting`);
         // the warning above already tells the user; do not repeat it as "not reachable" for the first retry
@@ -236,10 +227,27 @@ export class Poller {
             this.options.timers.clearTimeout(handle);
         }
         this.groupTimers.clear();
-        if (this.keepAliveTimer !== null) {
-            this.options.timers.clearTimeout(this.keepAliveTimer);
-            this.keepAliveTimer = null;
+        this.keepAliveTimer = this.cancel(this.keepAliveTimer);
+    }
+
+    private markDisconnected(): void {
+        if (this.connected) {
+            this.connected = false;
+            this.options.sink.connection(false);
         }
+    }
+
+    /**
+     * Cancel a timer handle if set.
+     *
+     * @param handle timer handle or `null`
+     * @returns `null`, for reassignment
+     */
+    private cancel(handle: unknown): null {
+        if (handle !== null) {
+            this.options.timers.clearTimeout(handle);
+        }
+        return null;
     }
 
     private startGroups(): void {

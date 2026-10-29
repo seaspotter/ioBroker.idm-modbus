@@ -5,7 +5,7 @@
  */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as vm from 'node:vm';
+import { statesOf } from './diagram-tags';
 import { loadRegisters } from '../src/lib/registers/plant';
 import type { RegisterEntry } from '../src/lib/registers/types';
 import { stateIdFor } from '../src/lib/state-model';
@@ -41,11 +41,6 @@ export interface Snapshot {
     settings: { storage?: string };
     language: string;
 }
-
-type Plant = { statesOf(tag: string): string[] };
-const exported: { module: { exports: unknown } } = { module: { exports: {} } };
-vm.runInNewContext(fs.readFileSync(path.join(root, 'www', 'plant.js'), 'utf8'), exported);
-const plant = exported.module.exports as Plant;
 
 /** The operating modes of the Navigator the pictures are drawn in (`hp.hp_operating_mode`). */
 export const MODE = { heating: 1, cooling: 2, hotWater: 4 } as const;
@@ -185,7 +180,7 @@ export function buildSnapshot(scheme: Scheme, language = 'en', mode: number = MO
     }
     let index = 0;
     for (const tag of [...tags].sort()) {
-        const ids = plant.statesOf(tag);
+        const ids = statesOf(tag);
         const id = ids[0];
         if (!id) {
             continue;

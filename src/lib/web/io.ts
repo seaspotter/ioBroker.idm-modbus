@@ -1,5 +1,6 @@
 import type { PlannedObject } from '../object-tree';
 import { localized, type LocalizedText } from '../translations';
+import { channelObject } from './objects';
 
 /** The four input/output tables of the Navigator's information menu (`data/settings.php`, ids `INFOAIN` ...). */
 export type IoGroup = 'sensors' | 'digital_in' | 'analog_out' | 'digital_out';
@@ -238,15 +239,9 @@ export function buildIoStates(io: Partial<Record<IoGroup, IoItem[]>>, isDuplicat
             continue;
         }
         if (!objects.length) {
-            objects.push({
-                id: 'web.io',
-                object: { type: 'channel', common: { name: localized('Inputs and outputs') }, native: {} },
-            });
+            objects.push(channelObject('web.io', 'Inputs and outputs'));
         }
-        objects.push({
-            id: `web.io.${group}`,
-            object: { type: 'channel', common: { name: localized(IO_GROUPS[group].channel) }, native: {} },
-        });
+        objects.push(channelObject(`web.io.${group}`, IO_GROUPS[group].channel));
         const used = new Set<string>();
         for (const item of rows) {
             const base = ioKey(item) || 'value';

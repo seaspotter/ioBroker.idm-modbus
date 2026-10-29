@@ -1,4 +1,5 @@
 import type { RoomSource } from '../config';
+import type { ForeignState } from '../runner-kit';
 
 /** What the last write of a row was. */
 export interface LastRoomWrite {
@@ -25,7 +26,7 @@ export type RoomDecision =
  */
 export function decideRoomWrite(
     row: RoomSource,
-    input: { val: unknown; ts: number } | undefined,
+    input: ForeignState | undefined,
     now: number,
     last: LastRoomWrite | undefined,
 ): RoomDecision {
@@ -42,7 +43,7 @@ export function decideRoomWrite(
     if (!Number.isFinite(raw)) {
         return { skip: 'invalid' };
     }
-    if (now - (input as { ts: number }).ts > row.maxAgeMs) {
+    if (now - input!.ts > row.maxAgeMs) {
         return row.onStale === 'fixed' && row.fixedValue !== null ? due(row.fixedValue, 'fixed') : { skip: 'stale' };
     }
     const value = Math.round((raw * row.factor + row.offset) * 10) / 10;
