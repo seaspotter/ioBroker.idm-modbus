@@ -71,6 +71,7 @@ A live picture of your plant on a web page, drawn from the values the adapter re
 
 ### **WORK IN PROGRESS**
 
+- (SeaSpotter) photovoltaics: no false "another energy manager seems to write them too" warning any more while the battery level -1 (not available) is written
 - (SeaSpotter) Navigator 10: the changeover valve of the heating circuit (M61, register 1110) shows Heating / Cooling instead of 0 / 1
 
 ### 0.1.18 (2026-10-28)

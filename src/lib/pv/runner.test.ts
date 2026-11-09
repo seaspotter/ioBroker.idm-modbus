@@ -121,4 +121,15 @@ describe('PvRunner', () => {
         }
         expect(host.published.writer_conflict).to.equal(false);
     });
+
+    it('does not take the neutral battery level -1 for a second writer when it reads it back', async () => {
+        const host = new Fake();
+        host.time = NOW + 10 * 60 * 1000; // all sources are too old: surplus 0, battery level -1
+        const runner = await make(host);
+        for (let i = 0; i < 12; i++) {
+            await runner.tick();
+        }
+        expect(host.logs.some(l => l.includes('PV source of battery_soc is too old, writing -1'))).to.equal(true);
+        expect(host.published.writer_conflict).to.equal(false);
+    });
 });
