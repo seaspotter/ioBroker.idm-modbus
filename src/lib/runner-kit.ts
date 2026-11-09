@@ -2,7 +2,7 @@ import type { FloatWordOrder } from './constants';
 import { checkWrite } from './control/rules';
 import type { Result } from './modbus/result';
 import type { RegisterEntry } from './registers/types';
-import { interpretWords } from './value';
+import { decodeWords } from './modbus/codec';
 
 /** Log lines of a runner, never containing host names, PINs or credentials. */
 export interface Logger {
@@ -232,7 +232,8 @@ export abstract class FeedRunner {
         if (!result.ok) {
             return undefined;
         }
-        const { value } = interpretWords(reg, result.value, this.floatWordOrder);
+        // the raw value, not the plausibility-checked one: a neutral value that is a sentinel (battery level -1) must read back as written
+        const value = decodeWords(reg.type, result.value, this.floatWordOrder);
         return value === null || Math.abs(value - expected) > tolerance;
     }
 
