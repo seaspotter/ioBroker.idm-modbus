@@ -69,6 +69,8 @@ describe('web information tables', () => {
     it('creates states, skips sensors Modbus already has and types digital inputs as boolean', () => {
         const states = buildIoStates(parseIo(SETTINGS), tag => tag === 'B32');
         expect(states.values.has('web.io.sensors.b32')).to.equal(false);
+        expect(states.copies.has('web.io.sensors.b32')).to.equal(true);
+        expect(states.objects.some(o => o.id === 'web.io.sensors.b32')).to.equal(false);
         expect(states.values.get('web.io.sensors.b2')).to.equal(0);
         expect(states.values.get('web.io.digital_in.b1')).to.equal(true);
         expect(states.values.get('web.io.digital_in.b5')).to.equal(false);

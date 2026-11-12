@@ -32,12 +32,15 @@ export class IoPublisher {
     public async update(io: Partial<Record<IoGroup, IoItem[]>>): Promise<void> {
         const states = buildIoStates(io, tag => this.host.hasModbusValue(tag));
         await this.objects.sync(states.objects);
+        // a state that exists stays current when Modbus delivers the part later (M73 reads -1 while the pump stands, so its web copy was created then)
+        const current = new Map(states.values);
+        states.copies.forEach((value, id) => this.objects.has(id) && current.set(id, value));
         for (const id of this.values.keys()) {
-            if (!states.values.has(id)) {
+            if (!current.has(id)) {
                 this.values.delete(id); // no longer created: publish it again if it comes back
             }
         }
-        states.values.forEach((value, id) => {
+        current.forEach((value, id) => {
             if (this.values.get(id) !== value) {
                 this.values.set(id, value);
                 this.host.publish(id, value);
