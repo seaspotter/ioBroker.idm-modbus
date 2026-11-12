@@ -179,6 +179,8 @@ export interface IoStates {
     objects: PlannedObject[];
     /** value per state id */
     values: Map<string, number | string | boolean>;
+    /** values of the rows Modbus delivers (no objects planned): they keep an object that exists current, see the publisher */
+    copies: Map<string, number | string | boolean>;
 }
 
 /**
@@ -228,20 +230,21 @@ function withTag(label: LocalizedText | string, tag: string): LocalizedText | st
  * (like room names).
  *
  * @param io the parsed tables
- * @param isDuplicate tells whether Modbus delivers the part with this IDM tag (those rows are left out)
+ * @param isDuplicate tells whether Modbus delivers the part with this IDM tag (no object is planned for those rows, their values
+ * go to `copies`)
  */
 export function buildIoStates(io: Partial<Record<IoGroup, IoItem[]>>, isDuplicate: (tag: string) => boolean): IoStates {
     const objects: PlannedObject[] = [];
     const values = new Map<string, number | string | boolean>();
+    const copies = new Map<string, number | string | boolean>();
     for (const group of Object.keys(IO_GROUPS) as IoGroup[]) {
-        const rows = (io[group] ?? []).filter(item => !item.tag || !isDuplicate(item.tag));
-        if (!rows.length) {
-            continue;
+        const rows = io[group] ?? [];
+        if (rows.some(item => !item.tag || !isDuplicate(item.tag))) {
+            if (!objects.length) {
+                objects.push(channelObject('web.io', 'Inputs and outputs'));
+            }
+            objects.push(channelObject(`web.io.${group}`, IO_GROUPS[group].channel));
         }
-        if (!objects.length) {
-            objects.push(channelObject('web.io', 'Inputs and outputs'));
-        }
-        objects.push(channelObject(`web.io.${group}`, IO_GROUPS[group].channel));
         const used = new Set<string>();
         for (const item of rows) {
             const base = ioKey(item) || 'value';
@@ -252,6 +255,10 @@ export function buildIoStates(io: Partial<Record<IoGroup, IoItem[]>>, isDuplicat
             used.add(key);
             const id = `web.io.${group}.${key}`;
             const type = stateType(group, item.value);
+            if (item.tag && isDuplicate(item.tag)) {
+                copies.set(id, type === 'boolean' ? item.value !== 0 : item.value);
+                continue;
+            }
             const role =
                 type === 'boolean' ? 'indicator' : type === 'string' ? 'text' : (ROLE_BY_UNIT[item.unit] ?? 'value');
             objects.push({
@@ -272,5 +279,5 @@ export function buildIoStates(io: Partial<Record<IoGroup, IoItem[]>>, isDuplicat
             values.set(id, type === 'boolean' ? item.value !== 0 : item.value);
         }
     }
-    return { objects, values };
+    return { objects, values, copies };
 }

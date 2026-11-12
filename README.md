@@ -69,6 +69,10 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.20 (2026-11-12)
+
+- (SeaSpotter) inputs and outputs of the web interface: a copy created while Modbus had no value (for example `analog_out.m73` while the charging pump stands, reported as -1) now stays current when Modbus delivers the part later, instead of freezing at its first value
+
 ### 0.1.19 (2026-11-09)
 
 - (SeaSpotter) photovoltaics: no false "another energy manager seems to write them too" warning any more while the battery level -1 (not available) is written

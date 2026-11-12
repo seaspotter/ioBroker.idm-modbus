@@ -29,6 +29,15 @@ export class ManagedObjects {
     ) {}
 
     /**
+     * Whether the object exists (created now or by an earlier start).
+     *
+     * @param id id of the object, relative to the instance
+     */
+    public has(id: string): boolean {
+        return this.known.has(id);
+    }
+
+    /**
      * Make the objects below the prefix match the plan.
      *
      * @param planned the objects that should exist
