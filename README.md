@@ -69,6 +69,10 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
+### 0.1.21 (2026-11-13)
+
+- (SeaSpotter) Navigator 10: the heat sink flow rate (B2, register 1072) is read as the floating point value the controller delivers instead of one word of it, so it no longer jumps to values like 41699 or 680000 l/min
+
 ### 0.1.20 (2026-11-12)
 
 - (SeaSpotter) inputs and outputs of the web interface: a copy created while Modbus had no value (for example `analog_out.m73` while the charging pump stands, reported as -1) now stays current when Modbus delivers the part later, instead of freezing at its first value
