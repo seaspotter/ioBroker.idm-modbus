@@ -1662,8 +1662,8 @@
         {
             "id": "heat_sink_flow_rate",
             "address": 1072,
-            "words": 1,
-            "type": "UCHAR",
+            "words": 2,
+            "type": "FLOAT",
             "pdfType": "UCHAR",
             "access": "R",
             "idmSensorRo": false,
@@ -1684,10 +1684,10 @@
             "enum": null,
             "requires": [],
             "overlaps": [],
-            "verified": "doc",
+            "verified": "community",
             "deviceStatus": null,
             "deviceFc": null,
-            "typeSource": "doc",
+            "typeSource": "community",
             "note": "flow-only-with-separating-heat-exchanger",
             "label": {
                 "en": "Heat sink flow rate (B2)",

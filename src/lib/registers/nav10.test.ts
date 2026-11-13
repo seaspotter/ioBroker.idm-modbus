@@ -53,7 +53,18 @@ describe('nav10 register file', () => {
     });
 
     it('is documented only: nothing is verified at a device', () => {
-        expect(registers.every(r => r.verified === 'doc')).to.equal(true);
+        expect(registers.every(r => r.verified !== 'device')).to.equal(true);
+    });
+
+    it('reads the B2 flow rate as a FLOAT of two words, not as the UCHAR of the document', () => {
+        // a support file showed 41699 (0xA2E3, the low word of 21.45 l/min) when only one word was read; the flow of that plant
+        // computed from its heat output and spread is 21.4 l/min
+        expect(byId.get('heat_sink_flow_rate')).to.deep.include({
+            type: 'FLOAT',
+            words: 2,
+            pdfType: 'UCHAR',
+            verified: 'community',
+        });
     });
 
     it('enables the booster registers only with the booster block', () => {
