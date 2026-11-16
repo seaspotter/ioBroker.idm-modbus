@@ -9,11 +9,10 @@ export interface ObjectHost {
 }
 
 /**
- * The objects below one prefix: planned ones that do not exist yet are created, and on the first call of a start the ones that
- * already exist are brought up to date as well (a renamed part or a new translation reaches installations that created the object
- * earlier; the objects are merged, so what the user added, for example history settings, stays). Nothing is ever deleted here (a
- * state that was there stays, whatever the plan says now; only a scan or the user removes states). The first call also takes in
- * what an earlier start left in the object tree.
+ * The objects below one prefix: planned ones that do not exist yet are created. The first call of a start also brings the existing
+ * ones up to date (a renamed part or a new translation reaches old installations; objects are merged, so user additions such as
+ * history settings stay) and takes in what an earlier start left. Nothing is ever deleted here; only a scan or the user removes
+ * states.
  */
 export class ManagedObjects {
     private readonly known = new Set<string>();

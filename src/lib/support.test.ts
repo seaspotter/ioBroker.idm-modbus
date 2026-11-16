@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { buildSupportReport, redact, type SupportInput } from './support';
+import { buildSupportReport, redact, supportSettings, type SupportInput } from './support';
 
 const input = (): SupportInput => ({
     adapterVersion: '0.0.1',
@@ -53,5 +53,25 @@ describe('support report', () => {
             zip: 'keep',
             pinned: 'keep',
         });
+    });
+
+    it('takes only whitelisted settings and counts what holds names or state ids', () => {
+        const settings = supportSettings({
+            host: '192.168.1.5',
+            webPin: '1234',
+            family: 'nav20',
+            hcA: true,
+            hcNameA: 'Ground floor',
+            pvSources: [{ stateId: 'a.b.c' }, { stateId: 'd.e.f' }],
+            extElecPowerId: 'x.y.z',
+        });
+        expect(settings).to.include({
+            family: 'nav20',
+            hcA: true,
+            heatingCircuitNamesSet: 1,
+            pvSources: 2,
+            externalMeters: 1,
+        });
+        expect(JSON.stringify(settings)).to.not.contain('192.168').and.not.contain('1234').and.not.contain('x.y.z');
     });
 });

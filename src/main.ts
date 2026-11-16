@@ -30,13 +30,13 @@ import { notConnected } from './lib/modbus/result';
 import { BoostRunner } from './lib/boost/runner';
 import { detectFamily } from './lib/detect';
 import { faultText } from './lib/faults';
-import { buildSupportReport, type SupportInput } from './lib/support';
+import { buildSupportReport, supportSettings, type SupportInput } from './lib/support';
 import { decodeWords } from './lib/modbus/codec';
 import { planCleanup, planObjects, type PlannedObject } from './lib/object-tree';
 import { Poller, type PollSink } from './lib/poller';
 import type { PlantConfig } from './lib/registers/plant';
 import { plantToNative, runScan, type ScanResult, scanToCsv, summarizeScan, suggestPlant } from './lib/scan';
-import { activeRegisters, HEATING_CIRCUITS, loadRegisters } from './lib/registers/plant';
+import { activeRegisters, loadRegisters } from './lib/registers/plant';
 import type { RegisterEntry } from './lib/registers/types';
 import { stateIdFor, toStateValue } from './lib/state-model';
 import { movePvRowsToFields } from './lib/pv/migrate';
@@ -390,11 +390,7 @@ class IdmModbus extends utils.Adapter {
                 },
                 setDemand: async on => (await this.poller?.writeRaw(demand.address, [on ? 1 : 0])) ?? OFFLINE,
                 publish: (id, value) => this.put(`dhw.boost_${id}`, { val: value, ack: true }),
-                load: async () => {
-                    const state = await this.getStateAsync('dhw.boost_data');
-                    return typeof state?.val === 'string' ? state.val : null;
-                },
-                save: json => this.put('dhw.boost_data', json, true),
+                ...this.jsonState('dhw.boost_data'),
             },
             { targetC: settings.targetC, maxMinutes: settings.maxMinutes },
         );
@@ -661,6 +657,7 @@ class IdmModbus extends utils.Adapter {
             );
             return;
         }
+        const data = this.jsonState('stats.data');
         this.stats = new StatsRunner(
             {
                 now: () => Date.now(),
@@ -669,11 +666,8 @@ class IdmModbus extends utils.Adapter {
                 sample: id => this.samples.get(id),
                 createObjects: planned => this.createPlanned(planned),
                 publish: (id, value) => this.put(id, { val: value, ack: true }),
-                loadData: async () => {
-                    const state = await this.getStateAsync('stats.data');
-                    return typeof state?.val === 'string' ? state.val : null;
-                },
-                saveData: json => this.put('stats.data', json, true),
+                loadData: data.load,
+                saveData: data.save,
                 foreignUnit: async id => {
                     const object = await this.getForeignObjectAsync(id);
                     const unit = (object?.common as { unit?: unknown } | undefined)?.unit;
@@ -701,6 +695,7 @@ class IdmModbus extends utils.Adapter {
         if (!registers.some(reg => isWritable(reg, control))) {
             return;
         }
+        const counters = this.jsonState('diag.writesData');
         this.control = new ControlRunner(
             {
                 now: () => Date.now(),
@@ -724,11 +719,8 @@ class IdmModbus extends utils.Adapter {
                     this.put('diag.lastError', message, true);
                 },
                 publishCounter: (registerId, counters) => void this.publishWriteCounter(registerId, counters.total),
-                loadCounters: async () => {
-                    const state = await this.getStateAsync('diag.writesData');
-                    return typeof state?.val === 'string' ? state.val : null;
-                },
-                saveCounters: json => this.put('diag.writesData', json, true),
+                loadCounters: counters.load,
+                saveCounters: counters.save,
             },
             {
                 registers,
@@ -805,6 +797,21 @@ class IdmModbus extends utils.Adapter {
         for (const { id, object } of planned) {
             await this.extendObject(id, object);
         }
+    }
+
+    /**
+     * Load and save callbacks for a JSON text kept in one of the adapter's own states.
+     *
+     * @param id state id
+     */
+    private jsonState(id: string): { load: () => Promise<string | null>; save: (json: string) => void } {
+        return {
+            load: async () => {
+                const state = await this.getStateAsync(id);
+                return typeof state?.val === 'string' ? state.val : null;
+            },
+            save: json => this.put(id, json, true),
+        };
     }
 
     /** The adapter's managed interval timers, handed to the runners (CLAUDE.md rule 17). */
@@ -1100,60 +1107,7 @@ class IdmModbus extends utils.Adapter {
 
     /** Collect what the support report is made of; only whitelisted configuration values, never hosts, PINs or state ids. */
     private async collectSupport(): Promise<SupportInput> {
-        const config = this.config as unknown as Record<string, unknown>;
-        const keep = [
-            'family',
-            'port',
-            'unitId',
-            'requestTimeoutMs',
-            'requestPauseMs',
-            'intervalFastS',
-            'intervalMediumS',
-            'intervalSlowS',
-            'intervalConfigS',
-            ...HEATING_CIRCUITS.map(letter => `hc${letter}`),
-            'zoneModules',
-            'roomsPerZone',
-            'blockSolar',
-            'blockIsc',
-            'blockCascade',
-            'blockBivalence',
-            'blockPv',
-            'blockBooster',
-            'hideUnavailable',
-            'removeInactiveStates',
-            'writeSystem',
-            'writeDhw',
-            'writeZones',
-            'writeExpert',
-            'writeSolar',
-            'eepromMinIntervalS',
-            'dailyWriteWarn',
-            'statsEnabled',
-            'thermalSource',
-            'currency',
-            'pvEnabled',
-            'pvIntervalS',
-            'pvMaxAgeS',
-            'pvSurplusMode',
-            'roomsEnabled',
-            'gltEnabled',
-            'boostEnabled',
-            'boostTargetC',
-            'boostMaxMinutes',
-            'webEnabled',
-            'webPort',
-            'webIntervalS',
-            'webStatisticsIntervalS',
-        ];
-        const settings: Record<string, unknown> = Object.fromEntries(keep.map(key => [key, config[key]]));
-        settings.heatingCircuitNamesSet = HEATING_CIRCUITS.filter(l => config[`hcName${l}`]).length;
-        for (const key of ['pvSources', 'roomSources', 'gltSources']) {
-            settings[key] = Array.isArray(config[key]) ? config[key].length : 0;
-        }
-        settings.externalMeters = ['extElecCounterId', 'extElecPowerId', 'extHeatCounterId', 'extHeatPowerId'].filter(
-            k => config[k],
-        ).length;
+        const settings = supportSettings(this.config as unknown as Record<string, unknown>);
         const value = async (id: string): Promise<unknown> => (await this.getStateAsync(id))?.val ?? null;
         const now = Date.now();
         let controllerVersion: string | null = null;

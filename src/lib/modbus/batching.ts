@@ -48,12 +48,11 @@ function allowedFunctionCodes(reg: RegisterEntry, useDeviceFc: boolean): Set<Rea
 /**
  * Bundle registers into read requests.
  *
- * Registers that sit exactly next to each other (no gap, no overlap) form a run; a run is cut into requests of at most
- * `maxWords`, and a new request starts where the registers no longer share a function code. This also bundles neighbours that
- * belong to other polling groups - reading them costs no extra request, and their states simply get a fresher value. A
- * request is only sent when it contains at least one `wanted` register. Registers with address overlaps (1392, 1441, 1483 and
- * their neighbours) are always read on their own so a neighbour never gets decoded out of a shared block. Gaps of unknown
- * addresses are never bridged: they answer with exception 02 and would fail the whole request.
+ * Registers that sit exactly next to each other form a run, cut into requests of at most `maxWords` and wherever the function
+ * code changes. Neighbours of other polling groups are bundled too (no extra request, a fresher value). A request is only sent
+ * when it holds at least one `wanted` register. Registers with address overlaps (1392, 1441, 1483 and their neighbours) are read
+ * alone so a neighbour is never decoded out of a shared block. Gaps of unknown addresses are never bridged: they answer with
+ * exception 02 and would fail the whole request.
  *
  * @param registers all candidate registers (any order); write-only registers are skipped
  * @param maxWords request size limit

@@ -66,7 +66,7 @@ export class ControlRunner {
      */
     public constructor(
         private readonly host: ControlHost,
-        private readonly options: ControlOptions,
+        options: ControlOptions,
     ) {
         for (const reg of options.registers) {
             if (isWritable(reg, options.control)) {

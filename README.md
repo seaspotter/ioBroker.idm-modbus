@@ -17,7 +17,7 @@ Connects [IDM](https://www.idm-energie.at) heat pumps (iDM Energiesysteme) with 
 
 **Manual:** [English](docs/en/manual.md) · [Deutsch](docs/de/handbuch.md)
 
-> **Status: early development.** The Navigator 2.0 (Pro) is verified at a real device for reading and for a few writes. Navigator 1.7 and 10 are built from the IDM documents only and untested. Control, PV, room-temperature and building-automation feeding and the web interface part are off by default.
+> **Status: early development.** The Navigator 2.0 (Pro) is verified at a real device for reading and for a few writes. The Navigator 10 runs at a tester's plant (reading, PV and room feeding); its web interface part and the Navigator 1.7 are built from the IDM documents and untested. Control, PV, room-temperature and building-automation feeding and the web interface part are off by default.
 
 ### Features
 
