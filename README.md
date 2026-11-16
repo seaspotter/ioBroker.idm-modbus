@@ -69,7 +69,7 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.2.1 (2026-11-16)
 
 - (SeaSpotter) Navigator 10: the heat sink temperatures, the flow rate (B2) and the groundwater temperatures show no value instead of -1 or 0 on plants that do not have these sensors (no separating heat exchanger, no groundwater source)
 
