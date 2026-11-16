@@ -202,6 +202,7 @@
     "webEnabled": "同时读取网页界面的数据（输入和输出；Navigator 2.0 / Pro：还包括房间名称、房间数据和统计数据）",
     "webEnabledHelp": "只读。使用显示屏的 PIN（与在浏览器中登录时相同）。Navigator 2.0 / Pro：设置房间和供暖回路的名称，添加 Modbus 不读取的房间以及 Navigator 的统计数据。Navigator 10：通过其 WebSocket 读取输入和输出。Modbus 已提供的内容不会再从网页界面重复创建。不适用于 Navigator 1.0/1.7。网页界面未被 IDM 文档化，可能随固件更新而变化。PIN 在本地网络中以未加密方式发送，与在浏览器中相同。",
     "webIntervalS": "间隔（秒，至少 30）",
+    "webLanguageNote": "语言：Web 界面部分仅在导航器设置为德语 (Allgemeine Einstellungen | Sprache) 时进行测试和支持。使用另一种语言时，统计数据、某些部件名称和图表可能会丢失或错误。来自 Modbus 的所有内容都不依赖于语言。",
     "webPin": "显示屏 PIN",
     "webPort": "网页界面端口",
     "webPortHelp": "0 = 自动：对于 Navigator 2.0 / Pro 为 80，对于 Navigator 10 为 61220 (WebSocket)",

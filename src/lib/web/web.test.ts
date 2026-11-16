@@ -152,7 +152,7 @@ describe('WebRunner', () => {
             },
             timers: { setInterval: () => 1, clearInterval: () => undefined },
             getData: name =>
-                name === 'rooms'
+                name === 'rooms' || name.startsWith('statistics')
                     ? answer()
                     : name === 'settings'
                       ? Promise.resolve(ok(settings))
@@ -178,6 +178,17 @@ describe('WebRunner', () => {
             circuitNames,
         };
     };
+
+    it('warns once that the web interface needs the Navigator in German when the statistics names are unknown', async () => {
+        const italian = {
+            data: { unitTotal: 'kWh', daily: [{ name: '10.10', values: [[1]] }] },
+            items: [[{ name: 'Riscaldamento' }]],
+        };
+        const t = make(() => Promise.resolve(ok(italian)));
+        await t.runner.statisticsTick();
+        await t.runner.statisticsTick();
+        expect(t.log.filter(line => line.startsWith('warn ') && line.includes('German'))).to.have.length(1);
+    });
 
     it('creates the objects once, publishes the values and hands the names on', async () => {
         const t = make(() => Promise.resolve(ok(rooms)));
@@ -306,6 +317,17 @@ describe('web statistics', () => {
                 items: [[{ name: 'Heizen' }]],
             })?.total,
         ).to.deep.equal({});
+    });
+
+    it('marks a page whose category names it does not know (a Navigator that is not set to German or English)', () => {
+        expect(parseStatistics(heat)?.unknownLanguage).to.equal(undefined);
+        const italian = page(
+            'kWh',
+            [1, 2, 3, 4],
+            [['Riscaldamento', 'Raffreddamento', 'Acqua calda'], ['Sbrinamento']],
+            [[1, 2, 3], [4]],
+        );
+        expect(parseStatistics(italian)?.unknownLanguage).to.equal(true);
     });
 
     it('builds states per kind, category and period, the history, and the COP', () => {
