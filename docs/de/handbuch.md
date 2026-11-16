@@ -75,7 +75,9 @@ Alle Datenpunkte liegen unter der Instanz (`idm-modbus.0.`). Die Namen sind in d
 | `solar`, `isc`, `cascade`, `bivalence`, `pv`, `glt` | optionale Blöcke                                                                                                                      |
 | `calc`                                              | berechnete Werte: Temperaturdifferenzen, Vorlaufabweichung, momentaner COP                                                            |
 | `stats`                                             | Energie je Betriebsart, COP und Jahresarbeitszahl, Kosten, CO₂, Betriebsstunden, Starts, Abtauungen                                   |
-| `web`                                               | Raumdaten und Statistik aus der Weboberfläche                                                                                         |
+| `web`                                               | Ein- und Ausgänge, Raumdaten und Statistik aus der Weboberfläche                                                                      |
+| `rooms`                                             | Raumtemperatur-Einspeisung: `writer_conflict`, `last_write` (wie bei `pv` und `glt`)                                                  |
+| `diagram`                                           | Einstellungen des Wärmepumpen-Diagramms (`settings`)                                                                                  |
 | `diag`                                              | Anfragestatistik, letzter Fehler, Schreibzähler, Scan-Zustand                                                                         |
 
 Regeln für die Werte:

@@ -75,7 +75,9 @@ All states are below the instance (`idm-modbus.0.`). Names are translated into y
 | `solar`, `isc`, `cascade`, `bivalence`, `pv`, `glt` | optional blocks                                                                                                     |
 | `calc`                                              | calculated values: temperature differences, flow deviation, momentary COP                                           |
 | `stats`                                             | energy per operating mode, COP and annual performance factor, cost, CO₂, operating hours, starts, defrosts          |
-| `web`                                               | room data and statistics from the web interface                                                                     |
+| `web`                                               | inputs and outputs, room data and statistics from the web interface                                                 |
+| `rooms`                                             | room temperature feeding: `writer_conflict`, `last_write` (like `pv` and `glt`)                                     |
+| `diagram`                                           | settings of the heat pump diagram (`settings`)                                                                      |
 | `diag`                                              | request statistics, last error, write counters, scan state                                                          |
 
 Rules for the values:

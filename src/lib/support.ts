@@ -1,3 +1,69 @@
+import { HEATING_CIRCUITS } from './registers/plant';
+
+/** The configuration values a support report carries (a whitelist: nothing else is ever copied, so no host, PIN or state id). */
+const SUPPORT_SETTING_KEYS = [
+    'family',
+    'port',
+    'unitId',
+    'requestTimeoutMs',
+    'requestPauseMs',
+    'intervalFastS',
+    'intervalMediumS',
+    'intervalSlowS',
+    'intervalConfigS',
+    ...HEATING_CIRCUITS.map(letter => `hc${letter}`),
+    'zoneModules',
+    'roomsPerZone',
+    'blockSolar',
+    'blockIsc',
+    'blockCascade',
+    'blockBivalence',
+    'blockPv',
+    'blockBooster',
+    'hideUnavailable',
+    'removeInactiveStates',
+    'writeSystem',
+    'writeDhw',
+    'writeZones',
+    'writeExpert',
+    'writeSolar',
+    'eepromMinIntervalS',
+    'dailyWriteWarn',
+    'statsEnabled',
+    'thermalSource',
+    'currency',
+    'pvEnabled',
+    'pvIntervalS',
+    'pvMaxAgeS',
+    'pvSurplusMode',
+    'roomsEnabled',
+    'gltEnabled',
+    'boostEnabled',
+    'boostTargetC',
+    'boostMaxMinutes',
+    'webEnabled',
+    'webPort',
+    'webIntervalS',
+    'webStatisticsIntervalS',
+];
+
+/**
+ * The settings of a support report: the whitelisted values, and for what holds state ids or names only how many are set.
+ *
+ * @param config the adapter configuration
+ */
+export function supportSettings(config: Record<string, unknown>): Record<string, unknown> {
+    const settings: Record<string, unknown> = Object.fromEntries(SUPPORT_SETTING_KEYS.map(key => [key, config[key]]));
+    settings.heatingCircuitNamesSet = HEATING_CIRCUITS.filter(letter => config[`hcName${letter}`]).length;
+    for (const key of ['pvSources', 'roomSources', 'gltSources']) {
+        settings[key] = Array.isArray(config[key]) ? config[key].length : 0;
+    }
+    settings.externalMeters = ['extElecCounterId', 'extElecPowerId', 'extHeatCounterId', 'extHeatPowerId'].filter(
+        key => config[key],
+    ).length;
+    return settings;
+}
+
 /** Everything the support report is built from; the adapter fills it, no host names or credentials go in. */
 export interface SupportInput {
     /** adapter version */
