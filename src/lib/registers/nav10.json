@@ -1592,7 +1592,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1636,7 +1638,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1680,7 +1684,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1770,7 +1776,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],
@@ -1814,7 +1822,9 @@
             "step": null,
             "ownRange": false,
             "cyclicSec": null,
-            "sentinel": [],
+            "sentinel": [
+                -1
+            ],
             "enum": null,
             "requires": [],
             "overlaps": [],

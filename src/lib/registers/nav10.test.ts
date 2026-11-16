@@ -67,6 +67,19 @@ describe('nav10 register file', () => {
         });
     });
 
+    it('treats -1 as "no sensor" for the heat sink and groundwater sensors (plants without separating heat exchanger or groundwater source)', () => {
+        // support files of two Navigator 10 plants showed -1 (and the low word 0 of -1.0 for the flow rate) there
+        for (const id of [
+            'heat_sink_return_temp',
+            'heat_sink_flow_temp',
+            'heat_sink_flow_rate',
+            'groundwater_inlet_temp_1',
+            'groundwater_inlet_temp_2',
+        ]) {
+            expect(byId.get(id)?.sentinel, id).to.deep.equal([-1]);
+        }
+    });
+
     it('enables the booster registers only with the booster block', () => {
         const plant: PlantConfig = {
             heatingCircuits: ['A'],
