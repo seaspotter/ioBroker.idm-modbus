@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "idm-modbus",
-        "version": "0.2.0",
+        "version": "0.2.1",
         "news": {
+            "0.2.1": {
+                "en": "Navigator 10: the heat sink temperatures, the flow rate (B2) and the groundwater temperatures show no value instead of -1 or 0 on plants without these sensors",
+                "de": "Navigator 10: Die Wärmesenken-Temperaturen, der Durchfluss (B2) und die Grundwassertemperaturen zeigen bei Anlagen ohne diese Sensoren keinen Wert statt -1 oder 0 an",
+                "ru": "Navigator 10: температуры теплоотвода, расход (B2) и температуры грунтовых вод не показывают значения вместо -1 или 0 на установках без этих датчиков",
+                "pt": "Navigator 10: as temperaturas do dissipador de calor, o caudal (B2) e as temperaturas da água subterrânea não mostram valor em vez de -1 ou 0 em instalações sem estes sensores",
+                "nl": "Navigator 10: de temperaturen van de warmteafgifte, de doorstroming (B2) en de grondwatertemperaturen tonen geen waarde in plaats van -1 of 0 bij installaties zonder deze sensoren",
+                "fr": "Navigator 10 : les températures du puits de chaleur, le débit (B2) et les températures de la nappe phréatique n'affichent aucune valeur au lieu de -1 ou 0 sur les installations sans ces capteurs",
+                "it": "Navigator 10: le temperature del dissipatore di calore, la portata (B2) e le temperature dell'acqua di falda non mostrano alcun valore invece di -1 o 0 negli impianti senza questi sensori",
+                "es": "Navigator 10: las temperaturas del sumidero de calor, el caudal (B2) y las temperaturas del agua subterránea no muestran ningún valor en lugar de -1 o 0 en instalaciones sin estos sensores",
+                "pl": "Navigator 10: temperatury odbiornika ciepła, przepływ (B2) i temperatury wód gruntowych nie pokazują wartości zamiast -1 lub 0 w instalacjach bez tych czujników",
+                "uk": "Navigator 10: температури тепловідведення, витрата (B2) і температури ґрунтових вод не показують значення замість -1 або 0 на установках без цих датчиків",
+                "zh-cn": "Navigator 10：在没有这些传感器的系统上，散热侧温度、流量 (B2) 和地下水温度不再显示 -1 或 0，而是不显示数值"
+            },
             "0.2.0": {
                 "en": "web interface: the settings and the manuals now say clearly that this part is only tested and supported with the Navigator language set to German; the adapter logs a warning once when the statistics use names it does not know; code clean-up",
                 "de": "Webinterface: In den Einstellungen und Handbüchern steht nun klar, dass dieser Teil nur mit der Navigator-Spracheinstellung Deutsch getestet und unterstützt wird; Der Adapter protokolliert einmal eine Warnung, wenn die Statistiken Namen verwenden, die ihm nicht bekannt sind. Code-Bereinigung",
@@ -54,19 +67,6 @@
                 "pl": "fotowoltaika: nie ma już fałszywych ostrzeżeń „inny menedżer ds. energii też je pisze”, gdy zapisywany jest poziom naładowania baterii -1 (niedostępny); Nawigator 10: zawór przełączający obiegu grzewczego (M61, rejestr 1110) zamiast 0 / 1 pokazuje Ogrzewanie / Chłodzenie",
                 "uk": "фотовольтаїка: більше немає помилкових попереджень «здається, інший менеджер енергоспоживання записує їх», поки записується рівень заряду батареї -1 (недоступно); Навігатор 10: перемикаючий клапан опалювального контуру (M61, реєстр 1110) показує Нагрівання / Охолодження замість 0 / 1",
                 "zh-cn": "光伏：在写入电池电量-1（不可用）时不再出现错误的“另一个能源管理器似乎也写了它们”警告；导航器 10：加热回路的转换阀（M61，寄存器 1110）显示加热/冷却而不是 0/1"
-            },
-            "0.1.18": {
-                "en": "photovoltaics: fixed an endless restart loop at the first start after updating from version 0.1.15 or older (the old PV table was not emptied, so it moved again and again)",
-                "de": "Photovoltaik: Endlos-Neustartschleife beim ersten Start nach dem Update von Version 0.1.15 oder älter behoben (die alte PV-Tabelle wurde nicht geleert und deshalb immer wieder verschoben)",
-                "ru": "фотовольтаика: исправлен бесконечный цикл перезапуска при первом запуске после обновления с версии 0.1.15 или старше (старая таблица PV не очищалась, поэтому перемещалась снова и снова)",
-                "pt": "energia fotovoltaica: corrigido um loop de reinicialização interminável na primeira inicialização após a atualização da versão 0.1.15 ou anterior (a tabela fotovoltaica antiga não foi esvaziada, então ela foi movida repetidamente)",
-                "nl": "fotovoltaïsche zonne-energie: een eindeloze herstartlus opgelost bij de eerste start na het updaten vanaf versie 0.1.15 of ouder (de oude PV-tabel werd niet geleegd, dus deze werd steeds opnieuw verplaatst)",
-                "fr": "photovoltaïque : correction d'une boucle de redémarrage sans fin au premier démarrage après mise à jour depuis la version 0.1.15 ou antérieure (l'ancienne table PV n'était pas vidée, donc elle bougeait encore et encore)",
-                "it": "fotovoltaico: risolto un ciclo di riavvio infinito al primo avvio dopo l'aggiornamento dalla versione 0.1.15 o precedente (la vecchia tabella PV non veniva svuotata, quindi si spostava ancora e ancora)",
-                "es": "Fotovoltaica: se corrigió un bucle de reinicio sin fin en el primer inicio después de actualizar desde la versión 0.1.15 o anterior (la tabla fotovoltaica anterior no se vació, por lo que se movió una y otra vez)",
-                "pl": "fotowoltaika: naprawiono niekończącą się pętlę restartu przy pierwszym uruchomieniu po aktualizacji z wersji 0.1.15 lub starszej (stara tabela PV nie została opróżniona, więc przesuwała się raz po raz)",
-                "uk": "фотоелектричні пристрої: виправлено нескінченний цикл перезапуску під час першого запуску після оновлення з версії 0.1.15 або старішої (стара таблиця PV не була порожня, тому вона переміщувалася знову і знову)",
-                "zh-cn": "光伏：修复了从0.1.15或更早版本更新后第一次启动时的无限重启循环（旧的PV表没有清空，所以它一次又一次地移动）"
             }
         },
         "titleLang": {
