@@ -108,6 +108,8 @@ export interface WebPeriod {
 
 /** A statistics table: lifetime totals and the periods, newest first. */
 export interface WebStatistics {
+    /** the page lists categories, but none has a name the adapter knows (the Navigator is probably not set to German) */
+    unknownLanguage?: boolean;
     /** lifetime totals by category in the base unit */
     total: Partial<Record<WebCategory, number>>;
     /** the last days, today first */
@@ -190,7 +192,14 @@ export function parseStatistics(json: unknown): WebStatistics | null {
             }
         }
     }
-    return { total, daily: periods(data.daily), monthly: periods(data.monthly), yearly: periods(data.yearly) };
+    const named = slugs.some(row => row.some(Boolean));
+    return {
+        ...(named || !slugs.some(row => row.length) ? {} : { unknownLanguage: true }),
+        total,
+        daily: periods(data.daily),
+        monthly: periods(data.monthly),
+        yearly: periods(data.yearly),
+    };
 }
 
 /**

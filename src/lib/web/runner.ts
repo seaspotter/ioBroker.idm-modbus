@@ -55,6 +55,7 @@ export class WebRunner {
     private readonly statisticsTicker: Ticker;
     private readonly failures: FailureLog;
     private statisticsBusy = false;
+    private languageWarned = false;
     private statisticsObjects = new Set<string>();
     private readonly io: IoPublisher;
     private readonly roomObjects: ManagedObjects;
@@ -112,6 +113,12 @@ export class WebRunner {
                 const table = answer.ok ? parseStatistics(answer.value) : null;
                 if (table) {
                     tables[kind] = table;
+                    if (table.unknownLanguage && !this.languageWarned) {
+                        this.languageWarned = true;
+                        this.host.log.warn(
+                            'The statistics of the web interface use names the adapter does not know: the web interface is only supported with the Navigator language set to German',
+                        );
+                    }
                 } else {
                     this.host.log.debug(`Web statistics ${kind} could not be read`);
                 }

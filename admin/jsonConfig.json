@@ -111,6 +111,17 @@
                     "xl": 12,
                     "hidden": "data.family === 'nav17'"
                 },
+                "webLanguageNote": {
+                    "type": "staticText",
+                    "text": "webLanguageNote",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "hidden": "data.family === 'nav17' || !data.webEnabled"
+                },
                 "webPin": {
                     "type": "password",
                     "label": "webPin",

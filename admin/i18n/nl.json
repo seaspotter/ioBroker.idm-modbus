@@ -202,6 +202,7 @@
     "webEnabled": "Ook gegevens uit de webinterface lezen (in- en uitgangen; Navigator 2.0 / Pro: ook ruimtenamen, ruimtegegevens en statistiek)",
     "webEnabledHelp": "Alleen lezen. Gebruikt de pincode van het display (dezelfde als voor het inloggen in de browser). Navigator 2.0 / Pro: stelt de namen van ruimtes en verwarmingscircuits in, voegt ruimtes toe die Modbus niet leest en de statistiek van de Navigator. Navigator 10: leest de in- en uitgangen via zijn WebSocket. Wat Modbus levert, wordt niet nog eens vanuit de webinterface aangemaakt. Niet beschikbaar voor de Navigator 1.0/1.7. De webinterface is niet gedocumenteerd door IDM en kan veranderen met firmware-updates. De pincode wordt onversleuteld verzonden in uw lokale netwerk, zoals in de browser.",
     "webIntervalS": "Interval (s, minimaal 30)",
+    "webLanguageNote": "Taal: het webinterfacegedeelte wordt alleen getest en ondersteund als de Navigator is ingesteld op Duits (Allgemeine Einstellungen | Sprache). Bij een andere taal kunnen de statistieken, sommige onderdeelnamen en het diagram ontbreken of verkeerd zijn. Alles wat uit Modbus komt, is niet afhankelijk van de taal.",
     "webPin": "Pincode van het display",
     "webPort": "Poort van de webinterface",
     "webPortHelp": "0 = automatisch: 80 voor de Navigator 2.0 / Pro, 61220 (WebSocket) voor de Navigator 10",

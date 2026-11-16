@@ -202,6 +202,7 @@
     "webEnabled": "Lire aussi les données de l'interface web (entrées et sorties ; Navigator 2.0 / Pro : aussi les noms des pièces, les données des pièces et les statistiques)",
     "webEnabledHelp": "Lecture seule. Utilise le code PIN de l'écran (le même que pour la connexion dans le navigateur). Navigator 2.0 / Pro : définit les noms des pièces et des circuits de chauffage, ajoute les pièces que Modbus ne lit pas ainsi que les statistiques du Navigator. Navigator 10 : lit les entrées et sorties via son WebSocket. Ce que Modbus fournit n'est pas recréé à partir de l'interface web. Non disponible pour le Navigator 1.0/1.7. L'interface web n'est pas documentée par IDM et peut changer avec les mises à jour du firmware. Le code PIN est envoyé en clair sur votre réseau local, comme dans le navigateur.",
     "webIntervalS": "Intervalle (s, au moins 30)",
+    "webLanguageNote": "Langue : la partie interface Web n'est testée et prise en charge qu'avec le navigateur défini sur l'allemand (Allgemeine Einstellungen | Sprache). Avec une autre langue, les statistiques, certains noms de pièces et le diagramme peuvent être manquants ou erronés. Tout ce qui vient de Modbus ne dépend pas de la langue.",
     "webPin": "PIN de l'écran",
     "webPort": "Port de l'interface web",
     "webPortHelp": "0 = automatique : 80 pour le Navigator 2.0 / Pro, 61220 (WebSocket) pour le Navigator 10",

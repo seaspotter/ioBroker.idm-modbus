@@ -109,6 +109,8 @@ All three modules are **off by default**, write only when something is configure
 
 ## 8. Web interface (optional)
 
+> **Language:** this part is only tested and supported with the Navigator language set to German (General settings | Language on the display). With another language the statistics, some part names and the diagram may be missing or wrong, and the adapter logs a warning once when the statistics use names it does not know. Everything that comes from Modbus does not depend on the language.
+
 With the display PIN the adapter reads the Navigator's local web pages (read only): room names and heating circuit names (used as names in the object tree), room temperature, target, humidity and mode per room, and the statistics. The web interface is not documented by IDM and may change with firmware updates. Polling every 60 s (rooms, inputs and outputs) and 15 minutes (statistics); never faster than 30 s / 5 minutes.
 
 The inputs and outputs of the Navigator's information menu become states under `web.io`: sensor inputs that Modbus does not deliver (for example the heating flow rate B2 and the refrigerant circuit pressures and temperatures), digital inputs (for example the hot water flow switch B1 and fault contacts), analog outputs (pump and fan control, -1 % means "not controlled") and digital outputs (pumps, valves, heating rods). Their names are English with translations where the adapter knows the part, otherwise the Navigator's own text.

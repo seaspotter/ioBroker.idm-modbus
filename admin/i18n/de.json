@@ -202,6 +202,7 @@
     "webEnabled": "Zusätzlich Daten der Weboberfläche lesen (Ein- und Ausgänge; Navigator 2.0 / Pro: auch Raumnamen, Raumdaten und Statistik)",
     "webEnabledHelp": "Nur lesend. Verwendet die PIN des Displays (wie die Anmeldung im Browser). Navigator 2.0 / Pro: setzt die Namen von Räumen und Heizkreisen, ergänzt Räume, die Modbus nicht liest, und die Statistik des Navigators. Navigator 10: liest die Ein- und Ausgänge über seinen WebSocket. Was Modbus liefert, wird aus der Weboberfläche nicht noch einmal angelegt. Für den Navigator 1.0/1.7 nicht verfügbar. Die Weboberfläche ist von IDM nicht dokumentiert und kann sich mit Firmware-Updates ändern. Die PIN wird im lokalen Netzwerk unverschlüsselt übertragen, wie im Browser.",
     "webIntervalS": "Intervall (s, mindestens 30)",
+    "webLanguageNote": "Sprache: Der Teil der Weboberfläche ist nur mit dem Navigator auf Deutsch getestet und unterstützt (Allgemeine Einstellungen | Sprache). Bei einer anderen Sprache können die Statistik, einzelne Bauteilnamen und das Diagramm fehlen oder falsch sein. Alles, was über Modbus kommt, ist von der Sprache unabhängig.",
     "webPin": "PIN des Displays",
     "webPort": "Port der Weboberfläche",
     "webPortHelp": "0 = automatisch: 80 für den Navigator 2.0 / Pro, 61220 (WebSocket) für den Navigator 10",

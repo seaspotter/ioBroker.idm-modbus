@@ -109,6 +109,8 @@ Alle drei Module sind **standardmäßig aus**, schreiben nur, wenn etwas konfigu
 
 ## 8. Weboberfläche (optional)
 
+> **Sprache:** Dieser Teil ist nur mit dem Navigator auf Deutsch getestet und unterstützt (Allgemeine Einstellungen | Sprache am Display). Bei einer anderen Sprache können die Statistik, einzelne Bauteilnamen und das Diagramm fehlen oder falsch sein; der Adapter schreibt einmal eine Warnung ins Protokoll, wenn die Statistik Namen verwendet, die er nicht kennt. Alles, was über Modbus kommt, ist von der Sprache unabhängig.
+
 Mit der PIN des Displays liest der Adapter die lokalen Webseiten des Navigators (nur lesend): Raum- und Heizkreisnamen (als Namen im Objektbaum), Raumtemperatur, Solltemperatur, Feuchte und Betriebsart je Raum sowie die Statistik. Die Weboberfläche ist von IDM nicht dokumentiert und kann sich mit Firmware-Updates ändern. Abfrage alle 60 s (Räume, Ein- und Ausgänge) und 15 Minuten (Statistik), nie schneller als 30 s bzw. 5 Minuten.
 
 Die Ein- und Ausgänge aus dem Informationsmenü des Navigators (Fühler, Digitaleingänge, Analog- und Digitalausgänge) liegen unter `web.io`; die Namen bekannter Teile sind in allen Sprachen vorhanden, unbekannte stehen so, wie der Navigator sie zeigt. Navigator 10: dieselben Tabellen werden über den WebSocket des Navigator 10 gelesen (Port 61220, die Display-PIN als Anmeldung); Räume, Heizkreisnamen und Statistik werden dort noch nicht gelesen. Das ist nur gegen einen simulierten Navigator 10 getestet, nach dem Protokoll, das Xerolux dokumentiert; bitte berichten Sie, wie es an einem echten Gerät läuft. Navigator 1.0/1.7: es gibt keine Weboberfläche zum Lesen, die Option ist ausgeblendet.

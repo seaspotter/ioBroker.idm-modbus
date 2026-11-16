@@ -27,7 +27,7 @@ Connects [IDM](https://www.idm-energie.at) heat pumps (iDM Energiesysteme) with 
 - **Statistics:** COP and annual performance factor, energy per operating mode, cost and CO₂ (fixed or from a state), operating hours, starts and defrosts, optional external electricity and heat meters; plus runtime, heat and electricity statistics from the Navigator's web pages.
 - **Control** (off by default, per group): system mode, hot water, heating circuits, room setpoints and modes (Navigator Pro), solar, bivalence and cascade, and a one-time hot water charge. Every value is checked, limited, read back and counted, with EEPROM protection.
 - **Feeding from ioBroker** (off by default): PV values, room temperatures and building-automation values, with scaling, limits, age checks and second-writer detection.
-- **Web interface** (optional, PIN): the inputs and outputs of the Navigator (Navigator 2.0 / Pro through its PHP pages, Navigator 10 through its WebSocket) and, on the Navigator 2.0 / Pro, room names, heating circuit names and room data. Modbus values win; the Navigator 1.0/1.7 has no web interface.
+- **Web interface** (optional, PIN): the inputs and outputs of the Navigator (Navigator 2.0 / Pro through its PHP pages, Navigator 10 through its WebSocket) and, on the Navigator 2.0 / Pro, room names, heating circuit names and room data. Modbus values win; the Navigator 1.0/1.7 has no web interface. The web interface part is only tested and supported with the Navigator language set to German; everything from Modbus is independent of the language.
 - **Heat pump diagram:** a read-only web page (a link next to the instance, served by the web adapter) with a live picture of your plant: heat pump (air or ground source), storage, fresh water station, heating circuits with their rooms, solar, photovoltaics. It assembles itself from the values the adapter has and shows the IDM measuring points (B33, B48, ...).
 - **Support file** with one click, without host, PIN or addresses.
 
@@ -68,6 +68,10 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- (SeaSpotter) web interface: the settings and the manuals say clearly that this part is only tested and supported with the Navigator language set to German; the adapter logs a warning once when the statistics use names it does not know
 
 ### 0.1.21 (2026-11-13)
 

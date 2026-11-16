@@ -224,5 +224,6 @@
     "diagramStorageSeparate": "Two vessels (separate heating buffer)",
     "diagramScale": "Size of the diagram (%)",
     "diagramScaleHelp": "How large the diagram is drawn, in percent of the original size. The default is 90; with 100 it is as large as in earlier versions.",
-    "pvFieldsHelp": "One block per register; a block without a source state sends nothing. The factor converts the unit of the state to kW (1 for kW, 0.001 for W) or percent; a decimal point or a comma both work. There is deliberately no default. The electric heating rod (register 76) is not offered: the Navigator delivers it itself."
+    "pvFieldsHelp": "One block per register; a block without a source state sends nothing. The factor converts the unit of the state to kW (1 for kW, 0.001 for W) or percent; a decimal point or a comma both work. There is deliberately no default. The electric heating rod (register 76) is not offered: the Navigator delivers it itself.",
+    "webLanguageNote": "Language: the web interface part is only tested and supported with the Navigator set to German (Allgemeine Einstellungen | Sprache). With another language the statistics, some part names and the diagram may be missing or wrong. Everything that comes from Modbus does not depend on the language."
 }
