@@ -69,9 +69,9 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.2.0 (2026-11-16)
 
-- (SeaSpotter) web interface: the settings and the manuals say clearly that this part is only tested and supported with the Navigator language set to German; the adapter logs a warning once when the statistics use names it does not know
+- (SeaSpotter) web interface: the settings and the manuals say clearly that this part is only tested and supported with the Navigator language set to German; the adapter logs a warning once when the statistics use names it does not know; code clean-up
 
 ### 0.1.21 (2026-11-13)
 
