@@ -79,6 +79,7 @@
     "externalMaxAgeHelp": "Starsza zewnętrzna wartość mocy jest ignorowana przy bieżącym COP. Minimum 10 s.",
     "externalMaxAgeS": "Maksymalny wiek wartości zewnętrznych (s)",
     "family": "Generacja Navigatora",
+    "foreignAckNote": "Źródło stwierdza: adapter używa tylko potwierdzonych wartości (ack = true). Skrypt ustawiający stan źródłowy musi zapisać go z ack = true, na przykład setState(id, wartość, true); wartości zapisane z ack = false są ignorowane, a dziennik podaje jednorazową nazwę stanu.",
     "gltColdStorage": "Temperatura zasobnika chłodu (1718)",
     "gltDemandCooling": "Żądanie chłodzenia (1711)",
     "gltDemandDhw": "Żądanie ładowania c.w.u. (1712)",

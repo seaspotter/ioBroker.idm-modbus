@@ -32,6 +32,7 @@ import { detectFamily } from './lib/detect';
 import { faultText } from './lib/faults';
 import { buildSupportReport, supportSettings, type SupportInput } from './lib/support';
 import { decodeWords } from './lib/modbus/codec';
+import { confirmedValue } from './lib/foreign';
 import {
     hasCustom,
     planCleanup,
@@ -181,6 +182,7 @@ class IdmModbus extends utils.Adapter {
     /** states are created when the Navigator reports the first real value (spec: no empty states for hardware that is not there) */
     private lazyStates = false;
     private readonly createdStates = new Set<string>();
+    private readonly unconfirmedWarned = new Set<string>();
     private readonly validSeen = new Set<string>();
     private readonly validNow = new Set<string>();
     private readonly startedAt = Date.now();
@@ -608,7 +610,24 @@ class IdmModbus extends utils.Adapter {
      */
     private async foreignState(id: string): Promise<{ val: ioBroker.StateValue; ts: number } | null> {
         const state = await this.getForeignStateAsync(id);
-        return state ? { val: state.val, ts: state.ts } : null;
+        this.warnUnconfirmed(id, state);
+        return confirmedValue(state);
+    }
+
+    /**
+     * Warn once per state when it is written without the confirmed flag, because the adapter ignores it then (a silent
+     * stop of a feed would otherwise be hard to find).
+     *
+     * @param id foreign state id
+     * @param state the state as delivered
+     */
+    private warnUnconfirmed(id: string, state: ioBroker.State | null | undefined): void {
+        if (state && !state.ack && !this.unconfirmedWarned.has(id)) {
+            this.unconfirmedWarned.add(id);
+            this.log.warn(
+                `The state ${id} is written with ack=false and is ignored: the adapter only uses confirmed values, so set it with ack=true`,
+            );
+        }
     }
 
     /**
@@ -1197,6 +1216,8 @@ class IdmModbus extends utils.Adapter {
                 errorCount: this.errorCount,
                 lastError: await value('diag.lastError'),
                 scanRunning: this.scanRunning,
+                // only the number: state ids are the user's own names and stay out of the file
+                unconfirmedSourceStates: this.unconfirmedWarned.size,
             },
             registers: {
                 enabled: this.registerCount,
@@ -1512,7 +1533,11 @@ class IdmModbus extends utils.Adapter {
     private onStateChange(id: string, state: ioBroker.State | null | undefined): void {
         if (!id.startsWith(`${this.namespace}.`)) {
             // a foreign state of the statistics (external meters, price)
-            const foreign = state ? { val: state.val, ts: state.ts } : null;
+            if (state && !state.ack) {
+                this.warnUnconfirmed(id, state);
+                return;
+            }
+            const foreign = confirmedValue(state);
             this.stats?.onForeignState(id, foreign);
             this.pv?.onForeignState(id, foreign);
             this.rooms?.onForeignState(id, foreign);
