@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "idm-modbus",
-        "version": "0.2.1",
+        "version": "0.2.2",
         "news": {
+            "0.2.2": {
+                "en": "unused objects with custom settings (history, logging) are no longer deleted by the clean-up; source states of the PV, room, building automation and statistics tabs are only used with ack = true (scripts must write them with ack = true, the log names ignored states)",
+                "de": "Ungenutzte Objekte mit eigenen Einstellungen (Historie, Protokollierung) werden beim Aufräumen nicht mehr gelöscht; Quell-Datenpunkte der Reiter Photovoltaik, Räume, Gebäudeleittechnik und Statistik werden nur mit ack = true verwendet (Skripte müssen sie mit ack = true schreiben, das Protokoll nennt ignorierte Datenpunkte)",
+                "ru": "неиспользуемые объекты с собственными настройками (история, журналирование) больше не удаляются при очистке; исходные состояния вкладок фотовольтаики, помещений, автоматизации здания и статистики используются только с ack = true (скрипты должны записывать их с ack = true, журнал называет игнорируемые состояния)",
+                "pt": "os objetos não utilizados com definições próprias (histórico, registo) já não são eliminados na limpeza; os estados de origem dos separadores fotovoltaico, divisões, automação do edifício e estatísticas só são usados com ack = true (os scripts têm de os escrever com ack = true, o registo indica os estados ignorados)",
+                "nl": "ongebruikte objecten met eigen instellingen (historie, logging) worden bij het opruimen niet meer verwijderd; bronstatussen van de tabbladen fotovoltaïsch, ruimtes, gebouwautomatisering en statistieken worden alleen met ack = true gebruikt (scripts moeten ze met ack = true schrijven, het logboek noemt genegeerde statussen)",
+                "fr": "les objets inutilisés avec des réglages propres (historique, journalisation) ne sont plus supprimés lors du nettoyage ; les états source des onglets photovoltaïque, pièces, gestion technique du bâtiment et statistiques ne sont utilisés qu'avec ack = true (les scripts doivent les écrire avec ack = true, le journal nomme les états ignorés)",
+                "it": "gli oggetti inutilizzati con impostazioni proprie (cronologia, registrazione) non vengono più eliminati durante la pulizia; gli stati sorgente delle schede fotovoltaico, stanze, automazione dell'edificio e statistiche vengono usati solo con ack = true (gli script devono scriverli con ack = true, il log indica gli stati ignorati)",
+                "es": "los objetos sin usar con ajustes propios (historial, registro) ya no se eliminan en la limpieza; los estados de origen de las pestañas fotovoltaica, habitaciones, automatización del edificio y estadísticas solo se usan con ack = true (los scripts deben escribirlos con ack = true, el registro nombra los estados ignorados)",
+                "pl": "nieużywane obiekty z własnymi ustawieniami (historia, logowanie) nie są już usuwane podczas czyszczenia; stany źródłowe kart fotowoltaiki, pomieszczeń, automatyki budynku i statystyk są używane tylko z ack = true (skrypty muszą zapisywać je z ack = true, dziennik wymienia ignorowane stany)",
+                "uk": "невикористані об'єкти з власними налаштуваннями (історія, журналювання) більше не видаляються під час очищення; вихідні стани вкладок фотовольтаїки, приміщень, автоматизації будівлі та статистики використовуються лише з ack = true (скрипти мають записувати їх з ack = true, журнал називає ігноровані стани)",
+                "zh-cn": "清理时不再删除带有自定义设置（历史、日志）的未使用对象；光伏、房间、楼宇自动化和统计标签页的源状态仅在 ack = true 时使用（脚本必须以 ack = true 写入，日志会列出被忽略的状态）"
+            },
             "0.2.1": {
                 "en": "Navigator 10: the heat sink temperatures, the flow rate (B2) and the groundwater temperatures show no value instead of -1 or 0 on plants without these sensors",
                 "de": "Navigator 10: Die Wärmesenken-Temperaturen, der Durchfluss (B2) und die Grundwassertemperaturen zeigen bei Anlagen ohne diese Sensoren keinen Wert statt -1 oder 0 an",
@@ -54,19 +67,6 @@
                 "pl": "wejścia i wyjścia interfejsu sieciowego: kopia utworzona, gdy Modbus nie miał żadnej wartości (na przykład analog_out.m73, gdy pompa ładująca stoi, raportowana jako -1) teraz pozostaje aktualna, gdy Modbus dostarczy część później, zamiast zamarzać na pierwszej wartości",
                 "uk": "входи та виходи веб-інтерфейсу: копія, створена, коли Modbus не мала значення (наприклад, analog_out.m73, поки зарядний насос стоїть, повідомляється як -1), тепер залишається актуальною, коли Modbus доставляє частину пізніше, замість зависання на першому значенні",
                 "zh-cn": "Web 界面的输入和输出：Modbus 没有值时创建的副本（例如充电泵处于状态时的 Analog_out.m73，报告为 -1）现在在 Modbus 稍后交付部件时保持最新状态，而不是冻结在其第一个值"
-            },
-            "0.1.19": {
-                "en": "photovoltaics: no false \"another energy manager seems to write them too\" warning any more while the battery level -1 (not available) is written; Navigator 10: the changeover valve of the heating circuit (M61, register 1110) shows Heating / Cooling instead of 0 / 1",
-                "de": "Photovoltaik: keine falsche Warnung „Ein anderer Energiemanager scheint sie auch zu schreiben“ mehr, während der Batteriestand -1 (nicht verfügbar) geschrieben wird; Navigator 10: Das Umschaltventil des Heizkreises (M61, Register 1110) zeigt Heizen / Kühlen statt 0 / 1",
-                "ru": "фотогальваника: больше нет ложного предупреждения «их, кажется, другой энергоменеджер тоже пишет», пока пишется уровень заряда батареи -1 (не доступен); Навигатор 10: переключающий клапан контура отопления (М61, регистр 1110) показывает Отопление/Охлаждение вместо 0/1",
-                "pt": "fotovoltaica: nenhum aviso falso \"outro gerenciador de energia parece escrevê-los também\" enquanto o nível de bateria -1 (não disponível) estiver escrito; Navegador 10: a válvula de comutação do circuito de aquecimento (M61, registro 1110) mostra Aquecimento/Resfriamento em vez de 0/1",
-                "nl": "fotovoltaïsche zonne-energie: geen valse \"een andere energiemanager lijkt ze ook te schrijven\" waarschuwing meer terwijl het batterijniveau -1 (niet beschikbaar) wordt geschreven; Navigator 10: de omschakelklep van het verwarmingscircuit (M61, register 1110) toont Verwarming / Koeling in plaats van 0 / 1",
-                "fr": "photovoltaïque : plus de faux avertissement \"un autre gestionnaire d'énergie semble les écrire aussi\" alors que le niveau de batterie -1 (non disponible) est écrit ; Navigateur 10 : la vanne d'inversion du circuit de chauffage (M61, registre 1110) affiche Chauffage / Refroidissement au lieu de 0 / 1",
-                "it": "fotovoltaico: nessun falso avviso \"sembra scriverli anche un altro gestore energetico\" mentre viene scritto il livello batteria -1 (non disponibile); Navigatore 10: la valvola di commutazione del circuito di riscaldamento (M61, registro 1110) mostra Riscaldamento / Raffrescamento invece di 0 / 1",
-                "es": "fotovoltaica: ya no hay advertencias falsas \"otro administrador de energía parece escribirlos también\" mientras se escribe el nivel de batería -1 (no disponible); Navegador 10: la válvula inversora del circuito de calefacción (M61, registro 1110) muestra Calefacción / Refrigeración en lugar de 0 / 1",
-                "pl": "fotowoltaika: nie ma już fałszywych ostrzeżeń „inny menedżer ds. energii też je pisze”, gdy zapisywany jest poziom naładowania baterii -1 (niedostępny); Nawigator 10: zawór przełączający obiegu grzewczego (M61, rejestr 1110) zamiast 0 / 1 pokazuje Ogrzewanie / Chłodzenie",
-                "uk": "фотовольтаїка: більше немає помилкових попереджень «здається, інший менеджер енергоспоживання записує їх», поки записується рівень заряду батареї -1 (недоступно); Навігатор 10: перемикаючий клапан опалювального контуру (M61, реєстр 1110) показує Нагрівання / Охолодження замість 0 / 1",
-                "zh-cn": "光伏：在写入电池电量-1（不可用）时不再出现错误的“另一个能源管理器似乎也写了它们”警告；导航器 10：加热回路的转换阀（M61，寄存器 1110）显示加热/冷却而不是 0/1"
             }
         },
         "titleLang": {
