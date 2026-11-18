@@ -115,3 +115,52 @@ export function planCleanup(all: readonly RegisterEntry[], active: readonly Regi
     const channelList = [...channels].sort((a, b) => b.split('.').length - a.split('.').length);
     return [...states, ...channelList];
 }
+
+/**
+ * Does an object carry user-configured `common.custom` data (History, InfluxDB, SQL links)? Deleting such an object loses
+ * the link for good, and the stored history can hardly be cleaned up afterwards.
+ *
+ * @param obj the object, or null/undefined if it does not exist
+ */
+export function hasCustom(obj: { common?: { custom?: unknown } } | null | undefined): boolean {
+    const custom = obj?.common?.custom;
+    return !!custom && typeof custom === 'object' && Object.keys(custom).length > 0;
+}
+
+/** An existing object that is a candidate for deletion. */
+export interface DeletionCandidate {
+    /** Object id relative to the adapter namespace */
+    id: string;
+    /** `hasCustom` of the object */
+    custom: boolean;
+}
+
+/** Result of {@link planGuardedDeletion}. */
+export interface GuardedDeletion {
+    /** Ids to delete, deepest first */
+    remove: string[];
+    /** Ids kept because they carry `common.custom` */
+    protectedIds: string[];
+}
+
+/**
+ * Decide what may be deleted: everything except objects with `common.custom` and the candidates that are their parents
+ * (a deleted parent would leave the protected state without its channel).
+ *
+ * @param candidates objects the cleanup wants to delete
+ */
+export function planGuardedDeletion(candidates: readonly DeletionCandidate[]): GuardedDeletion {
+    const protectedIds = candidates.filter(c => c.custom).map(c => c.id);
+    const keep = new Set(protectedIds);
+    for (const id of protectedIds) {
+        const parts = id.split('.');
+        for (let i = 1; i < parts.length; i++) {
+            keep.add(parts.slice(0, i).join('.'));
+        }
+    }
+    const remove = candidates
+        .map(c => c.id)
+        .filter(id => !keep.has(id))
+        .sort((a, b) => b.split('.').length - a.split('.').length);
+    return { remove, protectedIds };
+}

@@ -32,7 +32,14 @@ import { detectFamily } from './lib/detect';
 import { faultText } from './lib/faults';
 import { buildSupportReport, supportSettings, type SupportInput } from './lib/support';
 import { decodeWords } from './lib/modbus/codec';
-import { planCleanup, planObjects, type PlannedObject } from './lib/object-tree';
+import {
+    hasCustom,
+    planCleanup,
+    planGuardedDeletion,
+    planObjects,
+    type DeletionCandidate,
+    type PlannedObject,
+} from './lib/object-tree';
 import { Poller, type PollSink } from './lib/poller';
 import type { PlantConfig } from './lib/registers/plant';
 import { plantToNative, runScan, type ScanResult, scanToCsv, summarizeScan, suggestPlant } from './lib/scan';
@@ -641,11 +648,7 @@ class IdmModbus extends utils.Adapter {
         if (!settings.enabled) {
             if (this.config.removeInactiveStates) {
                 for (const id of ['calc', 'stats']) {
-                    try {
-                        await this.delObjectAsync(id, { recursive: true });
-                    } catch {
-                        // nothing to remove
-                    }
+                    await this.removeTree(id);
                 }
             }
             return;
@@ -862,23 +865,70 @@ class IdmModbus extends utils.Adapter {
     }
 
     /**
+     * Delete objects but keep those with `common.custom` (History, InfluxDB links) and their parents, with one warning.
+     *
+     * @param candidates existing objects to delete
+     * @returns how many objects were deleted
+     */
+    private async deleteGuarded(candidates: readonly DeletionCandidate[]): Promise<number> {
+        const plan = planGuardedDeletion(candidates);
+        let removed = 0;
+        for (const id of plan.remove) {
+            try {
+                await this.delObjectAsync(id);
+                removed++;
+            } catch (error) {
+                this.log.debug(`Could not remove ${id}: ${(error as Error).message}`);
+            }
+        }
+        if (plan.protectedIds.length) {
+            this.log.warn(
+                `Kept ${plan.protectedIds.length} unused objects because they have custom settings (history, logging): ${plan.protectedIds.slice(0, 5).join(', ')}${plan.protectedIds.length > 5 ? ', ...' : ''}. Delete them by hand if you do not need them.`,
+            );
+        }
+        return removed;
+    }
+
+    /**
+     * Delete an object and everything below it, keeping objects with `common.custom` and their parents.
+     *
+     * @param id root object id relative to the namespace
+     */
+    private async removeTree(id: string): Promise<void> {
+        try {
+            const prefix = `${this.namespace}.`;
+            const list = await this.getObjectListAsync({
+                startkey: `${prefix}${id}`,
+                endkey: `${prefix}${id}\u9999`,
+            });
+            const candidates = list.rows
+                .filter(row => row.id === `${prefix}${id}` || row.id.startsWith(`${prefix}${id}.`))
+                .map(row => ({ id: row.id.slice(prefix.length), custom: hasCustom(row.value) }));
+            await this.deleteGuarded(candidates);
+        } catch (error) {
+            this.log.debug(`Could not remove ${id}: ${(error as Error).message}`);
+        }
+    }
+
+    /**
      * Delete states (and channels) of registers the configuration no longer enables.
      *
      * @param all every register of the family
      * @param active enabled registers
      */
     private async removeInactive(all: readonly RegisterEntry[], active: readonly RegisterEntry[]): Promise<void> {
-        let removed = 0;
+        const candidates: DeletionCandidate[] = [];
         for (const id of planCleanup(all, active)) {
             try {
-                if (await this.getObjectAsync(id)) {
-                    await this.delObjectAsync(id);
-                    removed++;
+                const obj = await this.getObjectAsync(id);
+                if (obj) {
+                    candidates.push({ id, custom: hasCustom(obj) });
                 }
             } catch (error) {
-                this.log.debug(`Could not remove ${id}: ${(error as Error).message}`);
+                this.log.debug(`Could not read ${id}: ${(error as Error).message}`);
             }
         }
+        const removed = await this.deleteGuarded(candidates);
         if (removed) {
             this.log.info(`Removed ${removed} objects of registers that are no longer enabled`);
         }

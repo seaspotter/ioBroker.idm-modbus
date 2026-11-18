@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { planCleanup, planObjects } from './object-tree';
+import { hasCustom, planCleanup, planGuardedDeletion, planObjects } from './object-tree';
 import { activeRegisters, loadRegisters, type PlantConfig } from './registers/plant';
 import type { RegisterEntry } from './registers/types';
 
@@ -69,5 +69,38 @@ describe('planCleanup', () => {
         expect(removed).to.not.include('hc');
         expect(removed).to.include('solar');
         expect(removed.indexOf('hc.B.flow_temp')).to.be.lessThan(removed.indexOf('hc.B'));
+    });
+});
+
+describe('hasCustom', () => {
+    it('is true only for non-empty common.custom', () => {
+        expect(hasCustom({ common: { custom: { 'history.0': { enabled: true } } } })).to.equal(true);
+        expect(hasCustom({ common: { custom: {} } })).to.equal(false);
+        expect(hasCustom({ common: {} })).to.equal(false);
+        expect(hasCustom(null)).to.equal(false);
+    });
+});
+
+describe('planGuardedDeletion', () => {
+    it('deletes everything, deepest first, when nothing has custom settings', () => {
+        const plan = planGuardedDeletion([
+            { id: 'stats', custom: false },
+            { id: 'stats.a.b', custom: false },
+            { id: 'stats.a', custom: false },
+        ]);
+        expect(plan.remove).to.deep.equal(['stats.a.b', 'stats.a', 'stats']);
+        expect(plan.protectedIds).to.deep.equal([]);
+    });
+
+    it('keeps a state with custom settings and its parents, deletes the rest', () => {
+        const plan = planGuardedDeletion([
+            { id: 'stats', custom: false },
+            { id: 'stats.a', custom: false },
+            { id: 'stats.a.kept', custom: true },
+            { id: 'stats.a.gone', custom: false },
+            { id: 'stats.b', custom: false },
+        ]);
+        expect(plan.remove).to.have.members(['stats.a.gone', 'stats.b']);
+        expect(plan.protectedIds).to.deep.equal(['stats.a.kept']);
     });
 });
