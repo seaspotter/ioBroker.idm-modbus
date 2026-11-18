@@ -69,7 +69,7 @@ A live picture of your plant on a web page, drawn from the values the adapter re
     ### **WORK IN PROGRESS**
 -->
 
-### **WORK IN PROGRESS**
+### 0.2.2 (2026-11-18)
 
 - (SeaSpotter) unused objects are no longer deleted when they have custom settings (history, logging); they are kept and a warning names them (only relevant with "remove inactive states" switched on)
 - (SeaSpotter) source states of the PV, room, building automation and statistics tabs are only used with the confirmed flag (ack = true); a state written with ack = false is ignored and the log names it once. Scripts must write source states with ack = true; the support file shows how many source states were ignored for that reason
