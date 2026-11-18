@@ -704,6 +704,15 @@
             "type": "panel",
             "label": "tabStats",
             "items": {
+                "foreignAckNote": {
+                    "type": "staticText",
+                    "text": "foreignAckNote",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "statsEnabled": {
                     "type": "checkbox",
                     "label": "statsEnabled",
@@ -1264,6 +1273,15 @@
             "type": "panel",
             "label": "tabPv",
             "items": {
+                "foreignAckNote": {
+                    "type": "staticText",
+                    "text": "foreignAckNote",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "pvEnabled": {
                     "type": "checkbox",
                     "label": "pvEnabled",
@@ -1598,6 +1616,15 @@
             "type": "panel",
             "label": "tabRooms",
             "items": {
+                "foreignAckNote": {
+                    "type": "staticText",
+                    "text": "foreignAckNote",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "roomsEnabled": {
                     "type": "checkbox",
                     "label": "roomsEnabled",
@@ -1744,6 +1771,15 @@
             "type": "panel",
             "label": "tabGlt",
             "items": {
+                "foreignAckNote": {
+                    "type": "staticText",
+                    "text": "foreignAckNote",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "gltEnabled": {
                     "type": "checkbox",
                     "label": "gltEnabled",

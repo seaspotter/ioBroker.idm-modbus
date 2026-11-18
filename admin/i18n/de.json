@@ -79,6 +79,7 @@
     "externalMaxAgeHelp": "Ein älterer externer Leistungswert wird für den aktuellen COP ignoriert. Mindestens 10 s.",
     "externalMaxAgeS": "Maximales Alter externer Werte (s)",
     "family": "Navigator-Generation",
+    "foreignAckNote": "Quellstatus: Der Adapter verwendet nur bestätigte Werte (ack = true). Ein Skript, das einen Quellstatus festlegt, muss ihn mit ack = true schreiben, zum Beispiel setState(id, value, true); Mit ack = false geschriebene Werte werden ignoriert und das Protokoll benennt den Zustand einmal.",
     "gltColdStorage": "Kältespeichertemperatur (1718)",
     "gltDemandCooling": "Anforderung Kühlen (1711)",
     "gltDemandDhw": "Warmwasseranforderung (1712)",

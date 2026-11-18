@@ -79,6 +79,7 @@
     "externalMaxAgeHelp": "Une valeur de puissance externe plus ancienne est ignorée pour le COP actuel. Minimum 10 s.",
     "externalMaxAgeS": "Âge maximal des valeurs externes (s)",
     "family": "Génération du Navigator",
+    "foreignAckNote": "États sources : l'adaptateur utilise uniquement des valeurs confirmées (ack = true). Un script qui définit un état source doit l'écrire avec ack = true, par exemple setState(id, value, true); les valeurs écrites avec ack = false sont ignorées et le journal nomme l'état une fois.",
     "gltColdStorage": "Température du ballon de froid (1718)",
     "gltDemandCooling": "Demande de refroidissement (1711)",
     "gltDemandDhw": "Demande de charge eau chaude (1712)",

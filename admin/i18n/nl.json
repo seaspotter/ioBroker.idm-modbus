@@ -79,6 +79,7 @@
     "externalMaxAgeHelp": "Een oudere externe vermogenswaarde wordt genegeerd voor de huidige COP. Minimaal 10 s.",
     "externalMaxAgeS": "Maximale leeftijd van externe waarden (s)",
     "family": "Navigator-generatie",
+    "foreignAckNote": "Bronstatussen: de adapter gebruikt alleen bevestigde waarden (ack = true). Een script dat een bronstatus instelt, moet deze schrijven met ack = true, bijvoorbeeld setState(id, value, true); waarden geschreven met ack = false worden genegeerd en het logbestand geeft de status één keer een naam.",
     "gltColdStorage": "Temperatuur koudebuffer (1718)",
     "gltDemandCooling": "Aanvraag koelen (1711)",
     "gltDemandDhw": "Aanvraag warmwaterbereiding (1712)",

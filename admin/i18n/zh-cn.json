@@ -79,6 +79,7 @@
     "externalMaxAgeHelp": "较旧的外部功率值不会用于当前 COP。最小 10 秒。",
     "externalMaxAgeS": "外部数值的最大有效期（秒）",
     "family": "Navigator 代别",
+    "foreignAckNote": "源状态：适配器仅使用确认值（ack = true）。设置源状态的脚本必须使用 ack = true 编写，例如 setState(id, value, true);使用 ack = false 写入的值将被忽略，并且日志会命名状态一次。",
     "gltColdStorage": "蓄冷罐温度 (1718)",
     "gltDemandCooling": "制冷需求 (1711)",
     "gltDemandDhw": "热水加热需求 (1712)",
